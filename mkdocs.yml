@@ -1,0 +1,5 @@
+site_name: Tools for Creating Python Books
+repo_url: https://github.com/BruceEckel/pybooktools
+site_author: Bruce Eckel
+docs_dir: documentation
+site_dir: docs
