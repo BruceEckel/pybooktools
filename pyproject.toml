@@ -5,7 +5,10 @@ description = "My tools to assist in writing Python books."
 authors = [
     { name = "Bruce Eckel", email = "MindviewInc@gmail.com" }
 ]
-dependencies = []
+dependencies = [
+    "pytest>=8.1.1",
+    "rich>=13.7.1",
+]
 readme = "README.md"
 requires-python = ">= 3.8"
 

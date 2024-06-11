@@ -3,7 +3,7 @@
 # console == """
 # output string
 # """
-# Update scripts using: python update_output.py *
+# Update scripts using: python update_console_output.py *
 import atexit
 import sys
 from io import StringIO
@@ -29,7 +29,7 @@ class OutputValidator:
         atexit.register(self.stop)
 
     def start(self):
-        "Capture and mirror output"
+        """Capture and mirror output"""
         self.original_stdout = sys.stdout
         self.original_stderr = sys.stderr
         self.captured_output = StringIO()
@@ -37,14 +37,14 @@ class OutputValidator:
         sys.stderr = TeeStream(self.original_stderr, self.captured_output)
 
     def stop(self):
-        "Restore original stdout and stderr"
+        """Restore original stdout and stderr"""
         sys.stdout.flush()
         sys.stderr.flush()
         sys.stdout = self.original_stdout
         sys.stderr = self.original_stderr
 
     def __eq__(self, other: object) -> bool:
-        "Compare captured output to expected output"
+        """Compare captured output to expected output"""
         # Standard __eq__ requires `other` to be an object:
         assert isinstance(other, str), f"{other} must be str for console =="
         self.stop()

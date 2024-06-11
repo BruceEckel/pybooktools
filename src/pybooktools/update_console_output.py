@@ -1,9 +1,11 @@
-#: update_output.py
-# Update 'console ==' expressions in scripts.
-# Update all python scripts:
-# python update_output.py *
-# Update foo.py and bar.py:
-# python update_output.py foo.py bar.py
+#: update_console_output.py
+"""
+Update 'console ==' expressions in scripts.
+Update all python scripts:
+python update_console_output.py *
+Update foo.py and bar.py:
+python update_console_output.py foo.py bar.py
+"""
 import argparse
 import re
 import subprocess
@@ -27,7 +29,7 @@ def debug(*msgs: str, title: str | None = None) -> None:
 
 
 def test_script(script_path: Path) -> bool:
-    "Check script to see if it already works"
+    """Check script to see if it already works"""
     print(f"Checking: {script_path} ", end="")
     result = subprocess.run(
         [sys.executable, str(script_path)], capture_output=True, text=True
@@ -53,7 +55,7 @@ def clear_script_output(script_path: Path) -> None:
 
 
 def capture_script_output(script_path: Path, temp_content: str) -> str:
-    "Temporarily rewrite the script for output capture, run it, then restore original"
+    """Temporarily rewrite the script for output capture, run it, then restore original"""
     original_content = script_path.read_text()
     script_path.write_text(temp_content)  # temp_content does not redirect output
 

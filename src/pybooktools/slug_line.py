@@ -3,23 +3,23 @@ import argparse
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-
 from rich.console import Console
 
 console = Console()
 
 
 @dataclass
-class Changed:
+class FileChanged:
+    "Might qualify as a general utility"
     file_name: str
     # Set to False and exclude field from constructor arguments
     modified: bool = field(default=False, init=False)
 
-    def true(self) -> "Changed":
+    def true(self) -> "FileChanged":
         self.modified = True
         return self
 
-    def false(self) -> "Changed":
+    def false(self) -> "FileChanged":
         self.modified = False
         return self
 
@@ -29,16 +29,16 @@ class Changed:
         return f"[bold green]{self.file_name}[/bold green]"
 
 
-def ensure_slug_line(file_path: Path) -> Changed:
+def ensure_slug_line(file_path: Path) -> FileChanged:
     """
     Create or update the slug line in the Python file: file_path
     """
-    changed = Changed(file_path.name)
+    changed = FileChanged(file_path.name)
     lines = file_path.read_text(encoding="utf-8").splitlines(True)
     correct_slug_line = f"#: {file_path.name}\n"
 
     # Check if the first line is a slug line
-    if lines and re.match(r"^#\:\s\w+\.py\n$", lines[0]):
+    if lines and re.match(r"^#:\s\w+\.py\n$", lines[0]):
         # Slug line exists, verify and correct if necessary
         if lines[0] != correct_slug_line:
             lines[0] = correct_slug_line
@@ -76,6 +76,7 @@ def main():
         code_files = [
             file
             for file in Path(".").rglob("*.py")
+            # Exclude any directories starting with '.':
             if not any(part.startswith(".") for part in file.parts)
         ]
     else:  # No flags == find all files in current directory:
