@@ -1,17 +1,16 @@
-# Welcome to MkDocs
+# Python Book Creation tools
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+Tools I use for writing Python books.
 
-## Commands
+## Installation
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+If you are only using `validate_output.py` you do not need
+to `pip` install this package, but just include it in your project.
 
-## Project layout
+## Slugline
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+## Validate Output
+
+## Update Console Output
+
+## Update Markdown Code Listings
