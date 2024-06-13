@@ -82,6 +82,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-bs-level="2"><a href="#recommended-usage" class="nav-link">Recommended Usage</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
               </ul>
             </li>
         </ul>
@@ -94,7 +98,11 @@
 <h2 id="installation">Installation</h2>
 <p>If you are only using <code>validate_output.py</code> you do not need
 to <code>pip</code> install this package, but just include it in your project.</p>
+<p>If you install the package using <code>pip install git+https://github.com/BruceEckel/pybooktools.git</code>, you will get the command-line shortcuts shown in the subsections below:</p>
 <h2 id="slugline">Slugline</h2>
+<blockquote>
+<p>Shortcut: <strong>slugline</strong></p>
+</blockquote>
 <p>The "Slug Line" (a term from journalism) not only tells the reader which file
 this is, it also enables <code>update_markdown_code_listings.py</code> to update the
 code listing in the book from the source file.</p>
@@ -110,8 +118,62 @@ in the form:</p>
 <p>Changes are reported by the program.</p>
 <p>Run <code>python slug_line.py -h</code> for details on how to use it.</p>
 <h2 id="validate-output">Validate Output</h2>
+<p>This tool allows you to include console output in your examples, and
+to ensure the output is correct when the program runs. To use, include
+this import in your example:</p>
+<pre><code class="language-python">from validate_output import console
+</code></pre>
+<p>Then, at any point in your example you can add this:</p>
+<pre><code class="language-python">console == &quot;&quot;&quot;
+output string
+&quot;&quot;&quot;
+</code></pre>
+<p>The output string will be checked against the actual console output when
+the program runs.</p>
+<p>You may use multiple <code>console ==</code> expressions throughout your example.</p>
+<p>You can also insert empty <code>console == """"""</code> expressions and use 
+<code>update_console_output.py</code> to initialize the outputs.</p>
 <h2 id="update-console-output">Update Console Output</h2>
-<h2 id="update-markdown-code-listings">Update Markdown Code Listings</h2></div>
+<blockquote>
+<p>Shortcut: <strong>upcon</strong></p>
+</blockquote>
+<p>Updates or clears 'console ==' output sections in Python examples that use
+<code>validate_output</code>. When updating, produces the actual output from the example since
+the last <code>console ==</code> and inserts it, so that the output is correct and the example
+will run successfully without reporting any errors in the <code>console ==</code> output.</p>
+<p>Run <code>python update_console_output.py -h</code> for details on how to use it.</p>
+<h2 id="update-markdown-code-listings">Update Markdown Code Listings</h2>
+<blockquote>
+<p>Shortcut: <strong>uplist</strong></p>
+</blockquote>
+<p>Looks in Markdown files for listings with sluglines (those without are ignored),
+and updates those listings from the source code repository.
+You must provide the path to at least one source code repository,
+as a Markdown comment in the form:</p>
+<!-- #[code_location] ./src/functional_error_handling -->
+<p>These can appear anywhere in the file.
+If you provide more than one source code repository, you must ensure
+there are no duplicate file names across those directories, as the program
+searches across all of them for the file name in the slugline and
+chooses the first one it encounters.</p>
+<p>Run <code>python update_markdown_code_listings.py -h</code> for details on how to use it.</p>
+<p>{{ Possible addition: report duplicate names }}</p>
+<h2 id="recommended-usage">Recommended Usage</h2>
+<p>The easiest way to use these tools is to incorporate them in either
+your automated build or in a script that you run whenever you need to
+update. For example:</p>
+<pre><code class="language-bat">@REM refresh.bat
+@REM From original https://github.com/BruceEckel/functional_error_handling
+@REM Doesn't work here, only for reference.
+cd .\src\functional_error_handling\
+rye test
+python  .\update_output.py *
+rye test
+cd ..\..
+python .\update_markdown_code_listings.py &quot;.\Slides2.md&quot;
+python .\update_markdown_code_listings.py &quot;.\Slides.md&quot;
+python .\update_markdown_code_listings.py &quot;.\Functional Error Handling.md&quot;
+</code></pre></div>
             </div>
         </div>
 
@@ -193,5 +255,5 @@ in the form:</p>
 
 <!--
 MkDocs version : 1.6.0
-Build Date UTC : 2024-06-13 16:45:32.318993+00:00
+Build Date UTC : 2024-06-13 17:45:30.891977+00:00
 -->
