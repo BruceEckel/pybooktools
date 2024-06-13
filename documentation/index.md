@@ -10,8 +10,11 @@ Tools I use for writing Python books.
 If you are only using `validate_output.py` you do not need
 to `pip` install this package, but just include it in your project.
 
-If you install the package using `pip install git+https://github.com/BruceEckel/pybooktools.git
-`, you will get the command-line shortcuts shown in the subsections below:
+If you install the package using:
+```text
+pip install git+https://github.com/BruceEckel/pybooktools.git
+```
+You will get the command-line shortcuts shown in the subsections below:
 
 ## Slugline
 
