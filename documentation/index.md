@@ -1,5 +1,8 @@
 # Python Book Creation tools
 
+**NOTE:** This repository is under development so
+everything might not be working as described here.
+
 Tools I use for writing Python books.
 
 ## Installation
