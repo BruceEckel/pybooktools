@@ -95,6 +95,20 @@
 <p>If you are only using <code>validate_output.py</code> you do not need
 to <code>pip</code> install this package, but just include it in your project.</p>
 <h2 id="slugline">Slugline</h2>
+<p>The "Slug Line" (a term from journalism) not only tells the reader which file
+this is, it also enables <code>update_markdown_code_listings.py</code> to update the
+code listing in the book from the source file.</p>
+<p>Automatically adds the commented file name at the top of each Python file,
+in the form:</p>
+<pre><code class="language-text">#: file_name.py
+</code></pre>
+<ol>
+<li>If the slug line does not exist it is added.</li>
+<li>If it exists and is incorrect it is corrected.</li>
+<li>If it exists and is correct, no changes are made.</li>
+</ol>
+<p>Changes are reported by the program.</p>
+<p>Run <code>python slug_line.py -h</code> for details on how to use it.</p>
 <h2 id="validate-output">Validate Output</h2>
 <h2 id="update-console-output">Update Console Output</h2>
 <h2 id="update-markdown-code-listings">Update Markdown Code Listings</h2></div>
@@ -179,5 +193,5 @@ to <code>pip</code> install this package, but just include it in your project.</
 
 <!--
 MkDocs version : 1.6.0
-Build Date UTC : 2024-06-12 21:21:44.539952+00:00
+Build Date UTC : 2024-06-13 16:45:32.318993+00:00
 -->
