@@ -1,5 +1,7 @@
 # Python Book Creation tools
 
+#### [Repository](https://github.com/BruceEckel/pybooktools)
+
 **NOTE:** This repository is under development so
 everything might not be working as described here.
 
