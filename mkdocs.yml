@@ -1,5 +1,3 @@
 site_name: PyBookTools
 site_description: Tools for Creating Python Books
 site_author: Bruce Eckel
-docs_dir: documentation
-site_dir: docs
