@@ -20,7 +20,7 @@ You will get the command-line shortcuts shown in the subsections below:
 
 ## Slugline
 
-> Shortcut: **slugline**
+> Shortcut: **slug**
 
 The "Slug Line" (a term from journalism) not only tells the reader which file
 this is, it also enables `update_markdown_code_listings.py` to update the
