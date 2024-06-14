@@ -18,7 +18,7 @@ pip install git+https://github.com/BruceEckel/pybooktools.git
 ```
 You will get the command-line shortcuts shown in the subsections below:
 
-## Slugline
+## Slug Line
 
 > Shortcut: **slug**
 
