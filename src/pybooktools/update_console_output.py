@@ -6,6 +6,7 @@ python update_console_output.py *
 Update foo.py and bar.py:
 python update_console_output.py foo.py bar.py
 """
+
 import argparse
 import re
 import subprocess
@@ -112,7 +113,7 @@ def update_script_with_output(script_path: Path, outputs: List[str]) -> bool:
     return False  # No changes made
 
 
-def main(file_args: List[str], clear: bool):
+def update_console_output(file_args: List[str], clear: bool):
     this_script_name = Path(__file__).name
     for file_pattern in file_args:
         for file in Path(".").glob(file_pattern):
@@ -136,7 +137,7 @@ def main(file_args: List[str], clear: bool):
                             print(f"\t(No changes to {file})")
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
         description="Update or clear 'console ==' output sections in Python scripts"
     )
@@ -157,4 +158,8 @@ if __name__ == "__main__":
     if args.debug:
         print("Debugging")
         __debug = True
-    main(args.files, args.clear)
+    update_console_output(args.files, args.clear)
+
+
+if __name__ == "__main__":
+    main()
