@@ -7,6 +7,8 @@ everything might not be working as described here.
 
 Tools I use for writing Python books.
 
+
+---
 ## Installation
 
 If you are only using `validate_output.py` you do not need
@@ -16,8 +18,10 @@ If you install the package using:
 ```text
 pip install git+https://github.com/BruceEckel/pybooktools.git
 ```
-You will get the command-line shortcuts shown in the subsections below:
+You will get the command-line shortcuts shown in the subsections below.
 
+
+---
 ## Slug Line
 
 > Shortcut: **slug**
@@ -39,6 +43,8 @@ Changes are reported by the program.
 
 Run `python slug_line.py -h` for details on how to use it.
 
+
+---
 ## Validate Output
 
 This tool allows you to include console output in your examples, and
@@ -61,6 +67,8 @@ You may use multiple `console ==` expressions throughout your example.
 You can also insert empty `console == """"""` expressions and use 
 `update_console_output.py` to initialize the outputs.
 
+
+---
 ## Update Console Output
 
 > Shortcut: **upcon**
@@ -72,6 +80,8 @@ will run successfully without reporting any errors in the `console ==` output.
 
 Run `python update_console_output.py -h` for details on how to use it.
 
+
+---
 ## Update Markdown Code Listings
 
 > Shortcut: **uplist**
@@ -91,6 +101,8 @@ Run `python update_markdown_code_listings.py -h` for details on how to use it.
 
 {{ Possible addition: report duplicate names }}
 
+
+---
 ## Recommended Usage
 
 The easiest way to use these tools is to incorporate them in either
