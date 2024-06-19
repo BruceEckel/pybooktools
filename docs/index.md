@@ -1,13 +1,14 @@
 # Python Book Creation tools
 
+Tools I use for writing Python books.
+
 ##### [Repository](https://github.com/BruceEckel/pybooktools)
 
 **NOTE:** This repository is under development so
 everything might not be working as described here.
 
-Tools I use for writing Python books.
 
-<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:20px;">
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
 ## Installation
 
@@ -28,7 +29,7 @@ pip install . -e
 The `-e` is optional but it makes the installation editable. Without the `-e` you
 can make changes to the code but these will not be reflected in the running installation.
 
-<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:20px;">
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
 ## Slug Line
 
@@ -52,7 +53,7 @@ Changes are reported by the program.
 Run `python slug_line.py -h` for details on how to use it.
 
 
-<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:20px;">
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
 ## Validate Output
 
@@ -77,7 +78,7 @@ You can also insert empty `console == """"""` expressions and use
 `update_console_output.py` to initialize the outputs.
 
 
-<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:20px;">
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
 ## Update Console Output
 
@@ -91,7 +92,7 @@ will run successfully without reporting any errors in the `console ==` output.
 Run `python update_console_output.py -h` for details on how to use it.
 
 
-<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:20px;">
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
 ## Update Markdown Code Listings
 
@@ -113,7 +114,7 @@ Run `python update_markdown_code_listings.py -h` for details on how to use it.
 {{ Possible addition: report duplicate names }}
 
 
-<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:20px;">
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
 ## Recommended Usage
 
