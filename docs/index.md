@@ -1,14 +1,14 @@
 # Python Book Creation tools
 
-#### [Repository](https://github.com/BruceEckel/pybooktools)
+##### [Repository](https://github.com/BruceEckel/pybooktools)
 
 **NOTE:** This repository is under development so
 everything might not be working as described here.
 
 Tools I use for writing Python books.
 
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:20px;">
 
-===
 ## Installation
 
 If you are only using `validate_output.py` you do not need
@@ -28,7 +28,8 @@ pip install . -e
 The `-e` is optional but it makes the installation editable. Without the `-e` you
 can make changes to the code but these will not be reflected in the running installation.
 
----
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:20px;">
+
 ## Slug Line
 
 > Shortcut: **slug**
@@ -51,7 +52,8 @@ Changes are reported by the program.
 Run `python slug_line.py -h` for details on how to use it.
 
 
----
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:20px;">
+
 ## Validate Output
 
 This tool allows you to include console output in your examples, and
@@ -75,7 +77,8 @@ You can also insert empty `console == """"""` expressions and use
 `update_console_output.py` to initialize the outputs.
 
 
----
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:20px;">
+
 ## Update Console Output
 
 > Shortcut: **upcon**
@@ -88,7 +91,8 @@ will run successfully without reporting any errors in the `console ==` output.
 Run `python update_console_output.py -h` for details on how to use it.
 
 
----
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:20px;">
+
 ## Update Markdown Code Listings
 
 > Shortcut: **uplist**
@@ -109,7 +113,8 @@ Run `python update_markdown_code_listings.py -h` for details on how to use it.
 {{ Possible addition: report duplicate names }}
 
 
----
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:20px;">
+
 ## Recommended Usage
 
 The easiest way to use these tools is to incorporate them in either
