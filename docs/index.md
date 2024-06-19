@@ -24,7 +24,7 @@ You will get the command-line shortcuts shown in the subsections below.
 If you instead clone the repository, you can install it by moving to the root
 directory of the repository and using:
 ```text
-pip install . -e
+pip install -e .
 ```
 The `-e` is optional but it makes the installation editable. Without the `-e` you
 can make changes to the code but these will not be reflected in the running installation.
