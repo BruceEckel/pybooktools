@@ -12,7 +12,6 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import List
 
 console_pattern = re.compile(r'console\s*==\s*"""[\s\S]*?"""')
 console_import_line = "from validate_output import console"
@@ -74,7 +73,7 @@ def capture_script_output(script_path: Path, temp_content: str) -> str:
         script_path.write_text(original_content)
 
 
-def update_script_with_output(script_path: Path, outputs: List[str]) -> bool:
+def update_script_with_output(script_path: Path, outputs: list[str]) -> bool:
     "Update 'console ==' lines with the new outputs"
     original_script = script_path.read_text()
     modified_script = original_script
@@ -113,7 +112,7 @@ def update_script_with_output(script_path: Path, outputs: List[str]) -> bool:
     return False  # No changes made
 
 
-def update_console_output(file_args: List[str], clear: bool):
+def update_console_output(file_args: list[str], clear: bool):
     this_script_name = Path(__file__).name
     for file_pattern in file_args:
         for file in Path(".").glob(file_pattern):

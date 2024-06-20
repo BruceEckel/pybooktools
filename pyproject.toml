@@ -1,7 +1,7 @@
 [project]
 name = "pybooktools"
 version = "0.1.0"
-description = "My tools to assist in writing Python books."
+description = "Tools I use for writing Python books."
 authors = [{ name = "Bruce Eckel", email = "MindviewInc@gmail.com" }]
 dependencies = ["pytest>=8.1.1", "rich>=13.7.1"]
 readme = "README.md"
