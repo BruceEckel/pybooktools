@@ -92,7 +92,8 @@ will run successfully without reporting any errors in the `console ==` output.
 Run `python update_console_output.py -h` for details on how to use it.
 
 **Note**: This works only on the Python files, and not
-the examples embedded in Markdown documents. To update those, use
+the examples embedded in Markdown documents. To update those after
+you've run this program, use:
 `update_markdown_code_listings.py`.
 
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">

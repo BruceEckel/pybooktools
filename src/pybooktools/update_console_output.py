@@ -7,7 +7,8 @@ Update foo.py and bar.py:
 python update_console_output.py foo.py bar.py
 
 Note that this works only on the Python files, and not
-the examples embedded in Markdown documents. To update those, use
+the examples embedded in Markdown documents. To update those after
+you've run this program, use:
 `update_markdown_code_listings.py`.
 """
 
