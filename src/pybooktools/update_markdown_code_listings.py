@@ -8,22 +8,23 @@ as a Markdown comment in the form:
 These can appear anywhere in the file.
 If you provide more than one source code repository, you must ensure
 there are no duplicate file names across those directories.
-TODO: Add duplicate check.
 """
 import argparse
+import collections
 import difflib
 import re
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from pprint import pformat
 from textwrap import dedent
+from typing import List, Any
+
 from rich.console import Console
 
 width = 65
 console = Console()
-python_files = []
-
-
+python_files: list[Path] = []
 
 
 @dataclass
@@ -46,9 +47,7 @@ class MarkdownListing:
             raise ValueError("source_file cannot be None")
         self.source_file_contents = (
                 "```python\n"
-                + self.source_file_path.read_text(
-            encoding="utf-8"
-        )
+                + self.source_file_path.read_text(encoding="utf-8")
                 + "```"
         )
         self.changed = (
@@ -60,12 +59,8 @@ class MarkdownListing:
             differ = difflib.Differ()
             diff_lines = list(
                 differ.compare(
-                    self.markdown_listing.splitlines(
-                        keepends=True
-                    ),
-                    self.source_file_contents.splitlines(
-                        keepends=True
-                    ),
+                    self.markdown_listing.splitlines(keepends=True),
+                    self.source_file_contents.splitlines(keepends=True),
                 )
             )
             # Format the differences for display
@@ -97,38 +92,44 @@ def find_python_files_and_listings(
     listings: list[MarkdownListing] = []
     code_location_pattern = re.compile(r"#\[code_location\]\s*(.*)\s*-->")
 
-    for match in re.finditer(
-            code_location_pattern, markdown_content
-    ):
+    for match in re.finditer(code_location_pattern, markdown_content):
         code_location = Path(match.group(1))
         if code_location.is_absolute():
-            python_files.extend(
-                list(code_location.glob("**/*.py"))
-            )
+            python_files.extend(list(code_location.glob("**/*.py")))
         else:  # Relative path:
             python_files.extend(
-                list(
-                    (Path.cwd() / code_location)
-                    .resolve()
-                    .glob("**/*.py")
-                )
+                list((Path.cwd() / code_location).resolve().glob("**/*.py"))
             )
     console.print(
         f"""[orange3]{"  Available Python Files  ".center(width, "-")}[/orange3]"""
     )
     for pyfile in [pf.name for pf in python_files]:
-        console.print(
-            f"\t[sea_green2]{pyfile}[/sea_green2]"
-        )
+        console.print(f"\t[sea_green2]{pyfile}[/sea_green2]")
     console.print(f"""[orange3]{"-" * width}[/orange3]""")
+
+    # Check for duplicate file names in python_files.
+    # (Should python_files be a custom class?)
+    # Map file names to their full paths:
+    file_paths = collections.defaultdict(list)  # Values are lists
+    for fpath in python_files:
+        file_paths[fpath.name].append(fpath)
+
+    # Discover duplicates
+    duplicates = {file_name: paths for file_name, paths in file_paths.items() if len(paths) > 1}
+    if duplicates:
+        console.print(
+            f"""[red]{"  Duplicate Python File Names  ".center(width, "-")}[/red]"""
+        )
+        for name, pyfile in duplicates.items():
+            console.print(f"\t[red]{name}: {pyfile}[/red]")
+        console.print(f"""[red]{"-" * width}[/red]""")
+        sys.exit(1)
 
     # If slug line doesn't exist group(1) returns None:
     listing_pattern = re.compile(
         r"```python\n(#:(.*?)\n)?(.*?)```", re.DOTALL
     )
-    for match in re.finditer(
-            listing_pattern, markdown_content
-    ):
+    for match in re.finditer(listing_pattern, markdown_content):
         if match.group(1) is not None:
             listing_content = match.group(
                 0
@@ -138,9 +139,7 @@ def find_python_files_and_listings(
                 if match.group(2)
                 else None
             )
-            assert (
-                file_name
-            ), f"file_name not found in {match}"
+            assert file_name, f"file_name not found in {match}"
             source_file = next(
                 (
                     file

@@ -115,9 +115,6 @@ chooses the first one it encounters.
 
 Run `python update_markdown_code_listings.py -h` for details on how to use it.
 
-{{ Possible addition: report duplicate names }}
-
-
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
 ## Recommended Usage
