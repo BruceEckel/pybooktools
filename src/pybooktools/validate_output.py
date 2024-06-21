@@ -1,5 +1,7 @@
 #: validate_output.py
-# Ensure correctness of example output using
+# Ensure correctness of example output using:
+# from validate_output import console
+# ...
 # console == """
 # output string
 # """

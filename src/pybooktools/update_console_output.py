@@ -5,6 +5,10 @@ Update all python scripts:
 python update_console_output.py *
 Update foo.py and bar.py:
 python update_console_output.py foo.py bar.py
+
+Note that this works only on the Python files, and not
+the examples embedded in Markdown documents. To update those, use
+`update_markdown_code_listings.py`.
 """
 
 import argparse
@@ -74,7 +78,7 @@ def capture_script_output(script_path: Path, temp_content: str) -> str:
 
 
 def update_script_with_output(script_path: Path, outputs: list[str]) -> bool:
-    "Update 'console ==' lines with the new outputs"
+    """Update 'console ==' lines with the new outputs"""
     original_script = script_path.read_text()
     modified_script = original_script
     matches = list(console_pattern.finditer(original_script))

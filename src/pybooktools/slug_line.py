@@ -10,7 +10,7 @@ console = Console()
 
 @dataclass
 class FileChanged:
-    "Might qualify as a general utility"
+    """Might qualify as a general utility"""
     file_name: str
     # Set to False and exclude field from constructor arguments
     modified: bool = field(default=False, init=False)
