@@ -17,13 +17,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from pprint import pformat
 from textwrap import dedent
-from typing import List
-
 from rich.console import Console
 
 width = 65
 console = Console()
 python_files = []
+
+
 
 
 @dataclass
@@ -45,15 +45,15 @@ class MarkdownListing:
             console.print(pformat(python_files))
             raise ValueError("source_file cannot be None")
         self.source_file_contents = (
-            "```python\n"
-            + self.source_file_path.read_text(
-                encoding="utf-8"
-            )
-            + "```"
+                "```python\n"
+                + self.source_file_path.read_text(
+            encoding="utf-8"
+        )
+                + "```"
         )
         self.changed = (
-            self.markdown_listing
-            != self.source_file_contents
+                self.markdown_listing
+                != self.source_file_contents
         )
         if self.changed:
             # Compute the differences between markdown_listing and source_file_contents
@@ -80,28 +80,25 @@ class MarkdownListing:
         {self.markdown_listing}[/chartreuse4]
         {"  Source File Code Listing  ".center(width, "-")}[chartreuse4]
         {self.source_file_contents}[/chartreuse4]
-        {"  diffs  ".center(width,"v")}[chartreuse4]
+        {"  diffs  ".center(width, "v")}[chartreuse4]
         {self.diffs}[/chartreuse4]
         {'=' * width}
         """)
 
 
 def find_python_files_and_listings(
-    markdown_content: str,
-) -> List[MarkdownListing]:
+        markdown_content: str,
+) -> list[MarkdownListing]:
     """
     Find all #[code_location] paths in the markdown content and
     return associated Python files and listings.
     """
     global python_files
-    listings = []
-
-    code_location_pattern = re.compile(
-        r"#\[code_location\]\s*(.*)\s*-->"
-    )
+    listings: list[MarkdownListing] = []
+    code_location_pattern = re.compile(r"#\[code_location\]\s*(.*)\s*-->")
 
     for match in re.finditer(
-        code_location_pattern, markdown_content
+            code_location_pattern, markdown_content
     ):
         code_location = Path(match.group(1))
         if code_location.is_absolute():
@@ -130,38 +127,38 @@ def find_python_files_and_listings(
         r"```python\n(#:(.*?)\n)?(.*?)```", re.DOTALL
     )
     for match in re.finditer(
-        listing_pattern, markdown_content
+            listing_pattern, markdown_content
     ):
         if match.group(1) is not None:
             listing_content = match.group(
                 0
             )  # Include Markdown tags
-            filename = (
+            file_name = (
                 match.group(2).strip()
                 if match.group(2)
                 else None
             )
             assert (
-                filename
-            ), f"filename not found in {match}"
+                file_name
+            ), f"file_name not found in {match}"
             source_file = next(
                 (
                     file
                     for file in python_files
-                    if file.name == filename
+                    if file.name == file_name
                 ),
                 None,
             )
             listings.append(
                 MarkdownListing(
-                    filename, listing_content, source_file
+                    file_name, listing_content, source_file
                 )
             )
     return listings
 
 
 def update_markdown_listings(
-    markdown_content: str, listings: List[MarkdownListing]
+        markdown_content: str, listings: list[MarkdownListing]
 ) -> str:
     updated_markdown = markdown_content
     for listing in listings:
