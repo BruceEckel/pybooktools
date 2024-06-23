@@ -17,21 +17,21 @@ everything might not be working as described here.
 
 - If you install the package using:
 
-```text
-pip install git+https://github.com/BruceEckel/pybooktools.git
-```
+  ```text
+  pip install git+https://github.com/BruceEckel/pybooktools.git
+  ```
 
-You will get the command-line shortcuts shown in the subsections below.
+  You will get the command-line shortcuts shown in the subsections below.
 
 - If you clone the repository, you can install it by moving to the root
   directory of the repository and using:
 
-```text
-pip install -e .
-```
+  ```text
+  pip install -e .
+  ```
 
-The `-e` is optional but it makes the installation editable. Without the `-e` you
-can make changes to the code but these will not be reflected in the running installation.
+  The `-e` is optional but it makes the installation editable. Without the `-e` you
+  can make changes to the code but these will not be reflected in the running installation.
 
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
