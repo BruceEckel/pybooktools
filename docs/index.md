@@ -15,21 +15,17 @@ everything might not be working as described here.
 - If you are only using `validate_output.py` you do not need
   to `pip` install this package, but just include it in your project.
 
-- If you install the package using:
-
-  ```text
-  pip install git+https://github.com/BruceEckel/pybooktools.git
-  ```
-
+- If you install the package using:  
+      ```
+      pip install git+https://github.com/BruceEckel/pybooktools.git
+      ```    
   You will get the command-line shortcuts shown in the subsections below.
 
 - If you clone the repository, you can install it by moving to the root
-  directory of the repository and using:
-
-  ```text
-  pip install -e .
-  ```
-
+  directory of the repository and using:  
+      ```
+      pip install -e .
+      ```    
   The `-e` is optional but it makes the installation editable. Without the `-e` you
   can make changes to the code but these will not be reflected in the running installation.
 
@@ -50,8 +46,8 @@ in the form:
 #: file_name.py
 ```
 
-1. If the slug line does not exist it is added.
-2. If it exists and is incorrect it is corrected.
+1. If the slug line does not exist, it is added.
+2. If it exists and is incorrect, it is corrected.
 3. If it exists and is correct, no changes are made.
 
 Changes are reported by the program.
@@ -112,11 +108,13 @@ you've run this program, use:
 
 > Shortcut: **uplist**
 
-Looks in Markdown files for listings with sluglines (those without are ignored),
+Looks in Markdown files for listings with sluglines (listings without sluglines are ignored),
 and updates those listings from the source code repository.
 You must provide the path to at least one source code repository,
-as a Markdown comment in the form:
+as a Markdown comment in the form:  
+```
 <!-- #[code_location] ./src/functional_error_handling -->
+```
 These can appear anywhere in the file.
 If you provide more than one source code repository, you must ensure
 there are no duplicate file names across those directories, as the program
