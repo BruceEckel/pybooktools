@@ -12,10 +12,10 @@ everything might not be working as described here.
 
 ## Installation
 
-If you are only using `validate_output.py` you do not need
-to `pip` install this package, but just include it in your project.
+- If you are only using `validate_output.py` you do not need
+  to `pip` install this package, but just include it in your project.
 
-If you install the package using:
+- If you install the package using:
 
 ```text
 pip install git+https://github.com/BruceEckel/pybooktools.git
@@ -23,8 +23,8 @@ pip install git+https://github.com/BruceEckel/pybooktools.git
 
 You will get the command-line shortcuts shown in the subsections below.
 
-If you clone the repository, you can install it by moving to the root
-directory of the repository and using:
+- If you clone the repository, you can install it by moving to the root
+  directory of the repository and using:
 
 ```text
 pip install -e .
