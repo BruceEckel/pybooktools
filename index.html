@@ -171,11 +171,12 @@ you've run this program, use:
 <blockquote>
 <p>Shortcut: <strong>uplist</strong></p>
 </blockquote>
-<p>Looks in Markdown files for listings with sluglines (those without are ignored),
+<p>Looks in Markdown files for listings with sluglines (listings without sluglines are ignored),
 and updates those listings from the source code repository.
 You must provide the path to at least one source code repository,
-as a Markdown comment in the form:</p>
-<!-- #[code_location] ./src/functional_error_handling -->
+as a Markdown comment in the form:  </p>
+<pre><code>&lt;!-- #[code_location] ./src/functional_error_handling --&gt;
+</code></pre>
 <p>These can appear anywhere in the file.
 If you provide more than one source code repository, you must ensure
 there are no duplicate file names across those directories, as the program
@@ -281,5 +282,5 @@ python .\update_markdown_code_listings.py &quot;.\Functional Error Handling.md&q
 
 <!--
 MkDocs version : 1.6.0
-Build Date UTC : 2024-06-23 22:31:43.727350+00:00
+Build Date UTC : 2024-06-23 22:35:24.548701+00:00
 -->
