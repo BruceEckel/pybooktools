@@ -161,3 +161,9 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 /.idea
+
+# The pyproject.toml file is the reference for correct build instructions. 
+# Lockfiles are the reference for a single successful deployment.
+# Thus lockfiles are not stored in the Github repository.
+
+*.lock

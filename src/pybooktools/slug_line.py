@@ -3,6 +3,7 @@ import argparse
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
+
 from rich.console import Console
 
 console = Console()
@@ -11,6 +12,7 @@ console = Console()
 @dataclass
 class FileChanged:
     """Might qualify as a general utility"""
+
     file_name: str
     # Set to False and exclude field from constructor arguments
     modified: bool = field(default=False, init=False)
@@ -75,8 +77,9 @@ def main():
     elif args.recursive:
         code_files = [
             file
-            for file in Path(".").rglob("*.py")
-            # Exclude any directories starting with '.':
+            for file in Path(".").rglob(
+                "*.py"
+            )  # Exclude any directories starting with '.':
             if not any(part.startswith(".") for part in file.parts)
         ]
     else:  # No flags == find all files in current directory:

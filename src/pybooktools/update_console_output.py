@@ -11,7 +11,6 @@ the examples embedded in Markdown documents. To update those after
 you've run this program, use:
 `update_markdown_code_listings.py`.
 """
-
 import argparse
 import re
 import subprocess
@@ -54,15 +53,23 @@ def clear_script_output(script_path: Path) -> None:
     matches = list(console_pattern.finditer(original_script))
     for match in matches:
         debug(f"{match.group(0) = }")
-        cleared_script = cleared_script.replace(match.group(0), 'console == """"""', 1)
+        cleared_script = cleared_script.replace(
+            match.group(0), 'console == """"""', 1
+        )
         script_path.write_text(cleared_script)
     print(f"Cleared {script_path}")
 
 
 def capture_script_output(script_path: Path, temp_content: str) -> str:
-    """Temporarily rewrite the script for output capture, run it, then restore original"""
+    """
+    1. Temporarily rewrite the script for output capture
+    2. Run it
+    3. Restore original
+    """
     original_content = script_path.read_text()
-    script_path.write_text(temp_content)  # temp_content does not redirect output
+    script_path.write_text(
+        temp_content
+    )  # temp_content does not redirect output
 
     try:
         result = subprocess.run(
@@ -91,7 +98,9 @@ def update_script_with_output(script_path: Path, outputs: list[str]) -> bool:
         )
     debug(modified_script, title="modified_script")
     if __debug:
-        modified_script_path = script_path.with_name(script_path.stem + "_modified.py")
+        modified_script_path = script_path.with_name(
+            script_path.stem + "_modified.py"
+        )
         print(f"{modified_script_path = }")
         modified_script_path.write_text(modified_script)
 
@@ -133,7 +142,9 @@ def update_console_output(file_args: list[str], clear: bool):
                         )
                         output = capture_script_output(file, temp_content)
                         outputs = [
-                            out.strip() for out in output.split("\n") if out.strip()
+                            out.strip()
+                            for out in output.split("\n")
+                            if out.strip()
                         ]
                         if update_script_with_output(file, outputs):
                             print(f"\t{file} updated with console outputs.")
@@ -145,7 +156,9 @@ def main():
     parser = argparse.ArgumentParser(
         description="Update or clear 'console ==' output sections in Python scripts"
     )
-    parser.add_argument("files", nargs="+", help="File names or patterns to process")
+    parser.add_argument(
+        "files", nargs="+", help="File names or patterns to process"
+    )
     parser.add_argument(
         "--clear",
         action="store_true",
@@ -160,6 +173,7 @@ def main():
     if args.clear:
         print("Clearing all outputs")
     if args.debug:
+        global __debug
         print("Debugging")
         __debug = True
     update_console_output(args.files, args.clear)

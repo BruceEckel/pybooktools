@@ -9,6 +9,7 @@ These can appear anywhere in the file.
 If you provide more than one source code repository, you must ensure
 there are no duplicate file names across those directories.
 """
+
 import argparse
 import collections
 import difflib
@@ -18,7 +19,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from pprint import pformat
 from textwrap import dedent
-from typing import List, Any
 
 from rich.console import Console
 
@@ -50,10 +50,7 @@ class MarkdownListing:
                 + self.source_file_path.read_text(encoding="utf-8")
                 + "```"
         )
-        self.changed = (
-                self.markdown_listing
-                != self.source_file_contents
-        )
+        self.changed = self.markdown_listing != self.source_file_contents
         if self.changed:
             # Compute the differences between markdown_listing and source_file_contents
             differ = difflib.Differ()
@@ -67,7 +64,8 @@ class MarkdownListing:
             self.diffs = "".join(diff_lines)
 
     def __str__(self):
-        return dedent(f"""
+        return dedent(
+            f"""
         Filename from slugline: {self.slugname}
         Source File: {self.source_file_path.absolute() if self.source_file_path else ""}
         {self.changed = }
@@ -78,7 +76,8 @@ class MarkdownListing:
         {"  diffs  ".center(width, "v")}[chartreuse4]
         {self.diffs}[/chartreuse4]
         {'=' * width}
-        """)
+        """
+        )
 
 
 def find_python_files_and_listings(
@@ -115,7 +114,11 @@ def find_python_files_and_listings(
         file_paths[fpath.name].append(fpath)
 
     # Discover duplicates
-    duplicates = {file_name: paths for file_name, paths in file_paths.items() if len(paths) > 1}
+    duplicates = {
+        file_name: paths
+        for file_name, paths in file_paths.items()
+        if len(paths) > 1
+    }
     if duplicates:
         console.print(
             f"""[red]{"  Duplicate Python File Names  ".center(width, "-")}[/red]"""
@@ -126,32 +129,18 @@ def find_python_files_and_listings(
         sys.exit(1)
 
     # If slug line doesn't exist group(1) returns None:
-    listing_pattern = re.compile(
-        r"```python\n(#:(.*?)\n)?(.*?)```", re.DOTALL
-    )
+    listing_pattern = re.compile(r"```python\n(#:(.*?)\n)?(.*?)```", re.DOTALL)
     for match in re.finditer(listing_pattern, markdown_content):
         if match.group(1) is not None:
-            listing_content = match.group(
-                0
-            )  # Include Markdown tags
-            file_name = (
-                match.group(2).strip()
-                if match.group(2)
-                else None
-            )
+            listing_content = match.group(0)  # Include Markdown tags
+            file_name = match.group(2).strip() if match.group(2) else None
             assert file_name, f"file_name not found in {match}"
             source_file = next(
-                (
-                    file
-                    for file in python_files
-                    if file.name == file_name
-                ),
+                (file for file in python_files if file.name == file_name),
                 None,
             )
             listings.append(
-                MarkdownListing(
-                    file_name, listing_content, source_file
-                )
+                MarkdownListing(file_name, listing_content, source_file)
             )
     return listings
 
@@ -162,16 +151,10 @@ def update_markdown_listings(
     updated_markdown = markdown_content
     for listing in listings:
         if not listing.changed:
-            console.print(
-                f"[bold green]{listing.slugname}[/bold green]"
-            )
+            console.print(f"[bold green]{listing.slugname}[/bold green]")
         if listing.changed:
-            console.print(
-                f"[bold red]{listing.slugname}[/bold red]"
-            )
-            console.print(
-                f"[bright_cyan]{listing}[/bright_cyan]"
-            )
+            console.print(f"[bold red]{listing.slugname}[/bold red]")
+            console.print(f"[bright_cyan]{listing}[/bright_cyan]")
             updated_markdown = updated_markdown.replace(
                 listing.markdown_listing,
                 listing.source_file_contents,
@@ -190,35 +173,21 @@ def main():
     args = parser.parse_args()
 
     markdown_file = Path(args.markdown_file)
-    markdown_content = markdown_file.read_text(
-        encoding="utf-8"
-    )
-    listings = find_python_files_and_listings(
-        markdown_content
-    )
-    changes = [
-        True for listing in listings if listing.changed
-    ]
+    markdown_content = markdown_file.read_text(encoding="utf-8")
+    listings = find_python_files_and_listings(markdown_content)
+    changes = [True for listing in listings if listing.changed]
     if any(changes):
-        updated_markdown = update_markdown_listings(
-            markdown_content, listings
+        updated_markdown = update_markdown_listings(markdown_content, listings)
+        markdown_file.write_text(updated_markdown, encoding="utf-8")
+    change_count = (
+        f"  {changes.count(True)} changes made to {markdown_file}  ".center(
+            width, "-"
         )
-        markdown_file.write_text(
-            updated_markdown, encoding="utf-8"
-        )
-    change_count = f"  {changes.count(True)} changes made to {markdown_file}  ".center(
-        width, "-"
     )
     console.print(f"\n[orange3]{change_count}[/orange3]")
     if any(changes):
-        for change in [
-            listing
-            for listing in listings
-            if listing.changed
-        ]:
-            console.print(
-                f"[bright_cyan]{change.slugname}[/bright_cyan]"
-            )
+        for change in [listing for listing in listings if listing.changed]:
+            console.print(f"[bright_cyan]{change.slugname}[/bright_cyan]")
 
 
 if __name__ == "__main__":
