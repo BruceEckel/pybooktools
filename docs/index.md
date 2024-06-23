@@ -116,10 +116,10 @@ as a Markdown comment in the form:
 <!-- #[code_location] ./src/functional_error_handling -->
 ```
 These can appear anywhere in the file.
-If you provide more than one source code repository, you must ensure
+If you provide more than one source code repository, the program ensures
 there are no duplicate file names across those directories, as the program
-searches across all of them for the file name in the slugline and
-chooses the first one it encounters.
+searches across all the specified directories for the file name in the 
+slugline and there cannot be ambiguities.
 
 Run `python update_markdown_code_listings.py -h` for details on how to use it.
 
