@@ -16,16 +16,20 @@ If you are only using `validate_output.py` you do not need
 to `pip` install this package, but just include it in your project.
 
 If you install the package using:
+
 ```text
 pip install git+https://github.com/BruceEckel/pybooktools.git
 ```
+
 You will get the command-line shortcuts shown in the subsections below.
 
-If you instead clone the repository, you can install it by moving to the root
+If you clone the repository, you can install it by moving to the root
 directory of the repository and using:
+
 ```text
 pip install -e .
 ```
+
 The `-e` is optional but it makes the installation editable. Without the `-e` you
 can make changes to the code but these will not be reflected in the running installation.
 
@@ -41,9 +45,11 @@ code listing in the book from the source file.
 
 Automatically adds the commented file name at the top of each Python file,
 in the form:
+
 ```text
 #: file_name.py
 ```
+
 1. If the slug line does not exist it is added.
 2. If it exists and is incorrect it is corrected.
 3. If it exists and is correct, no changes are made.
@@ -60,21 +66,25 @@ Run `python slug_line.py -h` for details on how to use it.
 This tool allows you to include console output in your examples, and
 to ensure the output is correct when the program runs. To use, include
 this import in your example:
+
 ```python
 from validate_output import console
 ```
+
 Then, at any point in your example you can add this:
+
 ```python
 console == """
 output string
 """
 ```
+
 The output string will be checked against the actual console output when
 the program runs.
 
 You may use multiple `console ==` expressions throughout your example.
 
-You can also insert empty `console == """"""` expressions and use 
+You can also insert empty `console == """"""` expressions and use
 `update_console_output.py` to initialize the outputs.
 
 
@@ -122,6 +132,7 @@ Run `python update_markdown_code_listings.py -h` for details on how to use it.
 The easiest way to use these tools is to incorporate them in either
 your automated build or in a script that you run whenever you need to
 update. For example:
+
 ```bat
 @REM refresh.bat
 @REM From original https://github.com/BruceEckel/functional_error_handling
