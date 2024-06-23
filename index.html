@@ -178,10 +178,10 @@ as a Markdown comment in the form:  </p>
 <pre><code>&lt;!-- #[code_location] ./src/functional_error_handling --&gt;
 </code></pre>
 <p>These can appear anywhere in the file.
-If you provide more than one source code repository, you must ensure
+If you provide more than one source code repository, the program ensures
 there are no duplicate file names across those directories, as the program
-searches across all of them for the file name in the slugline and
-chooses the first one it encounters.</p>
+searches across all the specified directories for the file name in the 
+slugline and there cannot be ambiguities.</p>
 <p>Run <code>python update_markdown_code_listings.py -h</code> for details on how to use it.</p>
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
@@ -282,5 +282,5 @@ python .\update_markdown_code_listings.py &quot;.\Functional Error Handling.md&q
 
 <!--
 MkDocs version : 1.6.0
-Build Date UTC : 2024-06-23 22:35:24.548701+00:00
+Build Date UTC : 2024-06-23 22:37:47.385283+00:00
 -->
