@@ -115,6 +115,7 @@ as a Markdown comment in the form:
 ```
 <!-- #[code_location] ./src/functional_error_handling -->
 ```
+- The above is a relative path; You can also use absolute paths
 - These can appear anywhere in the file.
 - The program searches across all the specified directories for the file name in the slugline.
 - If you provide more than one source code repository, the program ensures
@@ -136,10 +137,10 @@ update. For example:
 @REM Doesn't work here, only for reference.
 cd .\src\functional_error_handling\
 rye test
-python  .\update_output.py *
+upcon *
 rye test
 cd ..\..
-python .\update_markdown_code_listings.py ".\Slides2.md"
-python .\update_markdown_code_listings.py ".\Slides.md"
-python .\update_markdown_code_listings.py ".\Functional Error Handling.md"
+uplist ".\Slides2.md"
+uplist ".\Slides.md"
+uplist ".\Functional Error Handling.md"
 ```
