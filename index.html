@@ -178,6 +178,7 @@ as a Markdown comment in the form:  </p>
 <pre><code>&lt;!-- #[code_location] ./src/functional_error_handling --&gt;
 </code></pre>
 <ul>
+<li>The above is a relative path; You can also use absolute paths</li>
 <li>These can appear anywhere in the file.</li>
 <li>The program searches across all the specified directories for the file name in the slugline.</li>
 <li>If you provide more than one source code repository, the program ensures
@@ -195,12 +196,12 @@ update. For example:</p>
 @REM Doesn't work here, only for reference.
 cd .\src\functional_error_handling\
 rye test
-python  .\update_output.py *
+upcon *
 rye test
 cd ..\..
-python .\update_markdown_code_listings.py &quot;.\Slides2.md&quot;
-python .\update_markdown_code_listings.py &quot;.\Slides.md&quot;
-python .\update_markdown_code_listings.py &quot;.\Functional Error Handling.md&quot;
+uplist &quot;.\Slides2.md&quot;
+uplist &quot;.\Slides.md&quot;
+uplist &quot;.\Functional Error Handling.md&quot;
 </code></pre></div>
             </div>
         </div>
@@ -283,5 +284,5 @@ python .\update_markdown_code_listings.py &quot;.\Functional Error Handling.md&q
 
 <!--
 MkDocs version : 1.6.0
-Build Date UTC : 2024-06-23 22:42:39.203649+00:00
+Build Date UTC : 2024-06-24 15:42:10.220961+00:00
 -->
