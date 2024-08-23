@@ -19,6 +19,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from pprint import pformat
 from textwrap import dedent
+from typing import LiteralString
 
 from rich.console import Console
 
@@ -29,7 +30,7 @@ python_files: list[Path] = []
 
 @dataclass
 class MarkdownListing:
-    slugname: str
+    slugname: LiteralString | None
     markdown_listing: str
     source_file_path: Path | None
     # Exclude field from constructor arguments:
@@ -89,7 +90,7 @@ def find_python_files_and_listings(
     """
     global python_files
     listings: list[MarkdownListing] = []
-    code_location_pattern = re.compile(r"#\[code_location\]\s*(.*)\s*-->")
+    code_location_pattern = re.compile(r"#\[code_location]\s*(.*)\s*-->")
 
     for match in re.finditer(code_location_pattern, markdown_content):
         code_location = Path(match.group(1))
