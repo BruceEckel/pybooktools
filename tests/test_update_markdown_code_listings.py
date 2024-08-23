@@ -7,6 +7,7 @@ import pytest
 from pybooktools.update_markdown_code_listings import (
     MarkdownListing,
     find_python_files_and_listings,
+    update_markdown_listings,
 )
 
 
@@ -106,3 +107,37 @@ def test_find_python_files_and_listings_listing_content_and_name():
         assert (
             k.markdown_listing == "```python\n#: filename.py \nsome_code\n```"
         )
+
+
+
+class MarkdownListing:
+    def __init__(self, slugname: str, changed: bool, markdown_listing: str, source_file_contents: str):
+        self.slugname = slugname
+        self.changed = changed
+        self.markdown_listing = markdown_listing
+        self.source_file_contents = source_file_contents
+
+    def __str__(self):
+        return self.slugname
+
+
+def test_update_markdown_listings_no_change():
+    markdown_content = "Some content"
+    listing = MarkdownListing('slugname1', False, 'Listing1', 'Contents1')
+    updated_markdown = update_markdown_listings(markdown_content, [listing])
+    assert updated_markdown == markdown_content
+
+
+def test_update_markdown_listings_with_change():
+    markdown_content = "Some content with Listing2"
+    listing = MarkdownListing('slugname2', True, 'Listing2', 'Contents2')
+    updated_markdown = update_markdown_listings(markdown_content, [listing])
+    assert updated_markdown == "Some content with Contents2"
+
+
+def test_update_markdown_listings_multi_listings():
+    markdown_content = "Some content with Listing1 and Listing2"
+    listing1 = MarkdownListing('slugname1', True, 'Listing1', 'Contents1')
+    listing2 = MarkdownListing('slugname2', False, 'Listing2', 'Contents2')
+    updated_markdown = update_markdown_listings(markdown_content, [listing1, listing2])
+    assert updated_markdown == "Some content with Contents1 and Listing2"
