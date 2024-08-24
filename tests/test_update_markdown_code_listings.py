@@ -66,8 +66,8 @@ def test_str_method():
 
     assert "Filename from slugline: slugname" in str_representation
     assert (
-            "Source File: /src/pybooktools/update_markdown_code_listings.py"
-            in str_representation
+        "Source File: /src/pybooktools/update_markdown_code_listings.py"
+        in str_representation
     )
     assert "Markdown Code Listing" in str_representation
     assert markdown_listing in str_representation
@@ -105,7 +105,7 @@ def test_find_python_files_and_listings_listing_content_and_name():
     for k in result:
         assert k.slugname == "filename.py"
         assert (
-                k.markdown_listing == "```python\n#: filename.py \nsome_code\n```"
+            k.markdown_listing == "```python\n#: filename.py \nsome_code\n```"
         )
 
 

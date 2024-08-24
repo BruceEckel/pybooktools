@@ -6,10 +6,10 @@ from unittest import mock
 
 import pytest
 
+from pybooktools.util import BoolStatus
 from src.pybooktools.update_console_output import (
     main,
     debug,
-    BoolStatus,
     check_script,
     clear_script_output,
 )
