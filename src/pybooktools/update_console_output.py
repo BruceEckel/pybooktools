@@ -15,6 +15,7 @@ import argparse
 import re
 import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 console_pattern = re.compile(r'console\s*==\s*"""[\s\S]*?"""')
@@ -22,15 +23,12 @@ console_import_line = "from validate_output import console"
 output_section_delimiter = "END_OF_CONSOLE_OUTPUT_SECTION"
 
 
+@dataclass(frozen=True)
 class BoolStatus:
-    def __init__(self, status: bool = False):
-        self._status = status
+    status: bool = False
 
-    def set(self, status: bool):
-        self._status = status
-
-    def __bool__(self):
-        return self._status
+    def __bool__(self) -> bool:
+        return self.status
 
 
 debug_status = BoolStatus(False)

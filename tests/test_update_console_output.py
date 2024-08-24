@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -14,7 +15,8 @@ from src.pybooktools.update_console_output import (
 )
 
 
-# Testing: def debug(
+# -- Testing --
+# def debug(
 #     *msgs: str, title: str | None = None, debugging: BoolStatus = debug_status
 # ) -> None:
 
@@ -39,7 +41,8 @@ def test_debug_with_title(capsys):
     assert "World" in captured.out
 
 
-# Testing: def check_script(script_path: Path) -> bool:
+# -- Testing --
+# def check_script(script_path: Path) -> bool:
 
 
 def test_check_script_success(mocker):
@@ -62,7 +65,8 @@ def test_check_script_failure(mocker):
     assert check_script(Path("mock_script_path.py")) is False
 
 
-# Testing: def clear_script_output(script_path: Path) -> None:
+# -- Testing --
+# def clear_script_output(script_path: Path) -> None:
 
 
 def write_script_file(text: str) -> Path:
@@ -70,19 +74,25 @@ def write_script_file(text: str) -> Path:
     script_path = Path("test_script.py")
     with script_path.open("w") as f:
         f.write(text)
-        print(f"{text = }")
+        # print(f"{text = }")
     return script_path
 
 
 @pytest.fixture
 def set_up_script_files():
-    # Create a setup for each test case
-    # These are dummy scripts with some console messages
-    yield [
+    # Create setup for each test case
+    script_files = [
         write_script_file('console == """Hello, world!"""'),
         write_script_file('console == """Goodbye, world!"""'),
         write_script_file("'This is a string, not a console message'"),
     ]
+    yield script_files
+    # Cleanup after test run
+    for script in script_files:
+        try:
+            os.remove(script)
+        except FileNotFoundError:
+            pass
 
 
 def test_clear_script_output_all_console_messages(set_up_script_files):
@@ -92,7 +102,6 @@ def test_clear_script_output_all_console_messages(set_up_script_files):
         was_cleared = clear_script_output(script)
         cleared_script = script.read_text()
         # print(f"{cleared_script = }")
-        # Assert that all cleared scripts should now have 'console == """"""'
         if was_cleared:
             assert 'console == """"""' in cleared_script
         else:
@@ -110,7 +119,8 @@ def test_clear_script_output_no_console_message(set_up_script_files):
             assert cleared_script == original_script
 
 
-# Testing: def main():
+# -- Testing --
+# def main():
 
 
 def test_main_clear_debug_on(capsys):
