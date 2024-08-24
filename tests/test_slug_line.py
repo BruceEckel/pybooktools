@@ -57,9 +57,24 @@ def test_ensure_slug_line_empty_file(test_file):
 # main()
 
 
+def test_main_no_files_found(mocker):
+    # Mock the arguments to simulate no files provided and no recursion
+    mocker.patch(
+        "argparse.ArgumentParser.parse_args",
+        return_value=argparse.Namespace(files=None, recursive=False),
+    )
+    # Mock the Path.glob to return an empty iterator, simulating no Python files found
+    mocker.patch.object(Path, "glob", return_value=iter([]))
+    # Mock the console print function
+    mock_console = mocker.patch("pybooktools.slug_line.console.print")
+    main()
+    mock_console.assert_any_call("No Python files found")
+
+
 @patch("argparse.ArgumentParser.parse_args")
 @patch("pybooktools.slug_line.console.print")
-def test_main_no_files_found(mock_console, mock_args):
+def test_main_local_files_found(mock_console, mock_args):
+    """Finds the local files in the test directory, which already have sluglines"""
     mock_args.return_value = argparse.Namespace(files=None, recursive=False)
     main()
     mock_console.assert_any_call("[bold blue]Number of changes[/bold blue]: 0")
@@ -67,7 +82,7 @@ def test_main_no_files_found(mock_console, mock_args):
 
 @pytest.fixture
 def temp_file(tmp_path: Path) -> Path:
-    """Fixture to create a temporary file."""
+    """A temporary file."""
     file_path = tmp_path / "testfile.py"
     file_path.write_text('print("Hello")')
     return file_path
