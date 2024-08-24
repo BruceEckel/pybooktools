@@ -21,18 +21,32 @@ console_pattern = re.compile(r'console\s*==\s*"""[\s\S]*?"""')
 console_import_line = "from validate_output import console"
 output_section_delimiter = "END_OF_CONSOLE_OUTPUT_SECTION"
 
-__debug = False
+
+class BoolStatus:
+    def __init__(self, status: bool = False):
+        self._status = status
+
+    def set(self, status: bool):
+        self._status = status
+
+    def __bool__(self):
+        return self._status
 
 
-def debug(*msgs: str, title: str | None = None) -> None:
-    if __debug:
+debug_status = BoolStatus(False)
+
+
+def debug(
+        *msgs: str, title: str | None = None, debugging: BoolStatus = debug_status
+) -> None:
+    if debugging:
         if title is not None:
             print((" " + title + " ").center(50, "-"))
         for msg in msgs:
             print(msg)
 
 
-def test_script(script_path: Path) -> bool:
+def check_script(script_path: Path) -> bool:
     """Check script to see if it already works"""
     print(f"Checking: {script_path} ", end="")
     result = subprocess.run(
@@ -46,7 +60,8 @@ def test_script(script_path: Path) -> bool:
         return True
 
 
-def clear_script_output(script_path: Path) -> None:
+def clear_script_output(script_path: Path) -> bool:
+    cleared = False
     debug(title=f"Clearing {script_path}")
     original_script = script_path.read_text()
     cleared_script = original_script
@@ -57,7 +72,13 @@ def clear_script_output(script_path: Path) -> None:
             match.group(0), 'console == """"""', 1
         )
         script_path.write_text(cleared_script)
-    print(f"Cleared {script_path}")
+        cleared = True
+    if cleared:
+        debug(f"Cleared {script_path}")
+        return True
+    else:
+        debug(f"Not cleared {script_path}")
+        return False
 
 
 def capture_script_output(script_path: Path, temp_content: str) -> str:
@@ -97,7 +118,7 @@ def update_script_with_output(script_path: Path, outputs: list[str]) -> bool:
             match.group(0), f'print("{output_section_delimiter}")', 1
         )
     debug(modified_script, title="modified_script")
-    if __debug:
+    if debug_status:
         modified_script_path = script_path.with_name(
             script_path.stem + "_modified.py"
         )
@@ -136,7 +157,7 @@ def update_console_output(file_args: list[str], clear: bool):
                     if clear:
                         clear_script_output(file)
                         continue  # Do not process this file
-                    if not test_script(file):
+                    if not check_script(file):
                         temp_content = content.replace(
                             console_import_line, "console = ''"
                         )
@@ -173,9 +194,9 @@ def main():
     if args.clear:
         print("Clearing all outputs")
     if args.debug:
-        global __debug
+        global debug_status
+        debug_status = BoolStatus(True)
         print("Debugging")
-        __debug = True
     update_console_output(args.files, args.clear)
 
 

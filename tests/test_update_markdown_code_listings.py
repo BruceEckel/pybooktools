@@ -17,9 +17,9 @@ def test_post_init():
     source_file_path = Path("/src/pybooktools/update_markdown_code_listings.py")
 
     markdown_listing_obj = MarkdownListing(
-        slugname=slugname,
-        markdown_listing=markdown_listing,
-        source_file_path=source_file_path,
+        slugname,
+        markdown_listing,
+        source_file_path,
     )
 
     assert markdown_listing_obj.slugname == slugname
@@ -66,8 +66,8 @@ def test_str_method():
 
     assert "Filename from slugline: slugname" in str_representation
     assert (
-        "Source File: /src/pybooktools/update_markdown_code_listings.py"
-        in str_representation
+            "Source File: /src/pybooktools/update_markdown_code_listings.py"
+            in str_representation
     )
     assert "Markdown Code Listing" in str_representation
     assert markdown_listing in str_representation
@@ -105,39 +105,29 @@ def test_find_python_files_and_listings_listing_content_and_name():
     for k in result:
         assert k.slugname == "filename.py"
         assert (
-            k.markdown_listing == "```python\n#: filename.py \nsome_code\n```"
+                k.markdown_listing == "```python\n#: filename.py \nsome_code\n```"
         )
-
-
-
-class MarkdownListing:
-    def __init__(self, slugname: str, changed: bool, markdown_listing: str, source_file_contents: str):
-        self.slugname = slugname
-        self.changed = changed
-        self.markdown_listing = markdown_listing
-        self.source_file_contents = source_file_contents
-
-    def __str__(self):
-        return self.slugname
 
 
 def test_update_markdown_listings_no_change():
     markdown_content = "Some content"
-    listing = MarkdownListing('slugname1', False, 'Listing1', 'Contents1')
+    listing = MarkdownListing("slugname1", False, "Listing1")
     updated_markdown = update_markdown_listings(markdown_content, [listing])
     assert updated_markdown == markdown_content
 
 
 def test_update_markdown_listings_with_change():
     markdown_content = "Some content with Listing2"
-    listing = MarkdownListing('slugname2', True, 'Listing2', 'Contents2')
+    listing = MarkdownListing("slugname2", True, "Listing2")
     updated_markdown = update_markdown_listings(markdown_content, [listing])
     assert updated_markdown == "Some content with Contents2"
 
 
 def test_update_markdown_listings_multi_listings():
     markdown_content = "Some content with Listing1 and Listing2"
-    listing1 = MarkdownListing('slugname1', True, 'Listing1', 'Contents1')
-    listing2 = MarkdownListing('slugname2', False, 'Listing2', 'Contents2')
-    updated_markdown = update_markdown_listings(markdown_content, [listing1, listing2])
+    listing1 = MarkdownListing("slugname1", True, "Listing1")
+    listing2 = MarkdownListing("slugname2", False, "Listing2")
+    updated_markdown = update_markdown_listings(
+        markdown_content, [listing1, listing2]
+    )
     assert updated_markdown == "Some content with Contents1 and Listing2"
