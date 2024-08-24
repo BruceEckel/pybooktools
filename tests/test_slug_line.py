@@ -1,3 +1,4 @@
+#: test_slug_line.py
 import argparse
 from pathlib import Path
 from unittest.mock import patch, MagicMock
@@ -5,9 +6,6 @@ from unittest.mock import patch, MagicMock
 import pytest
 
 from pybooktools.slug_line import ensure_slug_line, FileChanged, main
-
-
-# from src.pybooktools.slug_line import main
 
 
 @pytest.fixture
@@ -56,15 +54,17 @@ def test_ensure_slug_line_empty_file(test_file):
 
 
 @patch("argparse.ArgumentParser.parse_args")
-@patch("src.pybooktools.slug_line.console.print")
+@patch("pybooktools.slug_line.console.print")
 def test_main_no_files_found(mock_console, mock_args):
     mock_args.return_value = argparse.Namespace(files=None, recursive=False)
     main()
-    mock_console.assert_called_once_with("No Python files found")
+    assert mock_console.call_args[0][0] == (
+        "[bold blue]Number of changes[/bold blue]: 0"
+    )
 
 
 @patch("argparse.ArgumentParser.parse_args")
-@patch("src.pybooktools.slug_line.console.print")
+@patch("pybooktools.slug_line.console.print")
 def test_main_files_provided(mock_console, mock_args):
     mock_args.return_value = argparse.Namespace(
         files=["test.py"], recursive=False
@@ -78,7 +78,7 @@ def test_main_files_provided(mock_console, mock_args):
 
 
 @patch("argparse.ArgumentParser.parse_args")
-@patch("src.pybooktools.slug_line.console.print")
+@patch("pybooktools.slug_line.console.print")
 def test_main_recursive(mock_console, mock_args):
     mock_args.return_value = argparse.Namespace(files=None, recursive=True)
     mock_path = MagicMock()

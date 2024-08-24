@@ -1,3 +1,4 @@
+#: test_validate_output.py
 import sys
 from io import StringIO
 

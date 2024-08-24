@@ -1,3 +1,4 @@
+#: test_update_console_output.py
 import os
 import subprocess
 import sys

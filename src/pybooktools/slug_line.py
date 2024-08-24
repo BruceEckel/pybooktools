@@ -52,7 +52,8 @@ def main():
     args = parser.parse_args()
 
     if args.files:
-        code_files = [Path(file) for file in args.files]
+        # code_files = [Path(file) for file in args.files]
+        code_files = map(Path, args.files)
     elif args.recursive:
         code_files = [
             file
