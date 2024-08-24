@@ -27,7 +27,7 @@ debug_status = BoolStatus(False)
 
 
 def debug(
-        *msgs: str, title: str | None = None, debugging: BoolStatus = debug_status
+    *msgs: str, title: str | None = None, debugging: BoolStatus = debug_status
 ) -> None:
     if debugging:
         if title is not None:

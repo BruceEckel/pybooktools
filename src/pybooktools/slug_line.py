@@ -58,7 +58,7 @@ def main():
             file
             for file in Path(".").rglob(
                 "*.py"
-            )  # Exclude any directories starting with '.':
+            )  # Exclude directories starting with '.':
             if not any(part.startswith(".") for part in file.parts)
         ]
     else:  # No flags == find all files in current directory:
