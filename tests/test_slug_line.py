@@ -1,11 +1,15 @@
 #: test_slug_line.py
 import argparse
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 import pytest
 
 from pybooktools.slug_line import ensure_slug_line, FileChanged, main
+
+
+# -- Test --
+# ensure_slug_line()
 
 
 @pytest.fixture
@@ -58,35 +62,54 @@ def test_ensure_slug_line_empty_file(test_file):
 def test_main_no_files_found(mock_console, mock_args):
     mock_args.return_value = argparse.Namespace(files=None, recursive=False)
     main()
-    assert mock_console.call_args[0][0] == (
-        "[bold blue]Number of changes[/bold blue]: 0"
-    )
+    mock_console.assert_any_call("[bold blue]Number of changes[/bold blue]: 0")
+
+
+@pytest.fixture
+def temp_file(tmp_path: Path) -> Path:
+    """Fixture to create a temporary file."""
+    file_path = tmp_path / "testfile.py"
+    file_path.write_text('print("Hello")')
+    return file_path
 
 
 @patch("argparse.ArgumentParser.parse_args")
 @patch("pybooktools.slug_line.console.print")
-def test_main_files_provided(mock_console, mock_args):
+def test_main_files_provided(mock_console, mock_args, temp_file):
     mock_args.return_value = argparse.Namespace(
-        files=["test.py"], recursive=False
+        files=[str(temp_file)], recursive=False
     )
-    mock_path = MagicMock()
-    mock_path.parts = [".", "directory", "child", "file.py"]
-    with patch.object(Path, "__iter__", return_value=iter([mock_path])):
-        main()
+    main()
+    mock_console.assert_any_call(f"[bold blue]Number of changes[/bold blue]: 1")
 
-    mock_console.assert_any_call("No Python files found")
+
+@pytest.fixture
+def temp_python_files(tmp_path: Path) -> Path:
+    """A temporary directory tree containing Python files."""
+    (tmp_path / "file1.py").write_text("print('Hello from file1')")
+    (tmp_path / "file2.py").write_text("print('Hello from file2')")
+    subdir = tmp_path / "subdir"
+    subdir.mkdir()
+    (subdir / "file3.py").write_text("print('Hello from file3')")
+    return tmp_path
 
 
 @patch("argparse.ArgumentParser.parse_args")
 @patch("pybooktools.slug_line.console.print")
-def test_main_recursive(mock_console, mock_args):
+def test_main_recursive(mock_console, mock_args, temp_python_files):
     mock_args.return_value = argparse.Namespace(files=None, recursive=True)
-    mock_path = MagicMock()
-    mock_path.parts = [".", "directory", "child", "file.py"]
-    with patch.object(Path, "rglob", return_value=iter([mock_path])):
+    with patch.object(
+            Path, "rglob", return_value=temp_python_files.rglob("*.py")
+    ):
         main()
 
-    # assert the call contains the expected string
-    assert mock_console.call_args[0][0].startswith(
-        "[bold blue]Number of changes[/bold blue]"
-    )
+    processed_files = [
+        call_args[0] for call_args in mock_console.call_args_list
+    ]
+    for result in [
+        "[bold red]file1.py[/bold red]",
+        "[bold red]file2.py[/bold red]",
+        "[bold red]file3.py[/bold red]",
+        "[bold blue]Number of changes[/bold blue]: 3",
+    ]:
+        assert any(result in pf for pf in processed_files)
