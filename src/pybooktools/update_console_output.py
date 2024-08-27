@@ -27,7 +27,7 @@ debug_status = BoolStatus(False)
 
 
 def debug(
-    *msgs: str, title: str | None = None, debugging: BoolStatus = debug_status
+        *msgs: str, title: str | None = None, debugging: BoolStatus = debug_status
 ) -> None:
     if debugging:
         if title is not None:
@@ -37,7 +37,7 @@ def debug(
 
 
 def check_script(script_path: Path) -> bool:
-    """Check script to see if it already works"""
+    """Check to see if script runs"""
     print(f"Checking: {script_path} ", end="")
     result = subprocess.run(
         [sys.executable, str(script_path)], capture_output=True, text=True
