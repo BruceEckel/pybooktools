@@ -121,6 +121,15 @@ def test_clear_script_output_no_console_message(
 
 
 # -- Testing --
+# def capture_script_output(script_path: Path, temp_content: str) -> str:
+
+# -- Testing --
+# def update_script_with_output(script_path: Path, outputs: list[str]) -> bool:
+
+# -- Testing --
+# def update_console_output(file_args: list[str], clear: bool):
+
+# -- Testing --
 # def main():
 
 
