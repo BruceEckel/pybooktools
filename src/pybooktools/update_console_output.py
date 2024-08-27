@@ -19,10 +19,6 @@ from pathlib import Path
 
 from pybooktools.util import BoolStatus
 
-console_pattern = re.compile(r'console\s*==\s*"""[\s\S]*?"""')
-console_import_line = "from validate_output import console"
-output_section_delimiter = "END_OF_CONSOLE_OUTPUT_SECTION"
-
 debug_status = BoolStatus(False)
 
 
@@ -48,6 +44,9 @@ def check_script(script_path: Path) -> bool:
     else:
         print(" ... passed")
         return True
+
+
+console_pattern = re.compile(r'console\s*==\s*"""[\s\S]*?"""')
 
 
 def clear_script_output(script_path: Path) -> bool:
@@ -105,8 +104,11 @@ def capture_script_output(script_path: Path, temp_content: str) -> str:
 
 def update_script_with_output(script_path: Path, outputs: list[str]) -> bool:
     """Update 'console ==' lines with the new outputs"""
+    output_section_delimiter = "END_OF_CONSOLE_OUTPUT_SECTION"
     original_script = script_path.read_text()
     modified_script = original_script
+    # For reference only:
+    # console_pattern = re.compile(r'console\s*==\s*"""[\s\S]*?"""')
     matches = list(console_pattern.finditer(original_script))
     # Replace the console placeholders with delimiter prints in the temp script
     for match in matches:
@@ -145,6 +147,7 @@ def update_script_with_output(script_path: Path, outputs: list[str]) -> bool:
 
 
 def update_console_output(file_args: list[str], clear: bool):
+    console_import_line = "from validate_output import console"
     this_script_name = Path(__file__).name
     for file_pattern in file_args:
         for file in Path(".").glob(file_pattern):

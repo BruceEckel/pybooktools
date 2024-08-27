@@ -166,19 +166,19 @@ def tmp_script(tmp_path: Path) -> Path:
     "initial_content, outputs, expected_modified, expected_content",
     [
         # Test case 1: No change needed
-        # (
-        #     'print("Hello World!")',
-        #     ["Hello World!"],
-        #     False,
-        #     'print("Hello World!")',
-        # ),
-        # Test case 2: Single change in the script
         (
-                r'print("Hello World!")\nconsole = """',
+                'print("Hello World!")',
                 ["Hello World!"],
-                True,
-                'print("Hello World!")\nconsole = """\nHello World!\n"""',
+                False,
+                'print("Hello World!")',
         ),
+        # Test case 2: Single change in the script
+        # (
+        #     r'print("Hello World!")\nconsole = """',
+        #     ["Hello World!"],
+        #     True,
+        #     'print("Hello World!")\nconsole = """\nHello World!\n"""',
+        # ),
         # # Test case 3: Multiple outputs requiring modification
         # (
         #     'print("Hello World!")\nconsole = ""\nprint("Goodbye cruel world!")\nconsole = ""',
