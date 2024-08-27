@@ -71,6 +71,10 @@ def clear_script_output(script_path: Path) -> bool:
         return False
 
 
+class ScriptExecutionError(Exception):
+    pass
+
+
 def capture_script_output(script_path: Path, temp_content: str) -> str:
     """
     1. Temporarily rewrite the script for output capture
@@ -78,9 +82,8 @@ def capture_script_output(script_path: Path, temp_content: str) -> str:
     3. Restore original
     """
     original_content = script_path.read_text()
-    script_path.write_text(
-        temp_content
-    )  # temp_content does not redirect output
+    # temp_content does not redirect output:
+    script_path.write_text(temp_content)
 
     try:
         result = subprocess.run(
@@ -90,7 +93,11 @@ def capture_script_output(script_path: Path, temp_content: str) -> str:
         if result.returncode != 0:
             print(" Temporary script failed ".center(50, "-"))
             print(temp_content)
-            sys.exit(result.returncode)
+            print(f"stdout:\n{result.stdout}")
+            print(f"stderr:\n{result.stderr}")
+            raise ScriptExecutionError(
+                f"Script failed with return code {result.returncode}"
+            )
         return result.stdout
     finally:  # Always restore original
         script_path.write_text(original_content)

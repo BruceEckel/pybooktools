@@ -13,6 +13,9 @@ from src.pybooktools.update_console_output import (
     debug,
     check_script,
     clear_script_output,
+    capture_script_output,
+    update_script_with_output,
+    ScriptExecutionError,
 )
 
 
@@ -123,8 +126,81 @@ def test_clear_script_output_no_console_message(
 # -- Testing --
 # def capture_script_output(script_path: Path, temp_content: str) -> str:
 
+original_content = "print('Hello world!')"
+
+
+@pytest.fixture
+def script_file(tmp_path: Path) -> Path:
+    """Erases itself after the test"""
+    file_path = tmp_path / "testfile.py"
+    file_path.write_text(original_content)
+    return file_path
+
+
+def test_capture_script_output_success(script_file):
+    test_content = "print('Test content')\nprint('Additional content')"
+    expected_output = "Test content\nAdditional content\n"
+    assert capture_script_output(script_file, test_content) == expected_output
+    assert script_file.read_text() == original_content
+
+
+def test_capture_script_output_fail(script_file):
+    test_content = "exit(1)"  # Simulate a script that fails
+    with pytest.raises(SystemExit) as excinfo:
+        capture_script_output(script_file, test_content)
+    assert excinfo.value.code == 1
+    assert script_file.read_text() == original_content
+
+
 # -- Testing --
 # def update_script_with_output(script_path: Path, outputs: list[str]) -> bool:
+
+
+@pytest.fixture
+def tmp_script(tmp_path: Path) -> Path:
+    script_path = tmp_path / "test_script.py"
+    return script_path
+
+
+@pytest.mark.parametrize(
+    "initial_content, outputs, expected_modified, expected_content",
+    [
+        # Test case 1: No change needed
+        # (
+        #     'print("Hello World!")',
+        #     ["Hello World!"],
+        #     False,
+        #     'print("Hello World!")',
+        # ),
+        # Test case 2: Single change in the script
+        (
+                r'print("Hello World!")\nconsole = """',
+                ["Hello World!"],
+                True,
+                'print("Hello World!")\nconsole = """\nHello World!\n"""',
+        ),
+        # # Test case 3: Multiple outputs requiring modification
+        # (
+        #     'print("Hello World!")\nconsole = ""\nprint("Goodbye cruel world!")\nconsole = ""',
+        #     ["Hello World!", "Goodbye cruel world!"],
+        #     True,
+        #     'print("Hello World!")\nconsole = """\nHello World!\n"""\nprint("Goodbye cruel world!")\nconsole = """\nGoodbye cruel world!\n"""',
+        # ),
+    ],
+)
+def test_update_script_with_output(
+        tmp_script, initial_content, outputs, expected_modified, expected_content
+):
+    tmp_script.write_text(initial_content)
+
+    try:
+        assert (
+                update_script_with_output(tmp_script, outputs) == expected_modified
+        )
+        assert tmp_script.read_text() == expected_content
+    except ScriptExecutionError as e:
+        pytest.fail(f"Script execution failed: {e}")
+
 
 # -- Testing --
 # def update_console_output(file_args: list[str], clear: bool):
