@@ -174,7 +174,7 @@ you've run this program, use <code>uplist</code>.</p>
 </blockquote>
 <p>Looks in Markdown files for listings with sluglines (listings without sluglines are ignored),
 and updates those listings from the source code repository.
-You must provide the path to at least one source code repository,
+You must use the <code>#[code_location]</code> tag to provide the path to at least one source code repository,
 as a Markdown comment in the form:  </p>
 <pre><code>&lt;!-- #[code_location] ./src/functional_error_handling --&gt;
 </code></pre>
@@ -204,10 +204,12 @@ If you run the <code>chapz</code> command inside the directory containing such m
 <li>
 <p>For each file, ensure the file names and the Markdown chapter name on the first line agree:</p>
 <p>A. If there is no chapter name (beginning with a single <code>#</code>), the file name without the number will be adapted and inserted as the chapter name.</p>
-<p>B. If there is a chapter name, and it uses title capitalization, the program enforces the file name to match the chapter name, including correct title capitalization.</p>
+<p>B. If there is a chapter name, and it uses title capitalization, the program makes the file name match the chapter name, including correct title capitalization.</p>
 <p>C. If the chapter name doesn't use title capitalization, it is changed to use title capitalization and step B. is applied.</p>
 </li>
 </ol>
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
+
 <h2 id="recommended-usage">Recommended Usage</h2>
 <p>The easiest way to use these tools is to incorporate them in either
 your automated build or in a script that you run whenever you need to
@@ -305,5 +307,5 @@ uplist &quot;.\Functional Error Handling.md&quot;
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2024-11-11 20:39:56.321050+00:00
+Build Date UTC : 2024-11-11 20:48:49.137755+00:00
 -->
