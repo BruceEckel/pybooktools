@@ -105,7 +105,7 @@ you've run this program, use `uplist`.
 
 Looks in Markdown files for listings with sluglines (listings without sluglines are ignored),
 and updates those listings from the source code repository.
-You must provide the path to at least one source code repository,
+You must use the `#[code_location]` tag to provide the path to at least one source code repository,
 as a Markdown comment in the form:  
 ```
 <!-- #[code_location] ./src/functional_error_handling -->
@@ -136,9 +136,11 @@ If you run the `chapz` command inside the directory containing such markdown fil
 
     A. If there is no chapter name (beginning with a single `#`), the file name without the number will be adapted and inserted as the chapter name.
 
-    B. If there is a chapter name, and it uses title capitalization, the program enforces the file name to match the chapter name, including correct title capitalization.
+    B. If there is a chapter name, and it uses title capitalization, the program makes the file name match the chapter name, including correct title capitalization.
 
     C. If the chapter name doesn't use title capitalization, it is changed to use title capitalization and step B. is applied.
+
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
 ## Recommended Usage
 

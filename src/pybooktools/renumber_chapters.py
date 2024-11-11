@@ -5,22 +5,20 @@ from pathlib import Path
 from typing import List
 
 
-@dataclass
+@dataclass(order=True)
 class Chapter:
+    sort_index: int = field(init=False, repr=False)
     original_name: str
     number: str
     title: str
     path: Path
 
-    def update_number(self, new_number: str) -> None:
+    def __post_init__(self) -> None:
+        self.sort_index = int(re.sub(r"\D", "", self.number))
+
+    def update_number_and_title(self, new_number: str, new_title: str) -> None:
         self.number = new_number
-        self._rename_file()
-
-    def update_title(self, new_title: str) -> None:
         self.title = new_title
-        self._rename_file()
-
-    def _rename_file(self) -> None:
         new_name = f"{self.number} {self.title}.md"
         self.path.rename(self.path.parent / new_name)
         self.path = self.path.parent / new_name
@@ -56,15 +54,14 @@ class Book:
                 )
 
         self.chapters = sorted(
-            chapters,
-            key=lambda ch: (int(re.sub(r"\D", "", ch.number)), ch.number),
+            chapters, key=lambda ch: (ch.sort_index, ch.number)
         )
 
-    def ensure_chapter_titles(self) -> None:
+    def update_chapter_titles(self) -> None:
         for i, chapter in enumerate(self.chapters, start=1):
             updated_number = f"{i:0{len(str(len(self.chapters)))}}"
             updated_title = chapter.title.title()  # Use title case
-
+            # splitlines() does not retain newlines at the end:
             content = chapter.path.read_text(encoding="utf-8").splitlines()
 
             if not content or not content[0].startswith("# "):
@@ -72,16 +69,14 @@ class Book:
             elif content[0] != f"# {updated_title}":
                 content[0] = f"# {updated_title}"
 
-            chapter.path.write_text("\n".join(content), encoding="utf-8")
+            # Ensure one and only one newline at the end of the file
+            chapter.path.write_text("\n".join(content) + "\n", encoding="utf-8")
 
-            chapter.update_number(updated_number)
-            chapter.update_title(updated_title)
+            chapter.update_number_and_title(updated_number, updated_title)
 
 
 def main() -> None:
-    current_directory = Path(os.getcwd())
-    book = Book(directory=current_directory)
-    book.ensure_chapter_titles()
+    Book(Path(os.getcwd())).update_chapter_titles()
 
 
 if __name__ == "__main__":
