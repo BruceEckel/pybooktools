@@ -4,10 +4,6 @@ Tools I use for writing Python books.
 
 ##### [Repository](https://github.com/BruceEckel/pybooktools)
 
-**NOTE:** This repository is under development so
-everything might not be working as described here.
-
-
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
 ## Installation
@@ -131,12 +127,17 @@ Run `uplist -h` for details on how to use it.
 Only works with Markdown (`.md`) files with names beginning with a chapter number, which is digits, possibly followed by a letter.
 This is followed by a space and the name of the file followed by `.md`. 
 If you run the `chapz` command inside the directory containing such markdown files, it will:
-1.  Renumber the chapters, choosing the appropriate number of leading zeroes so that all chapter numbers have the same width.
+
+1. Renumber the chapters, choosing the appropriate number of leading zeroes so that all chapter numbers have the same width.
     If a chapter number includes a trailing letter, that letter will be used to establish the resulting numerical order.
     (The letters will be removed from the chapter number in the process).
+
 2.  For each file, ensure the file names and the Markdown chapter name on the first line agree:
+
     A. If there is no chapter name (beginning with a single `#`), the file name without the number will be adapted and inserted as the chapter name.
+
     B. If there is a chapter name, and it uses title capitalization, the program enforces the file name to match the chapter name, including correct title capitalization.
+
     C. If the chapter name doesn't use title capitalization, it is changed to use title capitalization and step B. is applied.
 
 ## Recommended Usage
