@@ -14,14 +14,14 @@ Tools I use for writing Python books.
 - If you install the package using:  
       ```
       pip install git+https://github.com/BruceEckel/pybooktools.git
-      ```    
+      ```
   You will get the command-line shortcuts shown in the subsections below.
 
 - If you clone the repository, you can install it by moving to the root
   directory of the repository and using:  
       ```
       pip install -e .
-      ```    
+      ```
   The `-e` is optional but it makes the installation editable. Without the `-e` you
   can make changes to the code, but these will not be reflected in the running installation.
 
@@ -49,7 +49,6 @@ in the form:
 Changes are reported by the program.
 
 Run `slug -h` for details on how to use it.
-
 
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
@@ -79,7 +78,6 @@ You may use multiple `console ==` expressions throughout your example.
 You can also insert empty `console == """"""` expressions and use
 `upcon` to initialize the outputs.
 
-
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
 ## Update Console Output
@@ -106,15 +104,17 @@ you've run this program, use `uplist`.
 Looks in Markdown files for listings with sluglines (listings without sluglines are ignored),
 and updates those listings from the source code repository.
 You must use the `#[code_location]` tag to provide the path to at least one source code repository,
-as a Markdown comment in the form:  
-```
+as a Markdown comment in the form:
+
+```text
 <!-- #[code_location] ./src/functional_error_handling -->
 ```
+
 - The above is a relative path; You can also use absolute paths
 - These can appear anywhere in the file.
 - The program searches across all the specified directories for the file name in the slugline.
 - If you provide more than one source code repository, the program ensures
-  there are no duplicate file names across those directories. 
+  there are no duplicate file names across those directories.
 
 Run `uplist -h` for details on how to use it.
 
@@ -125,14 +125,14 @@ Run `uplist -h` for details on how to use it.
 > Shortcut: **chapz**
 
 Only works with Markdown (`.md`) files with names beginning with a chapter number, which is digits, possibly followed by a letter.
-This is followed by a space and the name of the file followed by `.md`. 
+This is followed by a space and the name of the file followed by `.md`.
 If you run the `chapz` command inside the directory containing such markdown files, it will:
 
 1. Renumber the chapters, choosing the appropriate number of leading zeroes so that all chapter numbers have the same width.
     If a chapter number includes a trailing letter, that letter will be used to establish the resulting numerical order.
     (The letters will be removed from the chapter number in the process).
 
-2.  For each file, ensure the file names and the Markdown chapter name on the first line agree:
+2. For each file, ensure the file names and the Markdown chapter name on the first line agree:
 
     A. If there is no chapter name (beginning with a single `#`), the file name without the number will be adapted and inserted as the chapter name.
 
@@ -150,7 +150,7 @@ update. For example:
 
 ```bat
 @REM refresh.bat
-@REM From original https://github.com/BruceEckel/functional_error_handling
+@REM From https://github.com/BruceEckel/functional_error_handling
 @REM Doesn't work here, only for reference.
 cd .\src\functional_error_handling\
 rye test
