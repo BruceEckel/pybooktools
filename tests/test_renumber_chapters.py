@@ -1,4 +1,5 @@
 from pathlib import Path
+from pprint import pprint
 from tempfile import TemporaryDirectory
 
 import pytest
@@ -24,7 +25,7 @@ def temp_book_directory():
         )
         create_chapter_file(
             temp_path,
-            "3.1 Extra.md",
+            "3A Extra.md",
             "# Additional Information\nSome content here.",
         )
         create_chapter_file(
@@ -88,22 +89,43 @@ def test_markdown_chapter_title_precedence(temp_book_directory):
     assert chapter.content[0] == "# Custom Title"
 
 
-def test_book_initialization(temp_book_directory):
+def test_book_initialization(temp_book_directory, capsys):
     book = Book(directory=temp_book_directory)
-
-    assert len(book.chapters) == 10
+    with capsys.disabled():
+        pprint([f.name for f in temp_book_directory.glob("*")])
+        print(f"\n{book}")
+    assert len(book.chapters) == 11
+    # Before renumbering
     assert book.chapters[0].number == "2"
     assert book.chapters[1].number == "2"
-    assert book.chapters[2].number == "4"
+    assert book.chapters[2].number == "3A"
     assert book.chapters[3].number == "4"
+    assert book.chapters[4].number == "4"
+    assert book.chapters[5].number == "5"
+    assert book.chapters[6].number == "7"
+    assert book.chapters[7].number == "8"
+    assert book.chapters[8].number == "10"
+    assert book.chapters[9].number == "11"
+    assert book.chapters[10].number == "12"
+
+    assert book.chapters[0].file_name_title == "Introduction"
+    assert book.chapters[1].file_name_title == "Methodology"
+    assert book.chapters[2].file_name_title == "Extra"
+    assert book.chapters[3].file_name_title == "Analysis"
+    assert book.chapters[4].file_name_title == "Custom"
+    assert book.chapters[5].file_name_title == "Findings"
+    assert book.chapters[6].file_name_title == "Conclusion"
+    assert book.chapters[7].file_name_title == "Review"
+    assert book.chapters[8].file_name_title == "Future Work"
+    assert book.chapters[9].file_name_title == "Recommendations"
+    assert book.chapters[10].file_name_title == "Appendix"
 
 
 def test_book_update_chapter_numbers(temp_book_directory):
     book = Book(directory=temp_book_directory)
     book.update_chapter_numbers()
-    print(book)
 
-    assert len(book.chapters) == 10
+    assert len(book.chapters) == 11
     assert book.chapters[0].number == "01"
     assert book.chapters[1].number == "02"
     assert book.chapters[2].number == "03"
@@ -114,17 +136,19 @@ def test_book_update_chapter_numbers(temp_book_directory):
     assert book.chapters[7].number == "08"
     assert book.chapters[8].number == "09"
     assert book.chapters[9].number == "10"
+    assert book.chapters[10].number == "11"
 
     assert book.chapters[0].path.name == "01 Introduction.md"
     assert book.chapters[1].path.name == "02 Methods.md"
-    assert book.chapters[2].path.name == "03 Analysis.md"
-    assert book.chapters[3].path.name == "04 Custom Title.md"
-    assert book.chapters[4].path.name == "05 Results.md"
-    assert book.chapters[5].path.name == "06 Conclusion.md"
-    assert book.chapters[6].path.name == "07 Literature Review.md"
-    assert book.chapters[7].path.name == "08 Future Scope.md"
-    assert book.chapters[8].path.name == "09 Suggestions.md"
-    assert book.chapters[9].path.name == "10 Supplementary Data.md"
+    assert book.chapters[2].path.name == "03 Additional Information.md"
+    assert book.chapters[3].path.name == "04 Analysis.md"
+    assert book.chapters[4].path.name == "05 Custom Title.md"
+    assert book.chapters[5].path.name == "06 Results.md"
+    assert book.chapters[6].path.name == "07 Conclusion.md"
+    assert book.chapters[7].path.name == "08 Literature Review.md"
+    assert book.chapters[8].path.name == "09 Future Scope.md"
+    assert book.chapters[9].path.name == "10 Suggestions.md"
+    assert book.chapters[10].path.name == "11 Supplementary Data.md"
 
 
 def test_book_str(temp_book_directory):
@@ -132,14 +156,15 @@ def test_book_str(temp_book_directory):
     book_str = str(book)
     assert "01 Introduction" in book_str
     assert "02 Methods" in book_str
-    assert "03 Analysis" in book_str
-    assert "04 Custom Title" in book_str
-    assert "05 Results" in book_str
-    assert "06 Conclusion" in book_str
-    assert "07 Literature Review" in book_str
-    assert "08 Future Scope" in book_str
-    assert "09 Suggestions" in book_str
-    assert "10 Supplementary Data" in book_str
+    assert "03 Additional Information" in book_str
+    assert "04 Analysis" in book_str
+    assert "05 Custom Title" in book_str
+    assert "06 Results" in book_str
+    assert "07 Conclusion" in book_str
+    assert "08 Literature Review" in book_str
+    assert "09 Future Scope" in book_str
+    assert "10 Suggestions" in book_str
+    assert "11 Supplementary Data" in book_str
 
 
 if __name__ == "__main__":
