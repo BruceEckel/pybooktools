@@ -6,22 +6,48 @@ from typing import List
 
 
 @dataclass(order=True)
-class Chapter:
-    sort_index: int = field(init=False, repr=False)
-    original_name: str
-    number: str
-    title: str
+class MarkdownChapter:
     path: Path
+    file_name: str = field(init=False)
+    sort_index: int = field(init=False, repr=False)
+    number: str = field(init=False)
+    title: str = field(init=False)
+    content: list[str] = field(init=False)
 
     def __post_init__(self) -> None:
+        self.file_name = self.path.name
+        match = re.match(r"^(\d+[a-zA-Z]?)\s+(.+)\.md$", self.file_name)
+        if match:
+            self.number, self.title = match.groups()
+        else:
+            raise ValueError(
+                f"File name {self.file_name} does not match expected pattern"
+            )
         self.sort_index = int(re.sub(r"\D", "", self.number))
 
-    def update_number_and_title(self, new_number: str, new_title: str) -> None:
+        self.content = self.path.read_text(encoding="utf-8").splitlines()
+        # Title at the beginning of the Markdown file takes precedence:
+        if self.content and self.content[0].startswith("# "):
+            self.title = self.content[0][2:].strip()
+        # No title at the beginning of the Markdown file, use file name,
+        # which has already been set to self.title, above.
+        self.title = self.title.title()  # Force to title case
+        if not self.content or not self.content[0].startswith("# "):
+            self.content.insert(0, f"# {self.title}")
+        # Rethink: if there's an existing title, replace it with the title-cased version.
+        # If there's not an existing title, insert the generated title from the file name.
+        # So: figure out what the title should be, then insert or replace the existing one.
+
+    def update_chapter_number(self, new_number: str) -> None:
+        # Only the number should be changed externally,
+        # this object should manage the title by itself.
         self.number = new_number
-        self.title = new_title
-        new_name = f"{self.number} {self.title}.md"
+        sanitized_title = re.sub(r"[^A-Za-z0-9 ]", "", self.title)
+        new_name = f"{self.number} {sanitized_title}.md"
         self.path.rename(self.path.parent / new_name)
         self.path = self.path.parent / new_name
+        # Ensure one and only one newline at the end of the file
+        self.path.write_text("\n".join(self.content) + "\n", encoding="utf-8")
 
     def __str__(self) -> str:
         return f"{self.number} {self.title}"
@@ -30,7 +56,7 @@ class Chapter:
 @dataclass
 class Book:
     directory: Path
-    chapters: List[Chapter] = field(init=False)
+    chapters: List[MarkdownChapter] = field(init=False)
 
     def __post_init__(self) -> None:
         chapter_files = [
@@ -38,45 +64,25 @@ class Book:
             for f in self.directory.iterdir()
             if f.is_file() and f.suffix == ".md"
         ]
-        chapters = []
-
-        for file in chapter_files:
-            match = re.match(r"^(\d+[a-zA-Z]?)\s+(.+)\.md$", file.name)
-            if match:
-                number, title = match.groups()
-                chapters.append(
-                    Chapter(
-                        original_name=file.name,
-                        number=number,
-                        title=title,
-                        path=file,
-                    )
-                )
+        chapters = [MarkdownChapter(path=file) for file in chapter_files]
 
         self.chapters = sorted(
             chapters, key=lambda ch: (ch.sort_index, ch.number)
         )
 
-    def update_chapter_titles(self) -> None:
+    def update_chapter_numbers(self) -> None:
         for i, chapter in enumerate(self.chapters, start=1):
             updated_number = f"{i:0{len(str(len(self.chapters)))}}"
-            updated_title = chapter.title.title()  # Use title case
-            # splitlines() does not retain newlines at the end:
-            content = chapter.path.read_text(encoding="utf-8").splitlines()
+            chapter.update_chapter_number(updated_number)
 
-            if not content or not content[0].startswith("# "):
-                content.insert(0, f"# {updated_title}")
-            elif content[0] != f"# {updated_title}":
-                content[0] = f"# {updated_title}"
-
-            # Ensure one and only one newline at the end of the file
-            chapter.path.write_text("\n".join(content) + "\n", encoding="utf-8")
-
-            chapter.update_number_and_title(updated_number, updated_title)
+    def __str__(self) -> str:
+        return "\n".join(str(chapter) for chapter in self.chapters)
 
 
 def main() -> None:
-    Book(Path(os.getcwd())).update_chapter_titles()
+    book = Book(Path(os.getcwd()))
+    book.update_chapter_numbers()
+    print(book)
 
 
 if __name__ == "__main__":
