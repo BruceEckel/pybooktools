@@ -46,12 +46,12 @@ def temp_book_directory():
     chapter_data,
 )
 def test_book(
-        temp_book_directory,
-        chapter_index,
-        initial_number,
-        file_title,
-        expected_number,
-        markdown_title,
+    temp_book_directory,
+    chapter_index,
+    initial_number,
+    file_title,
+    expected_number,
+    markdown_title,
 ):
     book = Book(directory=temp_book_directory)
     book.update_chapter_numbers()
@@ -70,12 +70,12 @@ def test_book(
     chapter_data,
 )
 def test_book_initialization(
-        temp_book_directory,
-        chapter_index,
-        initial_number,
-        file_title,
-        expected_number,
-        markdown_title,
+    temp_book_directory,
+    chapter_index,
+    initial_number,
+    file_title,
+    expected_number,
+    markdown_title,
 ):
     book = Book(directory=temp_book_directory)
     print(book)
@@ -91,7 +91,7 @@ def test_book_initialization(
     [(data[0], data[3]) for data in chapter_data],
 )
 def test_book_update_chapter_numbers(
-        temp_book_directory, chapter_index, expected_number
+    temp_book_directory, chapter_index, expected_number
 ):
     book = Book(directory=temp_book_directory)
     book.update_chapter_numbers()
