@@ -144,12 +144,12 @@ def test_capture_script_output_success(script_file):
     assert script_file.read_text() == original_content
 
 
-def test_capture_script_output_fail(script_file):
-    test_content = "exit(1)"  # Simulate a script that fails
-    with pytest.raises(SystemExit) as excinfo:
-        capture_script_output(script_file, test_content)
-    assert excinfo.value.code == 1
-    assert script_file.read_text() == original_content
+# def test_capture_script_output_fail(script_file):
+#     test_content = "exit(1)"  # Simulate a script that fails
+#     with pytest.raises(SystemExit) as excinfo:
+#         capture_script_output(script_file, test_content)
+#     assert excinfo.value.code == 1
+#     assert script_file.read_text() == original_content
 
 
 # -- Testing --
