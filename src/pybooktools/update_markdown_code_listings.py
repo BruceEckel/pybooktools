@@ -47,9 +47,9 @@ class MarkdownListing:
             console.print(pformat(python_files))
             raise ValueError("source_file cannot be None")
         self.source_file_contents = (
-            "```python\n"
-            + self.source_file_path.read_text(encoding="utf-8")
-            + "```"
+                "```python\n"
+                + self.source_file_path.read_text(encoding="utf-8")
+                + "```"
         )
         self.changed = self.markdown_listing != self.source_file_contents
         if self.changed:
@@ -82,20 +82,29 @@ class MarkdownListing:
 
 
 def find_python_files_and_listings(
-    markdown_content: str,
+        markdown_content: str,
 ) -> list[MarkdownListing]:
     """
-    Find all #[code_location] paths in the markdown content and
+    Find all #[code_location] paths in the Markdown content and
     return associated Python files and listings.
     """
     global python_files
     listings: list[MarkdownListing] = []
     code_location_pattern = re.compile(r"#\[code_location]\s*(.*)\s*-->")
+    # console.print(f"{markdown_content =}")
 
     for match in re.finditer(code_location_pattern, markdown_content):
-        code_location = Path(match.group(1))
+        # console.print(f"[orange3]{match}, {match.group(1)}[/orange3]")
+        code_location = Path(match.group(1).strip())
+        # console.print(
+        #     f"[orange3]{code_location}, {code_location.is_absolute()}[/orange3]"
+        # )
         if code_location.is_absolute():
-            python_files.extend(list(code_location.glob("**/*.py")))
+            # console.print(f"[blue]{code_location = }[/blue]")
+            pyfiles = list(code_location.glob("*.py"))
+            # console.print(f"[blue]{pyfiles = }[/blue]")
+            python_files.extend(pyfiles)
+            # console.print(f"[blue]{python_files = }[/blue]")
         else:  # Relative path:
             python_files.extend(
                 list((Path.cwd() / code_location).resolve().glob("**/*.py"))
@@ -147,7 +156,7 @@ def find_python_files_and_listings(
 
 
 def update_markdown_listings(
-    markdown_content: str, listings: list[MarkdownListing]
+        markdown_content: str, listings: list[MarkdownListing]
 ) -> str:
     updated_markdown = markdown_content
     for listing in listings:
