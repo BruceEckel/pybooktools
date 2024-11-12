@@ -103,13 +103,13 @@
 </li>
 <li>
 <p>If you install the package using:<br />
-<code>pip install git+https://github.com/BruceEckel/pybooktools.git</code>  <br />
+<code>pip install git+https://github.com/BruceEckel/pybooktools.git</code>
   You will get the command-line shortcuts shown in the subsections below.</p>
 </li>
 <li>
 <p>If you clone the repository, you can install it by moving to the root
   directory of the repository and using:<br />
-<code>pip install -e .</code>  <br />
+<code>pip install -e .</code>
   The <code>-e</code> is optional but it makes the installation editable. Without the <code>-e</code> you
   can make changes to the code, but these will not be reflected in the running installation.</p>
 </li>
@@ -175,15 +175,15 @@ you've run this program, use <code>uplist</code>.</p>
 <p>Looks in Markdown files for listings with sluglines (listings without sluglines are ignored),
 and updates those listings from the source code repository.
 You must use the <code>#[code_location]</code> tag to provide the path to at least one source code repository,
-as a Markdown comment in the form:  </p>
-<pre><code>&lt;!-- #[code_location] ./src/functional_error_handling --&gt;
+as a Markdown comment in the form:</p>
+<pre><code class="language-text">&lt;!-- #[code_location] ./src/functional_error_handling --&gt;
 </code></pre>
 <ul>
 <li>The above is a relative path; You can also use absolute paths</li>
 <li>These can appear anywhere in the file.</li>
 <li>The program searches across all the specified directories for the file name in the slugline.</li>
 <li>If you provide more than one source code repository, the program ensures
-  there are no duplicate file names across those directories. </li>
+  there are no duplicate file names across those directories.</li>
 </ul>
 <p>Run <code>uplist -h</code> for details on how to use it.</p>
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
@@ -193,7 +193,7 @@ as a Markdown comment in the form:  </p>
 <p>Shortcut: <strong>chapz</strong></p>
 </blockquote>
 <p>Only works with Markdown (<code>.md</code>) files with names beginning with a chapter number, which is digits, possibly followed by a letter.
-This is followed by a space and the name of the file followed by <code>.md</code>. 
+This is followed by a space and the name of the file followed by <code>.md</code>.
 If you run the <code>chapz</code> command inside the directory containing such markdown files, it will:</p>
 <ol>
 <li>
@@ -215,7 +215,7 @@ If you run the <code>chapz</code> command inside the directory containing such m
 your automated build or in a script that you run whenever you need to
 update. For example:</p>
 <pre><code class="language-bat">@REM refresh.bat
-@REM From original https://github.com/BruceEckel/functional_error_handling
+@REM From https://github.com/BruceEckel/functional_error_handling
 @REM Doesn't work here, only for reference.
 cd .\src\functional_error_handling\
 rye test
@@ -307,5 +307,5 @@ uplist &quot;.\Functional Error Handling.md&quot;
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2024-11-11 20:48:49.137755+00:00
+Build Date UTC : 2024-11-12 20:37:35.135869+00:00
 -->
