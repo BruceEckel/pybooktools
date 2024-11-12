@@ -43,14 +43,14 @@ def create_chapter_file(path: Path, name: str, content: str = "") -> Path:
 
 
 @pytest.mark.parametrize(
-    "chapter_index, initial_number, initial_title, expected_number, markdown_title",
+    "chapter_index, initial_number, file_title, expected_number, markdown_title",
     chapter_data,
 )
 def test_book(
         temp_book_directory,
         chapter_index,
         initial_number,
-        initial_title,
+        file_title,
         expected_number,
         markdown_title,
 ):
@@ -67,14 +67,14 @@ def test_book(
 
 
 @pytest.mark.parametrize(
-    "chapter_index, initial_number, initial_title, expected_number, markdown_title",
+    "chapter_index, initial_number, file_title, expected_number, markdown_title",
     chapter_data,
 )
 def test_book_initialization(
         temp_book_directory,
         chapter_index,
         initial_number,
-        initial_title,
+        file_title,
         expected_number,
         markdown_title,
 ):
@@ -83,7 +83,7 @@ def test_book_initialization(
     assert len(book.chapters) == len(chapter_data)
     # Ensure numbering matches expected padded format:
     assert book.chapters[chapter_index].number == expected_number
-    assert book.chapters[chapter_index].file_name_title == initial_title
+    assert book.chapters[chapter_index].file_name_title == file_title
     assert book.chapters[chapter_index].markdown_title == markdown_title
 
 
