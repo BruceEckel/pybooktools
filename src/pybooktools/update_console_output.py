@@ -12,6 +12,7 @@ you've run this program, use:
 `update_markdown_code_listings.py`.
 """
 import argparse
+import os
 import re
 import subprocess
 import sys
@@ -20,6 +21,19 @@ from pathlib import Path
 from pybooktools.util import BoolStatus
 
 debug_status = BoolStatus(False)
+
+
+def get_virtual_env_python() -> str:
+    """Return the Python interpreter path from the virtual environment if available"""
+    venv_path = os.getenv("VIRTUAL_ENV")
+    if venv_path:
+        python_path = (
+                Path(venv_path)
+                / ("Scripts" if os.name == "nt" else "bin")
+                / "python"
+        )
+        return str(python_path)
+    return sys.executable
 
 
 def debug(
@@ -33,10 +47,12 @@ def debug(
 
 
 def check_script(script_path: Path) -> bool:
-    """Check to see if script runs"""
+    """See if the script runs"""
+    python_executable = get_virtual_env_python()
+    print(f"Using Python interpreter at: {python_executable}")
     print(f"Checking: {script_path} ", end="")
     result = subprocess.run(
-        [sys.executable, str(script_path)], capture_output=True, text=True
+        [python_executable, str(script_path)], capture_output=True, text=True
     )
     if result.returncode != 0:
         print(" ... failed")
@@ -84,9 +100,13 @@ def capture_script_output(script_path: Path, temp_content: str) -> str:
     # temp_content does not redirect output:
     script_path.write_text(temp_content)
 
+    python_executable = get_virtual_env_python()
+
     try:
         result = subprocess.run(
-            [sys.executable, str(script_path)], capture_output=True, text=True
+            [python_executable, str(script_path)],
+            capture_output=True,
+            text=True,
         )
         # Check if the script ran successfully
         if result.returncode != 0:
