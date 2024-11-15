@@ -49,7 +49,7 @@ def debug(
 def check_script(script_path: Path) -> bool:
     """See if the script runs"""
     python_executable = get_virtual_env_python()
-    print(f"Using Python interpreter at: {python_executable}")
+    # print(f"Using Python interpreter at: {python_executable}")
     print(f"Checking: {script_path} ", end="")
     result = subprocess.run(
         [python_executable, str(script_path)], capture_output=True, text=True
