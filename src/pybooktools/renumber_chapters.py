@@ -84,9 +84,13 @@ class Book:
     def __str__(self) -> str:
         return "\n".join(str(chapter) for chapter in self.chapters)
 
+    def display_chapters(self) -> None:
+        for chapter in self.chapters:
+            print(chapter.file_name)
+
 
 def main() -> None:
-    parser = ArgumentParser(description="Renumber Markdown chapters")
+    parser = ArgumentParser(description="Manage chapters in a Markdown book")
     parser.add_argument(
         "directory",
         type=str,
@@ -94,22 +98,33 @@ def main() -> None:
         default=None,
         help="Directory containing Markdown chapters (default: current directory)",
     )
-    parser.add_argument(
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
         "-r",
         "--renumber",
         action="store_true",
         help="Renumber the chapters in the directory",
     )
+    group.add_argument(
+        "-d",
+        "--display",
+        action="store_true",
+        help="Display the chapters in the directory without renumbering",
+    )
     args = parser.parse_args()
 
-    if not args.renumber:
+    if not (args.renumber or args.display):
         parser.print_help()
         return
 
     directory = Path(args.directory) if args.directory else Path(os.getcwd())
     book = Book(directory)
-    book.update_chapter_numbers()
-    print(book)
+
+    if args.renumber:
+        book.update_chapter_numbers()
+        print(book)
+    elif args.display:
+        book.display_chapters()
 
 
 if __name__ == "__main__":
