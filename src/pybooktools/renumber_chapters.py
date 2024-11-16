@@ -1,5 +1,6 @@
 import os
 import re
+from argparse import ArgumentParser
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List
@@ -85,7 +86,28 @@ class Book:
 
 
 def main() -> None:
-    book = Book(Path(os.getcwd()))
+    parser = ArgumentParser(description="Renumber Markdown chapters")
+    parser.add_argument(
+        "directory",
+        type=str,
+        nargs="?",
+        default=None,
+        help="Directory containing Markdown chapters (default: current directory)",
+    )
+    parser.add_argument(
+        "-r",
+        "--renumber",
+        action="store_true",
+        help="Renumber the chapters in the directory",
+    )
+    args = parser.parse_args()
+
+    if not args.renumber:
+        parser.print_help()
+        return
+
+    directory = Path(args.directory) if args.directory else Path(os.getcwd())
+    book = Book(directory)
     book.update_chapter_numbers()
     print(book)
 
