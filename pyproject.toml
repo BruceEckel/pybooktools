@@ -11,6 +11,7 @@ readme = "README.md"
 requires-python = ">= 3.8"
 
 [project.scripts]
+z = "pybooktools.reminder:main"
 slug = "pybooktools.slug_line:main"
 upcon = "pybooktools.update_console_output:main"
 uplist = "pybooktools.update_markdown_code_listings:main"
