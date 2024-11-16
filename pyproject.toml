@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Tools I use for writing Python books."
 authors = [{ name = "Bruce Eckel", email = "MindviewInc@gmail.com" }]
 dependencies = [
-    "rich>=13.7.1",
+    "rich>=13.9.4",
     "mypy>=1.11.1",
 ]
 readme = "README.md"
@@ -16,6 +16,7 @@ slug = "pybooktools.slug_line:main"
 upcon = "pybooktools.update_console_output:main"
 uplist = "pybooktools.update_markdown_code_listings:main"
 chapz = "pybooktools.renumber_chapters:main"
+pyout = "pybooktools.python_output_tester:main"
 
 [build-system]
 requires = ["hatchling"]
