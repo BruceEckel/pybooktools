@@ -29,15 +29,15 @@ class PythonOutputTester:
         Any unassigned string starting with ': ' is considered expected output.
         """
         output_pattern = re.compile(
-            r'^"{3}:\s*([\s\S]+?)"{3}|^":\s*(.*?)"', re.MULTILINE
+            r'(^"{3}:\s*([\s\S]+?)"{3})|(^":\s*(.*?))("{1})', re.MULTILINE
         )
         script_content = self.script_path.read_text(encoding="utf-8")
         matches = output_pattern.findall(script_content)
         # Flatten matches and remove empty strings
         extracted = [
-            match[0] or match[1]
+            match[1] or match[3]
             for match in matches
-            if match[0] or match[1] is not None
+            if match[1] or match[3] is not None
         ]
         # Split multiline matches into separate lines
         expected_lines = []
@@ -140,14 +140,7 @@ class PythonOutputTester:
                         )
             # Ensure all added or updated lines have proper closing quotes and are valid
             updated_content = re.sub(
-                r'(": [^"]*)$', r'\1"', updated_content, flags=re.MULTILINE
-            )
-            # Correct lines that may still be missing quotes
-            updated_content = re.sub(
-                r'(?<=: )([^"]+)(?=$|\n)',
-                r'\1"',
-                updated_content,
-                flags=re.MULTILINE,
+                r'(": [^\"]*)$', r'\1"', updated_content, flags=re.MULTILINE
             )
             self.script_path.write_text(updated_content, encoding="utf-8")
             print(f"Corrected the expected output in {self.script_path}")
