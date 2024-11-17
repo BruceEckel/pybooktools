@@ -29,7 +29,7 @@ class PythonOutputTester:
         Any unassigned string starting with ': ' is considered expected output.
         """
         output_pattern = re.compile(
-            r'(^"{3}:\s*([\s\S]+?)"{3})|(^":\s*(.*?))(")', re.MULTILINE
+            r'(^""":\n([\s\S]*?)\n""")|(^":\s*([^\n"]*?)")', re.MULTILINE
         )
         script_content = self.script_path.read_text(encoding="utf-8")
         matches = output_pattern.findall(script_content)
@@ -119,32 +119,50 @@ class PythonOutputTester:
         results = self.compare_output()
         if update:
             script_content = self.script_path.read_text(encoding="utf-8")
-            updated_content = script_content
+            lines = script_content.splitlines()
 
-            for result in results:
-                if not result.passed:
-                    if result.expected == "(No expected output)":
-                        # Add expected output where none existed before
-                        updated_content = re.sub(
-                            r"(print\(.*?\))",
-                            lambda match: f'{match.group(1)}\n": {result.actual}"',
-                            updated_content,
-                            count=1,
-                        )
-                    elif result.actual != "(No actual output)":
-                        # Update existing expected output, properly handling multi-line comments
-                        pattern = re.escape(f": {result.expected}")
-                        replacement = f": {result.actual}"
-                        updated_content = re.sub(
-                            pattern, replacement, updated_content, count=1
-                        )
+            updated_lines = []
+            result_idx = 0
 
-            # Ensure all added or updated lines are properly quoted
-            updated_content = re.sub(
-                r'(": [^\"]*)$', r'\1"', updated_content, flags=re.MULTILINE
+            for line in lines:
+                updated_lines.append(line)
+                if "print(" in line and result_idx < len(results):
+                    # Process single-line expected output
+                    result = results[result_idx]
+                    result_idx += 1
+
+                    # Update or append the expected output
+                    if not result.passed:
+                        if result.expected == "(No expected output)":
+                            updated_lines.append(f'": {result.actual}"')
+                        else:
+                            # Update existing single-line expected output
+                            if len(updated_lines) > 1 and updated_lines[
+                                -2
+                            ].startswith('": '):
+                                updated_lines[-1] = f'": {result.actual}"'
+
+                elif line.startswith('"""') and result_idx < len(results):
+                    # Process multi-line expected outputs
+                    result = results[result_idx]
+                    result_idx += 1
+
+                    # Update multi-line block if mismatched
+                    if not result.passed:
+                        updated_lines.append(result.actual)
+
+            # Add any remaining results as expected outputs
+            while result_idx < len(results):
+                result = results[result_idx]
+                result_idx += 1
+                if result.expected == "(No expected output)":
+                    updated_lines.append(f'": {result.actual}"')
+                elif result.actual == "(No actual output)":
+                    updated_lines.append(f'": {result.expected}"')
+
+            self.script_path.write_text(
+                "\n".join(updated_lines), encoding="utf-8"
             )
-
-            self.script_path.write_text(updated_content, encoding="utf-8")
             print(f"Corrected the expected output in {self.script_path}")
         else:
             for idx, result in enumerate(results, start=1):

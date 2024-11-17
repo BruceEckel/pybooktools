@@ -1,5 +1,5 @@
 print("test1")
-": tes"
+":test1"
 
 print("test2")
 print("test3")
