@@ -33,7 +33,9 @@ class PythonOutputTester:
         matches = output_pattern.findall(script_content)
         # Flatten matches and remove empty strings
         extracted = [
-            match[0] or match[1] for match in matches if match[0] or match[1] is not None
+            match[0] or match[1]
+            for match in matches
+            if match[0] or match[1] is not None
         ]
         # Split multiline matches into separate lines
         expected_lines = []
@@ -121,21 +123,30 @@ class PythonOutputTester:
                     if result.expected == "(No expected output)":
                         # Add expected output where none existed before
                         updated_content = re.sub(
-                            r'(print\(.*\))',
+                            r"(print\(.*\))",
                             f'\1\n": {result.actual}"',
                             updated_content,
                             count=1,
                         )
                     elif result.actual != "(No actual output)":
-                        # Update existing expected output
+                        # Update existing expected output and ensure it is properly quoted
                         updated_content = re.sub(
-                            f'(?<=: ){re.escape(result.expected)}(?=\n|$)',
+                            f"(?<=: ){re.escape(result.expected)}(?=\n|$)",
                             result.actual,
                             updated_content,
                             count=1,
                         )
-            # Ensure all added lines have proper closing quotes and are valid
-            updated_content = re.sub(r'(": [^"]+)$', r'\1"', updated_content, flags=re.MULTILINE)
+            # Ensure all added or updated lines have proper closing quotes and are valid
+            updated_content = re.sub(
+                r'(": [^"]*)$', r'\1"', updated_content, flags=re.MULTILINE
+            )
+            # Correct lines that may still be missing quotes
+            updated_content = re.sub(
+                r'(?<=: )([^"]+)(?=$|\n)',
+                r'\1"',
+                updated_content,
+                flags=re.MULTILINE,
+            )
             self.script_path.write_text(updated_content, encoding="utf-8")
             print(f"Corrected the expected output in {self.script_path}")
         else:
