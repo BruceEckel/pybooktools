@@ -26,10 +26,20 @@ class PythonOutputTester:
         Extracts expected output lines from the Python script.
         Any unassigned string starting with ': ' is considered expected output.
         """
-        output = re.compile(r'(?<!=)"""|":\s(.+?)\n')
+        output_pattern = re.compile(
+            r'^"{3}:\s*([\s\S]+?)"{3}|^":\s*(.+?)"', re.MULTILINE
+        )
         script_content = self.script_path.read_text(encoding="utf-8")
-        matches = output.findall(script_content)
-        return matches
+        matches = output_pattern.findall(script_content)
+        # Flatten matches and remove empty strings
+        extracted = [
+            match[0] or match[1] for match in matches if match[0] or match[1]
+        ]
+        # Split multiline matches into separate lines
+        expected_lines = []
+        for match in extracted:
+            expected_lines.extend(match.strip().splitlines())
+        return expected_lines
 
     def run_script(self) -> str:
         """
@@ -63,12 +73,38 @@ class PythonOutputTester:
         actual_output = self.run_script().splitlines()
 
         results = []
-        for expected, actual in zip(expected_output, actual_output):
+        for idx, (expected, actual) in enumerate(
+                zip(expected_output, actual_output)
+        ):
             results.append(
                 TestResult(
-                    passed=expected == actual, expected=expected, actual=actual
+                    passed=expected.strip() == actual.strip(),
+                    expected=expected,
+                    actual=actual,
                 )
             )
+
+        # Handle cases where actual output has more lines than expected output
+        if len(actual_output) > len(expected_output):
+            for extra_actual in actual_output[len(expected_output):]:
+                results.append(
+                    TestResult(
+                        passed=False,
+                        expected="(No expected output)",
+                        actual=extra_actual,
+                    )
+                )
+
+        # Handle cases where expected output has more lines than actual output
+        if len(expected_output) > len(actual_output):
+            for extra_expected in expected_output[len(actual_output):]:
+                results.append(
+                    TestResult(
+                        passed=False,
+                        expected=extra_expected,
+                        actual="(No actual output)",
+                    )
+                )
 
         return results
 
@@ -81,7 +117,10 @@ class PythonOutputTester:
             script_content = self.script_path.read_text(encoding="utf-8")
             updated_content = script_content
             for result in results:
-                if not result.passed:
+                if (
+                        not result.passed
+                        and result.expected != "(No expected output)"
+                ):
                     updated_content = re.sub(
                         f"(?<=: ){re.escape(result.expected)}",
                         result.actual,
