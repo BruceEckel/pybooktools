@@ -79,9 +79,7 @@ class PythonOutputTester:
         actual_output = self.run_script().splitlines()
 
         results = []
-        for idx, (expected, actual) in enumerate(
-                zip(expected_output, actual_output)
-        ):
+        for expected, actual in zip(expected_output, actual_output):
             results.append(
                 TestResult(
                     passed=expected.strip() == actual.strip(),
