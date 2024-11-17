@@ -29,7 +29,7 @@ class PythonOutputTester:
         Any unassigned string starting with ': ' is considered expected output.
         """
         output_pattern = re.compile(
-            r'(^"{3}:\s*([\s\S]+?)"{3})|(^":\s*(.*?))("{1})', re.MULTILINE
+            r'(^"{3}:\s*([\s\S]+?)"{3})|(^":\s*(.*?))(")', re.MULTILINE
         )
         script_content = self.script_path.read_text(encoding="utf-8")
         matches = output_pattern.findall(script_content)
