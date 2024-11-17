@@ -9,6 +9,8 @@ from typing import List
 from rich.console import Console
 from rich.syntax import Syntax
 
+from pybooktools.util import get_virtual_env_python
+
 
 @dataclass
 class TestResult:
@@ -27,7 +29,7 @@ class PythonOutputTester:
         Any unassigned string starting with ': ' is considered expected output.
         """
         output_pattern = re.compile(
-            r'^"{3}:\s*([\s\S]+?)"{3}|^":\s*(.*)', re.MULTILINE
+            r'^"{3}:\s*([\s\S]+?)"{3}|^":\s*(.*?)"', re.MULTILINE
         )
         script_content = self.script_path.read_text(encoding="utf-8")
         matches = output_pattern.findall(script_content)
@@ -48,7 +50,9 @@ class PythonOutputTester:
         Runs the script and captures its output.
         """
         result = subprocess.run(
-            ["python", str(self.script_path)], capture_output=True, text=True
+            [get_virtual_env_python(), str(self.script_path)],
+            capture_output=True,
+            text=True,
         )
         if result.returncode != 0:
             console = Console()

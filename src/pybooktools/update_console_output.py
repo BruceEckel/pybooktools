@@ -12,32 +12,17 @@ you've run this program, use:
 `update_markdown_code_listings.py`.
 """
 import argparse
-import os
 import re
 import subprocess
-import sys
 from pathlib import Path
 
-from pybooktools.util import BoolStatus
+from pybooktools.util import BoolStatus, get_virtual_env_python
 
 debug_status = BoolStatus(False)
 
 
-def get_virtual_env_python() -> str:
-    """Return the Python interpreter path from the virtual environment if available"""
-    venv_path = os.getenv("VIRTUAL_ENV")
-    if venv_path:
-        python_path = (
-            Path(venv_path)
-            / ("Scripts" if os.name == "nt" else "bin")
-            / "python"
-        )
-        return str(python_path)
-    return sys.executable
-
-
 def debug(
-    *msgs: str, title: str | None = None, debugging: BoolStatus = debug_status
+        *msgs: str, title: str | None = None, debugging: BoolStatus = debug_status
 ) -> None:
     if debugging:
         if title is not None:
