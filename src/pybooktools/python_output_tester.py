@@ -120,28 +120,30 @@ class PythonOutputTester:
         if update:
             script_content = self.script_path.read_text(encoding="utf-8")
             updated_content = script_content
+
             for result in results:
                 if not result.passed:
                     if result.expected == "(No expected output)":
                         # Add expected output where none existed before
                         updated_content = re.sub(
-                            r"(print\(.*\))",
-                            f'\1\n": {result.actual}"',
+                            r"(print\(.*?\))",
+                            lambda match: f'{match.group(1)}\n": {result.actual}"',
                             updated_content,
                             count=1,
                         )
                     elif result.actual != "(No actual output)":
-                        # Update existing expected output and ensure it is properly quoted
+                        # Update existing expected output, properly handling multi-line comments
+                        pattern = re.escape(f": {result.expected}")
+                        replacement = f": {result.actual}"
                         updated_content = re.sub(
-                            f"(?<=: ){re.escape(result.expected)}(?=\n|$)",
-                            result.actual,
-                            updated_content,
-                            count=1,
+                            pattern, replacement, updated_content, count=1
                         )
-            # Ensure all added or updated lines have proper closing quotes and are valid
+
+            # Ensure all added or updated lines are properly quoted
             updated_content = re.sub(
                 r'(": [^\"]*)$', r'\1"', updated_content, flags=re.MULTILINE
             )
+
             self.script_path.write_text(updated_content, encoding="utf-8")
             print(f"Corrected the expected output in {self.script_path}")
         else:
