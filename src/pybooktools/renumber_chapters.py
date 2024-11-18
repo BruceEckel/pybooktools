@@ -1,3 +1,4 @@
+#: renumber_chapters.py
 import os
 import re
 from argparse import ArgumentParser
