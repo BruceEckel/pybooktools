@@ -91,18 +91,13 @@ def verify_tracer_output(
         elif stripped_line.startswith('""":'):
             # Toggle the multiline comment state
             in_multiline_comment = not in_multiline_comment
-            if in_multiline_comment:
-                # Start of multiline comment, extract expected output if present
-                if len(stripped_line) > 4:
-                    expected_outputs.append(stripped_line[4:].strip())
         elif in_multiline_comment:
-            # Inside multiline comment, add expected output
-            expected_outputs.append(stripped_line)
+            # Inside multiline comment, add expected output if the line is not empty
+            if stripped_line:
+                expected_outputs.append(stripped_line)
 
     # Clean up any extraneous quotes or whitespace from the expected outputs
-    expected_outputs = [
-        output.strip('"').strip() for output in expected_outputs
-    ]
+    expected_outputs = [output.strip('"').strip() for output in expected_outputs if output]
 
     # Debugging: Print both expected and actual outputs for comparison
     print(f"Expected Outputs: {expected_outputs}")
