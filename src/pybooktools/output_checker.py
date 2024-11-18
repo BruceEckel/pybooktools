@@ -71,7 +71,7 @@ def run_temp_script(script_path: Path) -> list[str]:
     exec(script_content, exec_globals)
     tracer = exec_globals.get("tracer")
     if tracer:
-        tracer_outputs = tracer.outputs
+        tracer_outputs = [output.strip() for output in tracer.outputs]
 
     return tracer_outputs
 
@@ -86,14 +86,27 @@ def verify_tracer_output(
         stripped_line = line.strip()
 
         if stripped_line.startswith('":'):
-            expected_outputs.append(stripped_line[1:].strip())
+            # Single-line expected output
+            expected_outputs.append(stripped_line[2:].strip())
         elif stripped_line.startswith('""":'):
+            # Toggle the multiline comment state
             in_multiline_comment = not in_multiline_comment
-            if not in_multiline_comment:
-                continue
-            expected_outputs.append(stripped_line[4:].strip())
+            if in_multiline_comment:
+                # Start of multiline comment, extract expected output if present
+                if len(stripped_line) > 4:
+                    expected_outputs.append(stripped_line[4:].strip())
         elif in_multiline_comment:
+            # Inside multiline comment, add expected output
             expected_outputs.append(stripped_line)
+
+    # Clean up any extraneous quotes or whitespace from the expected outputs
+    expected_outputs = [
+        output.strip('"').strip() for output in expected_outputs
+    ]
+
+    # Debugging: Print both expected and actual outputs for comparison
+    print(f"Expected Outputs: {expected_outputs}")
+    print(f"Tracer Outputs: {tracer_outputs}")
 
     return tracer_outputs == expected_outputs
 

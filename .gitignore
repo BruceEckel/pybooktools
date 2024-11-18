@@ -167,3 +167,4 @@ cython_debug/
 # Thus lockfiles are not stored in the Github repository.
 
 *.lock
+src/pybooktools/test_temp_a.py
