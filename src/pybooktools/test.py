@@ -1,3 +1,4 @@
+#: test.py
 print("test1")
 ":test1"
 

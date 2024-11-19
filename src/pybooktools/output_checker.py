@@ -1,3 +1,4 @@
+#: output_checker.py
 import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
