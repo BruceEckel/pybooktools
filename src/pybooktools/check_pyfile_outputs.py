@@ -1,6 +1,12 @@
 #: check_pyfile_outputs.py
+import argparse
 import ast
+import glob
 from pathlib import Path
+from typing import Final
+
+validate_dir: Final[Path] = Path("_validate")
+validate_dir.mkdir(exist_ok=True)
 
 
 class PrintTransformer(ast.NodeTransformer):
@@ -36,7 +42,7 @@ class UnassignedStringTransformer(ast.NodeTransformer):
         return node
 
 
-def transform_pyfile(pyfile: Path) -> None:
+def create_validation_pyfile(pyfile: Path) -> Path:
     # Read the original Python file
     source_code = pyfile.read_text(encoding="utf-8")
     tree = ast.parse(source_code)
@@ -67,14 +73,44 @@ def transform_pyfile(pyfile: Path) -> None:
 
     # Write the transformed code to a new file
     transformed_code = ast.unparse(tree)
-    new_file_path = pyfile.with_name(
+    new_file_path = validate_dir / pyfile.with_name(
         f"{pyfile.stem}_transformed{pyfile.suffix}"
     )
     new_file_path.write_text(
         transformed_code + "\ntrack.compare()\n", encoding="utf-8"
     )
+    return new_file_path
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Python Output Tester - Compare expected output comments with actual output."
+    )
+    parser.add_argument(
+        "file_pattern",
+        type=str,
+        help="File or pattern to match Python scripts to test.",
+    )
+    parser.add_argument(
+        "-u",
+        "--update",
+        action="store_true",
+        help="Update the expected output to match the actual output.",
+    )
+    args = parser.parse_args()
+    if not (args.file_pattern or args.store_true):
+        parser.print_help()
+        return
+
+    scripts_to_test = glob.glob(args.file_pattern)
+    if not scripts_to_test:
+        print("No files matched the given file pattern.")
+    else:
+        for script in scripts_to_test:
+            print(f"\nTesting script: {script}")
+            val_file = create_validation_pyfile(Path(script))
+            print(f"Created {val_file}")
 
 
 if __name__ == "__main__":
-    pyfile_path = Path("test.py")  # Change to the path of your file
-    transform_pyfile(pyfile_path)
+    main()
