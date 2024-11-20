@@ -62,9 +62,13 @@ class Tracker:
         )
 
     @classmethod
-    def from_file(cls, output_file_path: Path) -> "Tracker":
+    def from_file(cls, output_file_path: Path | str) -> "Tracker":
+        if isinstance(output_file_path, str):
+            json_path = Path(output_file_path)
+        else:
+            json_path = output_file_path
         # Recreate a Tracker instance from a result file
-        data = json.loads(output_file_path.read_text(encoding="utf-8"))
+        data = json.loads(json_path.read_text(encoding="utf-8"))
         outputs = [Output.from_dict(output) for output in data["outputs"]]
         current = Output.from_dict(data["current"])
-        return cls(str(output_file_path), outputs, current)
+        return cls(str(json_path), outputs, current)

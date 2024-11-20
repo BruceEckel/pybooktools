@@ -2,8 +2,11 @@
 import argparse
 import ast
 import glob
+import subprocess
 from pathlib import Path
 from typing import Final
+
+from pybooktools.util import get_virtual_env_python
 
 validate_dir: Final[Path] = Path("_validate")
 validate_dir.mkdir(exist_ok=True)
@@ -46,7 +49,9 @@ def create_validation_pyfile(pyfile: Path) -> Path:
     validation_file_path = validate_dir / pyfile.with_name(
         f"{pyfile.stem}_validate{pyfile.suffix}"
     )
-    output_file_path = pyfile.with_name(f"{pyfile.stem}_tracker.json")
+    output_file_path = validate_dir / pyfile.with_name(
+        f"{pyfile.stem}_tracker.json"
+    )
     # Read the original Python file
     source_code = pyfile.read_text(encoding="utf-8")
     tree = ast.parse(source_code)
@@ -86,6 +91,26 @@ def create_validation_pyfile(pyfile: Path) -> Path:
     return validation_file_path
 
 
+def run_validation_pyfile(validation_file_path: Path) -> bool:
+    python_executable = get_virtual_env_python()
+    if not validation_file_path.exists():
+        print(f"Cannot locate {validation_file_path}")
+        return False
+    print(f"Using: {python_executable}")
+    print(f"Running: {validation_file_path} ", end="")
+    result = subprocess.run(
+        [python_executable, str(validation_file_path)],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        print(" ... failed")
+        return False
+    else:
+        print(" ... passed")
+        return True
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Python Output Tester - Compare expected output comments with actual output."
@@ -114,6 +139,7 @@ def main():
             print(f"\nTesting script: {script}")
             val_file = create_validation_pyfile(Path(script))
             print(f"Created {val_file}")
+            run_validation_pyfile(val_file)
 
 
 if __name__ == "__main__":
