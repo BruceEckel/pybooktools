@@ -45,7 +45,7 @@ class UnassignedStringTransformer(ast.NodeTransformer):
         return node
 
 
-def create_validation_pyfile(pyfile: Path) -> Path:
+def create_validation_pyfile(pyfile: Path) -> (Path, Path):
     validation_file_path = validate_dir / pyfile.with_name(
         f"{pyfile.stem}_validate{pyfile.suffix}"
     )
@@ -88,7 +88,7 @@ def create_validation_pyfile(pyfile: Path) -> Path:
         transformed_code + "\ntrack.compare()\ntrack.create_output_file()\n",
         encoding="utf-8",
     )
-    return validation_file_path
+    return validation_file_path, output_file_path
 
 
 def run_validation_pyfile(validation_file_path: Path) -> bool:
@@ -144,9 +144,11 @@ def main():
     if not scripts_to_test:
         print("No files matched the given file pattern.")
     else:
-        for script in scripts_to_test:
-            print(f"\nTesting script: {script}")
-            val_file = create_validation_pyfile(Path(script))
+        for original_script in scripts_to_test:
+            print(f"\nTesting script: {original_script}")
+            val_file, json_tracker_data = create_validation_pyfile(
+                Path(original_script)
+            )
             print(f"Created {val_file}")
             success = run_validation_pyfile(val_file)
             if not success:
@@ -154,7 +156,7 @@ def main():
                 continue
             else:
                 print(f"{val_file} ran successfully")
-                # update_original_script(script, )
+                update_original_script(original_script, json_tracker_data)
 
 
 if __name__ == "__main__":
