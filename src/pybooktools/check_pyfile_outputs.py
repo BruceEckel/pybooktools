@@ -2,6 +2,7 @@
 import argparse
 import ast
 import glob
+import json
 import subprocess
 from pathlib import Path
 from typing import Final
@@ -117,7 +118,36 @@ def update_original_script(original_script: Path, json_tracker_data: Path):
         return
     if not json_tracker_data.exists():
         print(f"Cannot locate {json_tracker_data}")
-    return
+        return
+
+    # Load the tracker data from the JSON file
+    with json_tracker_data.open("r", encoding="utf-8") as f:
+        tracker_data = json.load(f)
+
+    # Read the original source code
+    source_code = original_script.read_text(encoding="utf-8")
+    tree = ast.parse(source_code)
+
+    # Update unassigned strings with the actual outputs from tracker data
+    updated_tree = UnassignedStringTransformer().visit(tree)
+
+    for node in updated_tree.body:
+        if (
+                isinstance(node, ast.Expr)
+                and isinstance(node.value, ast.Constant)
+                and isinstance(node.value.value, str)
+        ):
+            if node.value.value in tracker_data:
+                # Replace the node value with the updated expected value
+                node.value = ast.Constant(
+                    value=tracker_data[node.value.value], kind=None
+                )
+
+    # Fix locations and write the updated script back
+    ast.fix_missing_locations(updated_tree)
+    updated_code = ast.unparse(updated_tree)
+    original_script.write_text(updated_code, encoding="utf-8")
+    print(f"Updated {original_script} with new expected outputs")
 
 
 def main():
@@ -156,7 +186,9 @@ def main():
             else:
                 print(f"{val_file} ran successfully")
                 if args.update:
-                    update_original_script(original_script, json_tracker_data)
+                    update_original_script(
+                        Path(original_script), json_tracker_data
+                    )
 
 
 if __name__ == "__main__":
