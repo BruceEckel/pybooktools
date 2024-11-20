@@ -43,20 +43,26 @@ class UnassignedStringTransformer(ast.NodeTransformer):
 
 
 def create_validation_pyfile(pyfile: Path) -> Path:
+    validation_file_path = validate_dir / pyfile.with_name(
+        f"{pyfile.stem}_validate{pyfile.suffix}"
+    )
+    output_file_path = pyfile.with_name(f"{pyfile.stem}_tracker.json")
     # Read the original Python file
     source_code = pyfile.read_text(encoding="utf-8")
     tree = ast.parse(source_code)
 
     # Add the necessary import and global Tracker instance
     import_node = ast.ImportFrom(
-        module="tracker",
+        module="pybooktools.tracker",
         names=[ast.alias(name="Tracker", asname=None)],
         level=0,
     )
     tracker_instance_node = ast.Assign(
         targets=[ast.Name(id="track", ctx=ast.Store())],
         value=ast.Call(
-            func=ast.Name(id="Tracker", ctx=ast.Load()), args=[], keywords=[]
+            func=ast.Name(id="Tracker", ctx=ast.Load()),
+            args=[ast.Constant(value=str(output_file_path), kind=None)],
+            keywords=[],
         ),
     )
 
@@ -73,13 +79,11 @@ def create_validation_pyfile(pyfile: Path) -> Path:
 
     # Write the transformed code to a new file
     transformed_code = ast.unparse(tree)
-    new_file_path = validate_dir / pyfile.with_name(
-        f"{pyfile.stem}_transformed{pyfile.suffix}"
+    validation_file_path.write_text(
+        transformed_code + "\ntrack.compare()\ntrack.create_output_file()\n",
+        encoding="utf-8",
     )
-    new_file_path.write_text(
-        transformed_code + "\ntrack.compare()\n", encoding="utf-8"
-    )
-    return new_file_path
+    return validation_file_path
 
 
 def main():
