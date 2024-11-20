@@ -150,13 +150,13 @@ def main():
                 Path(original_script)
             )
             print(f"Created {val_file}")
-            success = run_validation_pyfile(val_file)
-            if not success:
+            if not run_validation_pyfile(val_file):
                 print(f"{val_file} failed to run")
                 continue
             else:
                 print(f"{val_file} ran successfully")
-                update_original_script(original_script, json_tracker_data)
+                if args.update:
+                    update_original_script(original_script, json_tracker_data)
 
 
 if __name__ == "__main__":
