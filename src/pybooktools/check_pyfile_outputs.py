@@ -111,6 +111,15 @@ def run_validation_pyfile(validation_file_path: Path) -> bool:
         return True
 
 
+def update_original_script(original_script: Path, json_tracker_data: Path):
+    if not original_script.exists():
+        print(f"Cannot locate {original_script}")
+        return
+    if not json_tracker_data.exists():
+        print(f"Cannot locate {json_tracker_data}")
+    return
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Python Output Tester - Compare expected output comments with actual output."
@@ -139,7 +148,13 @@ def main():
             print(f"\nTesting script: {script}")
             val_file = create_validation_pyfile(Path(script))
             print(f"Created {val_file}")
-            run_validation_pyfile(val_file)
+            success = run_validation_pyfile(val_file)
+            if not success:
+                print(f"{val_file} failed to run")
+                continue
+            else:
+                print(f"{val_file} ran successfully")
+                # update_original_script(script, )
 
 
 if __name__ == "__main__":
