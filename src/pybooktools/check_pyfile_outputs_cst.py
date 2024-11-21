@@ -70,7 +70,11 @@ def create_validation_pyfile(pyfile: Path) -> (Path, Path):
                 value=cst.Call(
                     func=cst.Name("Tracker"),
                     args=[
-                        cst.Arg(cst.SimpleString(f'"{str(output_file_path)}"'))
+                        cst.Arg(
+                            cst.SimpleString(
+                                f'"{str(output_file_path.resolve())}"'
+                            )
+                        )
                     ],
                 ),
             )
@@ -105,8 +109,9 @@ def create_validation_pyfile(pyfile: Path) -> (Path, Path):
     new_body = list(tree.body)
     if not has_import:
         new_body.insert(0, import_node)
+        new_body.insert(1, cst.EmptyLine())
     if not has_tracker_instance:
-        new_body.insert(1, tracker_instance_node)
+        new_body.insert(2, tracker_instance_node)
 
     modified_tree = tree.with_changes(body=new_body)
 
@@ -116,7 +121,7 @@ def create_validation_pyfile(pyfile: Path) -> (Path, Path):
 
     # Write the transformed code to a new file
     transformed_code = (
-            modified_tree.code + "\ntrack.compare()\ntrack.create_output_file()\n"
+            modified_tree.code + "\ntrack.compare()\ntrack.create_json_file()\n"
     )
     validation_file_path.write_text(transformed_code, encoding="utf-8")
     return validation_file_path, output_file_path

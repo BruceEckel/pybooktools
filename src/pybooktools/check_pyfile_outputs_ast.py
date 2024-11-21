@@ -106,7 +106,7 @@ def create_validation_pyfile(pyfile: Path) -> (Path, Path):
     if not has_import:
         new_body.insert(0, import_node)
     if not has_tracker_instance:
-        new_body.insert(1, tracker_instance_node)
+        new_body.insert(2, tracker_instance_node)
 
     modified_tree = tree.with_changes(body=new_body)
 
