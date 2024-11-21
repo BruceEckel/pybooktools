@@ -7,6 +7,7 @@ dependencies = [
     "rich>=13.9.4",
     "mypy>=1.11.1",
     "pyparsing>=3.2.0",
+    "libcst>=1.5.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
@@ -14,6 +15,7 @@ requires-python = ">= 3.8"
 [project.scripts]
 z = "pybooktools.reminder:main"
 slug = "pybooktools.slug_line:main"
+cstpy = "pybooktools.check_pyfile_outputs_cst:main"
 checkpy = "pybooktools.check_pyfile_outputs:main"
 upcon = "pybooktools.update_console_output:main"
 uplist = "pybooktools.update_markdown_code_listings:main"

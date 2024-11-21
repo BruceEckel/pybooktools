@@ -51,7 +51,7 @@ class Tracker:
         for output in self.outputs:
             output.compare()
 
-    def create_output_file(self):
+    def create_json_file(self):
         # Containing Tracker data in human-readable JSON
         data = {
             "outputs": [output.to_dict() for output in self.outputs],
