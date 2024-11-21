@@ -71,9 +71,7 @@ def create_validation_pyfile(pyfile: Path) -> (Path, Path):
                     func=cst.Name("Tracker"),
                     args=[
                         cst.Arg(
-                            cst.SimpleString(
-                                f'"{str(output_file_path.resolve())}"'
-                            )
+                            cst.SimpleString(f"{repr(str(output_file_path))}")
                         )
                     ],
                 ),
