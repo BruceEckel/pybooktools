@@ -80,7 +80,7 @@ def create_validation_pyfile(pyfile: Path) -> (Path, Path):
         ]
     )
 
-    # Modify tree by adding the import and tracker instance
+    # Modify the tree by adding the import and tracker instance
     new_body = list(tree.body)
     new_body.insert(0, import_node)
     new_body.insert(1, cst.EmptyLine())
@@ -116,7 +116,7 @@ def run_validation_pyfile(validation_file_path: Path) -> bool:
         print(" ... failed")
         return False
     else:
-        print(" ... passed")
+        print("")
         return True
 
 
