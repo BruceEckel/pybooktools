@@ -1,6 +1,5 @@
 import argparse
 import glob
-import json
 import subprocess
 from pathlib import Path
 from typing import Final
@@ -9,6 +8,7 @@ import libcst as cst
 import libcst.matchers as m
 from libcst.metadata import MetadataWrapper
 
+from pybooktools.tracker import Tracker
 from pybooktools.util import get_virtual_env_python
 
 validate_dir: Final[Path] = Path("_validate")
@@ -56,7 +56,7 @@ def create_validation_pyfile(pyfile: Path) -> (Path, Path):
     wrapper = MetadataWrapper(cst.parse_module(source_code))
     tree = wrapper.module
 
-    # Add the necessary import and global Tracker instance if not present
+    # Add the necessary import and global Tracker instance
     import_node = cst.ImportFrom(
         module=cst.Attribute(
             value=cst.Name("pybooktools"), attr=cst.Name("tracker")
@@ -79,37 +79,11 @@ def create_validation_pyfile(pyfile: Path) -> (Path, Path):
         ]
     )
 
-    # Check if import or tracker instance already exists
-    has_import = any(
-        m.matches(
-            node,
-            m.ImportFrom(
-                module=m.Attribute(
-                    value=m.Name("pybooktools"), attr=m.Name("tracker")
-                )
-            ),
-        )
-        for node in tree.body
-    )
-    has_tracker_instance = any(
-        m.matches(
-            node,
-            m.SimpleStatementLine(
-                body=[
-                    m.Assign(targets=[m.AssignTarget(target=m.Name("track"))])
-                ]
-            ),
-        )
-        for node in tree.body
-    )
-
-    # Modify tree by adding the import and tracker instance if needed
+    # Modify tree by adding the import and tracker instance
     new_body = list(tree.body)
-    if not has_import:
-        new_body.insert(0, import_node)
-        new_body.insert(1, cst.EmptyLine())
-    if not has_tracker_instance:
-        new_body.insert(2, tracker_instance_node)
+    new_body.insert(0, import_node)
+    new_body.insert(1, cst.EmptyLine())
+    new_body.insert(2, tracker_instance_node)
 
     modified_tree = tree.with_changes(body=new_body)
 
@@ -149,38 +123,22 @@ def update_original_script(original_script: Path, json_tracker_data: Path):
     if not original_script.exists():
         print(f"Cannot locate {original_script}")
         return
-    if not json_tracker_data.exists():
-        print(f"Cannot locate {json_tracker_data}")
-        return
-
-    # Load the tracker data from the JSON file
-    with json_tracker_data.open("r", encoding="utf-8") as f:
-        tracker_data = json.load(f)
-
-    # Read the original source code
     source_code = original_script.read_text(encoding="utf-8")
-    wrapper = MetadataWrapper(cst.parse_module(source_code))
-    tree = wrapper.module
 
-    # Update unassigned strings with the actual outputs from tracker data
-    class UpdateExpectedTransformer(cst.CSTTransformer):
-        def leave_Expr(
-                self, original_node: cst.Expr, updated_node: cst.Expr
-        ) -> cst.CSTNode:
-            if isinstance(original_node.value, cst.SimpleString):
-                original_value = original_node.value.value.strip('"')
-                if original_value in tracker_data:
-                    new_value = tracker_data[original_value]
-                    return updated_node.with_changes(
-                        value=cst.SimpleString(f'"{new_value}"')
-                    )
-            return updated_node
+    # Recreate Tracker instance from the JSON file
+    tracker = Tracker.from_file(json_tracker_data)
 
-    updated_tree = tree.visit(UpdateExpectedTransformer())
+    # Update the expected strings in the original script based on tracker data
+    for output in tracker.outputs:
+        expected = output.expected.strip()
+        actual = output.actual.strip()
+        if expected != actual:
+            # Replace all occurrences of the expected output with the actual output
+            print(f"Updating expected value: {expected} -> {actual}")
+            source_code = source_code.replace(expected, actual, 1)
 
     # Write the updated code back to the original script
-    updated_code = updated_tree.code
-    original_script.write_text(updated_code, encoding="utf-8")
+    original_script.write_text(source_code, encoding="utf-8")
     print(f"Updated {original_script} with new expected outputs")
 
 

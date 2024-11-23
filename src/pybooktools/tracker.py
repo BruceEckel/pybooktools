@@ -2,6 +2,7 @@
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Union
 
 
 @dataclass
@@ -62,11 +63,15 @@ class Tracker:
         )
 
     @classmethod
-    def from_file(cls, output_file_path: Path | str) -> "Tracker":
-        if isinstance(output_file_path, str):
-            json_path = Path(output_file_path)
+    def from_file(
+            cls, tracker_json_file_path: Path | str
+    ) -> Union["Tracker", None]:
+        if not tracker_json_file_path.exists():
+            return None
+        if isinstance(tracker_json_file_path, str):
+            json_path = Path(tracker_json_file_path)
         else:
-            json_path = output_file_path
+            json_path = tracker_json_file_path
         # Recreate a Tracker instance from a result file
         data = json.loads(json_path.read_text(encoding="utf-8"))
         outputs = [Output.from_dict(output) for output in data["outputs"]]
