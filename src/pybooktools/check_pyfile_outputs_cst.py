@@ -1,3 +1,4 @@
+#: check_pyfile_outputs_cst.py
 import argparse
 import glob
 import re

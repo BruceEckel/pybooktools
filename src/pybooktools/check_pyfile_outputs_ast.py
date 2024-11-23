@@ -1,3 +1,4 @@
+#: check_pyfile_outputs_ast.py
 import argparse
 import glob
 import json
