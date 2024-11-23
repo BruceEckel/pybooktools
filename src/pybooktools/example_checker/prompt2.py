@@ -26,7 +26,8 @@ def add_output_tracking(example_path: Path):
        `tracker.expected(the_number, the_complete_text_of_the_unassigned_string)`
     4. Using libcst, find all calls to `print` and replace them with `tracker.print`
     5. Store the modified numbered_py in tracked_py_path.
-    6. Call `tracker.convert_to_json()` and store that return value in json_tracker.
+    # 6. Call `tracker.convert_to_json()` and store that return value in json_tracker.
+>>>>>>>(This only works after tracked_py is executed)
     """
 
 
