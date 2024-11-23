@@ -10,6 +10,11 @@ from pathlib import Path
 # )
 
 
+def panic(msg: str) -> None:
+    sys.stderr.write(msg + "\nEXITING\n")
+    sys.exit("EXITING")
+
+
 def valid_python_file(pyfile: Path) -> bool:
     if not pyfile.is_file():
         print(f"{pyfile} not found")

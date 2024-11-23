@@ -4,32 +4,67 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Union
 
+from pybooktools.util import panic
+
 
 @dataclass
 class Output:
-    original_numbered_string: str = ""
+    id_number: int
+    untouched_output: str
     expected_output: str = ""
     actual_output: str = ""
+    actual_output_written: bool = False
+
+    def __post_init__(self):
+        if self.untouched_output.startswith(f'"""{self.id_number}:'):
+            start, self.expected_output = self.untouched_output.split(
+                ":", maxsplit=1
+            )
+            self.expected_output = self.expected_output[:3]
+            assert int(start[3:]) == self.id_number
+        elif self.untouched_output.startswith(f'"{self.id_number}:'):
+            start, self.expected_output = self.untouched_output.split(
+                ":", maxsplit=1
+            )
+            self.expected_output = self.expected_output[:1]
+            assert int(start[1:]) == self.id_number
+        else:
+            panic(f"No ':' in {self}")
 
     def write(self, s: str) -> None:
         # For print(..., file='Output object')
         self.actual_output += s
+        self.actual_output_written = True
 
     def compare(self):
+        if not self.actual_output_written:
+            panic(f"Actual output not written in {self}")
         if self.actual_output != self.expected_output:
             print(
-                f"actual: {self.actual_output} != expected: {self.expected_output}"
+                f"actual: [{self.actual_output}] NOT expected: [{self.expected_output}]"
             )
         else:
-            print(f"{self.actual_output = }    {self.expected_output = }")
+            print(
+                f"actual: [{self.actual_output}]  IS expected: [{self.expected_output}]"
+            )
 
     def to_dict(self) -> dict:
-        return {"actual": self.actual_output, "expected": self.expected_output}
+        return {
+            "expected_output": self.expected_output,
+            "actual_output": self.actual_output,
+            "actual_output_written": self.actual_output_written,
+            "id_number": self.id_number,
+            "untouched_output": self.untouched_output,
+        }
 
     @classmethod
     def from_dict(cls, data: dict) -> "Output":
         return cls(
-            actual_output=data["actual"], expected_output=data["expected"]
+            expected_output=data["expected_output"],
+            actual_output=data["actual_output"],
+            actual_output_written=data["actual_output_written"],
+            id_number=data["id_number"],
+            untouched_output=data["untouched_output"],
         )
 
 
