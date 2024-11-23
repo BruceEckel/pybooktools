@@ -1,5 +1,6 @@
 import argparse
 import glob
+import re
 import subprocess
 from pathlib import Path
 from typing import Final
@@ -133,9 +134,19 @@ def update_original_script(original_script: Path, json_tracker_data: Path):
         expected = output.expected.strip()
         actual = output.actual.strip()
         if expected != actual:
-            # Replace all occurrences of the expected output with the actual output
+            # Replace only the first occurrence of the expected output with the actual output
             print(f"Updating expected value: {expected} -> {actual}")
-            source_code = source_code.replace(expected, actual, 1)
+            # Use a more specific pattern to avoid accidental replacements
+            pattern = re.escape(expected)
+            matches = list(re.finditer(pattern, source_code))
+            if matches:
+                match = matches[0]  # Only replace the first match
+                start, end = match.span()
+                source_code = source_code[:start] + actual + source_code[end:]
+            else:
+                print(
+                    f"Warning: Expected value '{expected}' not found for replacement."
+                )
 
     # Write the updated code back to the original script
     original_script.write_text(source_code, encoding="utf-8")
