@@ -41,11 +41,11 @@ class Output:
             panic(f"Actual output not written in {self}")
         if self.actual_output != self.expected_output:
             print(
-                f"actual: [{self.actual_output}] NOT expected: [{self.expected_output}]"
+                f"actual: [{self.actual_output}] IS NOT expected: [{self.expected_output}]"
             )
         else:
             print(
-                f"actual: [{self.actual_output}]  IS expected: [{self.expected_output}]"
+                f"actual: [{self.actual_output}]     IS expected: [{self.expected_output}]"
             )
 
     def to_dict(self) -> dict:
@@ -71,21 +71,21 @@ class Output:
 @dataclass
 class Tracker:
     outputs: list[Output] = field(default_factory=list)
-    current: Output = field(default_factory=Output)
+    __current: Output = field(default_factory=Output)
 
     def print(self, *args, **kwargs):
-        print(*args, **kwargs, file=self.current)
+        print(*args, **kwargs, file=self.__current)
 
     def expected(self, expected_output: str):
         # Call to expected() means compare all the current output
         # to the expected output and start a new Output object.
         if not expected_output.startswith(":"):
             return
-        self.current.expected_output = expected_output[1:].strip()
+        self.__current.expected_output = expected_output[1:].strip()
         # Complete the current Output and start a new one:
-        self.current.actual_output = self.current.actual_output.strip()
-        self.outputs.append(self.current)
-        self.current = Output()
+        self.__current.actual_output = self.__current.actual_output.strip()
+        self.outputs.append(self.__current)
+        self.__current = Output()
 
     def compare(self):
         for output in self.outputs:
@@ -107,7 +107,7 @@ class Tracker:
         else:
             json_path = tracker_json_file_path
         if not json_path.exists():
-            return None
+            panic(f"Does not exist: {tracker_json_file_path}")
         # Recreate a Tracker instance from a result file
         data = json.loads(json_path.read_text(encoding="utf-8"))
         outputs = [Output.from_dict(output) for output in data["outputs"]]
