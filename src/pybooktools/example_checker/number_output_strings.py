@@ -5,6 +5,8 @@ from typing import override
 
 import libcst as cst
 
+from pybooktools.util import valid_python_file
+
 
 @dataclass
 class StringNumberingTransformer(cst.CSTTransformer):
@@ -36,11 +38,7 @@ class StringNumberingTransformer(cst.CSTTransformer):
 
 
 def number_output_strings(example_path: Path) -> None:
-    if not example_path.is_file():
-        print(f"{example_path} not found")
-        return
-    if example_path.suffix != ".py":
-        print(f"{example_path} is not a Python file")
+    if not valid_python_file(example_path):
         return
 
     validate_dir = example_path.parent / "_validate"
