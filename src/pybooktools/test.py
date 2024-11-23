@@ -1,6 +1,8 @@
 #: test.py
 print("test1")
 ":test1"
+print("test1")
+":test1"
 
 print("test47")
 print("test3")

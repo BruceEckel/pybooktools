@@ -9,6 +9,8 @@ def main() -> None:
     content = (
         "[deep_sky_blue1]slug  [/deep_sky_blue1]"
         "    [yellow]Add/update sluglines in Python files[/yellow]\n"
+        "[deep_sky_blue1]exnum[/deep_sky_blue1]"
+        "     [yellow]Add numbers to[/yellow] [green]'\":' / '\"\"\":'[/green] [yellow]statements in Python files[/yellow]\n"
         "[deep_sky_blue1]cstpy[/deep_sky_blue1]"
         "     [yellow]Check/Update[/yellow] [green]'\":' / '\"\"\":'[/green] [yellow]statements in Python files[/yellow]\n"
         "[deep_sky_blue1]checkpy[/deep_sky_blue1]"
