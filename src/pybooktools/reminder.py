@@ -9,8 +9,13 @@ def main() -> None:
     content = (
         "[deep_sky_blue1]slug  [/deep_sky_blue1]"
         "    [yellow]Add/update sluglines in Python files[/yellow]\n"
+        "[deep_sky_blue1]chapz  [/deep_sky_blue1]"
+        "   [yellow]Renumber Markdown chapters & align chapter names[/yellow]\n"
         "[deep_sky_blue1]exnum[/deep_sky_blue1]"
         "     [yellow]Add numbers to[/yellow] [green]'\":' / '\"\"\":'[/green] [yellow]statements in Python files[/yellow]\n"
+        "[deep_sky_blue1]etrack[/deep_sky_blue1]"
+        "    [yellow]Add tracking statements in Python files[/yellow]\n"
+        "\n\n"
         "[deep_sky_blue1]cstpy[/deep_sky_blue1]"
         "     [yellow]Check/Update[/yellow] [green]'\":' / '\"\"\":'[/green] [yellow]statements in Python files[/yellow]\n"
         "[deep_sky_blue1]checkpy[/deep_sky_blue1]"
@@ -19,8 +24,6 @@ def main() -> None:
         "   [yellow]Update[/yellow] [green]'console =='[/green] [yellow]statements in Python files[/yellow]\n"
         "[deep_sky_blue1]uplist  [/deep_sky_blue1]"
         "  [yellow]Update code listings in Markdown files[/yellow]\n"
-        "[deep_sky_blue1]chapz  [/deep_sky_blue1]"
-        "   [yellow]Renumber Markdown chapters & align chapter names[/yellow]\n"
         "[deep_sky_blue1]pyout  [/deep_sky_blue1]"
         "   [yellow]Check ': ' outputs of Python example(s)[/yellow]"
     )

@@ -64,10 +64,6 @@ def add_output_tracking(example_path: Path):
     # Step 5: Store the modified numbered_py in tracked_py_path
     tracked_py_path.write_text(modified_tree.code, encoding="utf-8")
 
-    # # Step 6: Call `tracker.convert_to_json()` and store that return value in json_tracker
-    # tracker_json = tracker.convert_to_json()
-    # json_tracker.write_text(tracker_json, encoding="utf-8")
-
 
 def main():
     parser = argparse.ArgumentParser(
