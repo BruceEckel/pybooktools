@@ -8,11 +8,12 @@ from typing_extensions import override
 from pybooktools.util import valid_python_file, panic
 
 
-def add_output_tracking(example_path: Path):
+def add_output_tracking(example_path: Path) -> Path:
     validate_dir = example_path.parent / "_validate"
     if not validate_dir.exists():
         panic(f"add_output_tracking: {validate_dir} does not exist")
     tracked_py_path = validate_dir / f"{example_path.stem}_tracked.py"
+    json_tracker_path = validate_dir / f"{example_path.stem}_tracker.json"
 
     # Created by number_output_strings():
     numbered_py_path = valid_python_file(
@@ -69,8 +70,15 @@ def add_output_tracking(example_path: Path):
     cst_tree = cst.parse_module(numbered_py)
     modified_tree = cst_tree.visit(TrackerTransformer())
 
-    # Step 5: Store the modified numbered_py in tracked_py_path
-    tracked_py_path.write_text(modified_tree.code, encoding="utf-8")
+    # Step 5: Add line to write the Tracker as a JSON file:
+    modified_code = (
+            modified_tree.code
+            + f"\ntracker.write_json_file('{json_tracker_path}')\n"
+    )
+
+    # Step 6: Store the modified numbered_py in tracked_py_path
+    tracked_py_path.write_text(modified_code, encoding="utf-8")
+    return tracked_py_path
 
 
 def main():
@@ -87,13 +95,14 @@ def main():
         parser.print_help()
         return
 
-    scripts_to_number = list(Path(".").glob(args.file_pattern))
-    if not scripts_to_number:
+    scripts_to_track = list(Path(".").glob(args.file_pattern))
+    if not scripts_to_track:
         print("No files matched the given file pattern.")
     else:
-        for original_script in scripts_to_number:
-            print(f"\nNumbering script: {original_script}")
-            add_output_tracking(original_script)
+        for original_script in scripts_to_track:
+            print(f"\nAdding tracking to script: {original_script}")
+            tracked_py_path = add_output_tracking(original_script)
+            print(f"Tracked version saved: {tracked_py_path}")
 
 
 if __name__ == "__main__":

@@ -91,15 +91,19 @@ class Tracker:
         for output in self.outputs:
             output.compare()
 
-    def convert_to_json(self) -> str:
-        # Containing Tracker data in human-readable JSON
+    def write_json_file(self, tracker_json_file: str) -> None:
         data = {
             "outputs": [output.to_dict() for output in self.outputs],
         }
-        return json.dumps(data, indent=4)
+        tracker_json_file_path = Path(tracker_json_file)
+        if not tracker_json_file_path.parent.exists():
+            panic(f"Directory not found: {tracker_json_file_path.parent}")
+        tracker_json_file_path.write_text(
+            json.dumps(data, indent=4), encoding="utf-8"
+        )
 
     @classmethod
-    def from_file(
+    def from_json_file(
             cls, tracker_json_file_path: Path | str
     ) -> Union["Tracker", None]:
         if isinstance(tracker_json_file_path, str):

@@ -1,3 +1,4 @@
+#: prompt3.py
 from pathlib import Path
 
 from pybooktools.util import panic
