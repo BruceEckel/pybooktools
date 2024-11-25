@@ -1,0 +1,54 @@
+#: prompt3.py
+import argparse
+from pathlib import Path
+
+from pybooktools.tracker import Tracker
+from pybooktools.util import panic, run_script, get_artifact
+
+
+def incorporate_tracked_output(example_path: Path):
+    tracked_py_path = get_artifact(example_path, "tracked", "incorporate_tracked_output")
+    # if not validate_dir.exists():
+    #     panic(f"incorporate_tracked_output: {validate_dir} does not exist")
+    # tracked_py_path = validate_dir / f"{example_path.stem}_tracked.py"
+    # if not tracked_py_path.exists():
+    #     panic(f"incorporate_tracked_output: {tracked_py_path} does not exist")
+    # Step 1: Run tracked_py_path in its venv
+    run_script(tracked_py_path)
+    # Step 2: Use json_tracker to incorporate outputs into example_path
+    validate_dir = example_path.parent / "_validate"
+    json_tracker = validate_dir / f"{example_path.stem}_tracker.json"
+    if not json_tracker.exists():
+        panic(f"incorporate_tracked_output: {json_tracker} does not exist")
+    modified_example = validate_dir / f"{example_path.stem}_modified.py"
+    tracker = Tracker.from_file(json_tracker)
+    print(tracker)
+    return modified_example
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Executes example_tracked.py and incorporates results"
+    )
+    parser.add_argument(
+        "file_pattern",
+        type=str,
+        help="File or pattern to match Python scripts to test.",
+    )
+    args = parser.parse_args()
+    if not args.file_pattern:
+        parser.print_help()
+        return
+
+    scripts_to_update = list(Path(".").glob(args.file_pattern))
+    if not scripts_to_update:
+        print("No files matched the given file pattern.")
+    else:
+        for original_script in scripts_to_update:
+            print(f"\nModifying {original_script}")
+            modified_py_path = incorporate_tracked_output(original_script)
+            print(f"Modified version saved: {modified_py_path}")
+
+
+if __name__ == "__main__":
+    main()
