@@ -1,13 +1,21 @@
 #: prompt3.py
 import argparse
+import pprint
 from pathlib import Path
 
-from pybooktools.tracker import Tracker
+from pybooktools.example_checker.tracker import Tracker
 from pybooktools.util import panic, run_script, get_artifact
 
 
+def trace(msg: str):
+    # pass
+    print(msg)
+
+
 def incorporate_tracked_output(example_path: Path):
-    tracked_py_path = get_artifact(example_path, "tracked", "incorporate_tracked_output")
+    tracked_py_path = get_artifact(
+        example_path, "tracked", "incorporate_tracked_output"
+    )
     # if not validate_dir.exists():
     #     panic(f"incorporate_tracked_output: {validate_dir} does not exist")
     # tracked_py_path = validate_dir / f"{example_path.stem}_tracked.py"
@@ -20,10 +28,32 @@ def incorporate_tracked_output(example_path: Path):
     json_tracker = validate_dir / f"{example_path.stem}_tracker.json"
     if not json_tracker.exists():
         panic(f"incorporate_tracked_output: {json_tracker} does not exist")
-    modified_example = validate_dir / f"{example_path.stem}_modified.py"
-    tracker = Tracker.from_file(json_tracker)
-    print(tracker)
-    return modified_example
+    numbered_example_path = (
+            validate_dir / f"{example_path.stem}_numbered.py"
+    )  # Use get_artifact
+    tracker = Tracker.from_json_file(json_tracker)
+    pprint.pprint(tracker.outputs)
+    updated = numbered_example_path.read_text(encoding="utf-8")
+    for output in tracker.outputs:
+        if output.untouched_output.startswith('"""'):
+            trace(f"3 quotes {output.untouched_output = }")
+            trace(f"3 quotes {output.actual_output = }")
+            updated = updated.replace(
+                output.untouched_output, f'""":\n{output.actual_output}\n"""'
+            )
+            trace(updated)
+        elif output.untouched_output.startswith('"'):
+            trace(f"1 quote {output.untouched_output = }")
+            trace(f"1 quote {output.actual_output = }")
+            updated = updated.replace(
+                output.untouched_output, f'":{output.actual_output}"'
+            )
+            trace(updated)
+        else:
+            panic(f"Bad output: {output}")
+    updated_example_path = validate_dir / f"{example_path.stem}_updated.py"
+    updated_example_path.write_text(updated, encoding="utf-8")
+    return updated_example_path
 
 
 def main():
@@ -46,8 +76,8 @@ def main():
     else:
         for original_script in scripts_to_update:
             print(f"\nModifying {original_script}")
-            modified_py_path = incorporate_tracked_output(original_script)
-            print(f"Modified version saved: {modified_py_path}")
+            updated_py_path = incorporate_tracked_output(original_script)
+            print(f"Updated version saved: {updated_py_path}")
 
 
 if __name__ == "__main__":

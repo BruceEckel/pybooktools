@@ -5,7 +5,7 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from rich import Console
+from rich.console import Console
 from rich.syntax import Syntax
 
 

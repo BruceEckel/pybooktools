@@ -27,13 +27,13 @@ class Output:
             start, self.expected_output = self.untouched_output.split(
                 ":", maxsplit=1
             )
-            self.expected_output = self.expected_output[:3]
+            self.expected_output = self.expected_output[:-3]
             assert int(start[3:]) == self.id_number
         elif self.untouched_output.startswith(f'"{self.id_number}:'):
             start, self.expected_output = self.untouched_output.split(
                 ":", maxsplit=1
             )
-            self.expected_output = self.expected_output[:1]
+            self.expected_output = self.expected_output[:-1]
             assert int(start[1:]) == self.id_number
         else:
             panic(f"No ':' in {self}")
