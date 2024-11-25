@@ -66,7 +66,7 @@ def add_output_tracking(example_path: Path) -> Path:
                 n = parts[0][1:]
                 trace(f"{n = }")
                 return cst.parse_expression(
-                    f"tracker.expected({n}, {original_node.value})"
+                    f"tracker.expected({n}, r'{original_node.value}')"
                 )
             return updated_node
 

@@ -90,9 +90,13 @@ class Tracker:
         self.__current.untouched_output = untouched_output
         if ":" not in untouched_output:
             panic(f"expected() ':' not in {untouched_output=}")
-        self.__current.expected_output = untouched_output.split(
-            ":", maxsplit=1
-        )[1].strip()
+        expected1 = untouched_output.split(":", maxsplit=1)
+        trace(f"{expected1 = }")
+        expected2 = expected1[1]
+        trace(f"{expected2 = }")
+        expected3 = expected2.strip()
+        trace(f"{expected3 = }")
+        self.__current.expected_output = expected3
         trace(f"{self.__current.expected_output = }")
         # Complete the __current Output and start a new one:
         self.__current.actual_output = self.__current.actual_output.strip()
