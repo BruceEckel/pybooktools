@@ -8,7 +8,8 @@ from pybooktools.util import panic
 
 
 def trace(msg: str):
-    print(msg)
+    # print(msg)
+    pass
 
 
 @dataclass
