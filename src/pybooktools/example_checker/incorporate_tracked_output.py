@@ -1,15 +1,17 @@
 #: prompt3.py
 import argparse
-import pprint
 from pathlib import Path
 
 from pybooktools.example_checker.tracker import Tracker
-from pybooktools.util import panic, run_script, get_artifact
+from pybooktools.util import (
+    panic,
+    run_script,
+    get_artifact,
+    artifact_path,
+    Trace,
+)
 
-
-def trace(msg: str):
-    # pass
-    print(msg)
+trace = Trace(True)
 
 
 def incorporate_tracked_output(example_path: Path):
@@ -24,15 +26,21 @@ def incorporate_tracked_output(example_path: Path):
     # Step 1: Run tracked_py_path in its venv
     run_script(tracked_py_path)
     # Step 2: Use json_tracker to incorporate outputs into example_path
-    validate_dir = example_path.parent / "_validate"
-    json_tracker = validate_dir / f"{example_path.stem}_tracker.json"
-    if not json_tracker.exists():
-        panic(f"incorporate_tracked_output: {json_tracker} does not exist")
-    numbered_example_path = (
-            validate_dir / f"{example_path.stem}_numbered.py"
-    )  # Use get_artifact
+    # validate_dir = example_path.parent / "_validate"
+    # json_tracker = validate_dir / f"{example_path.stem}_tracker.json"
+    # if not json_tracker.exists():
+    #     panic(f"incorporate_tracked_output: {json_tracker} does not exist")
+    json_tracker = get_artifact(
+        example_path, "tracker", "incorporate_tracked_output", file_ext="json"
+    )
+    # numbered_example_path = (
+    #     validate_dir / f"{example_path.stem}_numbered.py"
+    # )
     tracker = Tracker.from_json_file(json_tracker)
-    pprint.pprint(tracker.outputs)
+    trace(tracker.outputs)
+    numbered_example_path = get_artifact(
+        example_path, "numbered", "incorporate_tracked_output"
+    )
     updated = numbered_example_path.read_text(encoding="utf-8")
     for output in tracker.outputs:
         if output.untouched_output.startswith('"""'):
@@ -51,7 +59,10 @@ def incorporate_tracked_output(example_path: Path):
             trace(updated)
         else:
             panic(f"Bad output: {output}")
-    updated_example_path = validate_dir / f"{example_path.stem}_updated.py"
+    # updated_example_path = validate_dir / f"{example_path.stem}_updated.py"
+    updated_example_path = artifact_path(
+        example_path, "updated", "incorporate_tracked_output"
+    )
     updated_example_path.write_text(updated, encoding="utf-8")
     return updated_example_path
 

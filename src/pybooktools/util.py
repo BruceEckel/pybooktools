@@ -1,5 +1,6 @@
 #: util.py
 import os
+import pprint
 import subprocess
 import sys
 from dataclasses import dataclass, field
@@ -12,6 +13,19 @@ from rich.syntax import Syntax
 # self.temp_script_path = Path(
 #     tempfile.NamedTemporaryFile(delete=False, suffix="_tmp.py").name
 # )
+
+
+@dataclass
+class Trace:
+    tracing: bool = False
+
+    def __call__(self, arg):
+        if not self.tracing:
+            return
+        if isinstance(arg, list):
+            pprint.pprint(arg)
+        else:
+            print(arg)
 
 
 def panic(msg: str) -> None:
