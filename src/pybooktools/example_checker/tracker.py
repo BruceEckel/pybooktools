@@ -56,21 +56,21 @@ class Output:
 
     def to_dict(self) -> dict:
         return {
+            "id_number": self.id_number,
+            "untouched_output": self.untouched_output,
             "expected_output": self.expected_output,
             "actual_output": self.actual_output,
             "actual_output_written": self.actual_output_written,
-            "id_number": self.id_number,
-            "untouched_output": self.untouched_output,
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> "Output":
         return cls(
+            id_number=data["id_number"],
+            untouched_output=data["untouched_output"],
             expected_output=data["expected_output"],
             actual_output=data["actual_output"],
             actual_output_written=data["actual_output_written"],
-            id_number=data["id_number"],
-            untouched_output=data["untouched_output"],
         )
 
 
@@ -90,13 +90,27 @@ class Tracker:
         self.__current.untouched_output = untouched_output
         if ":" not in untouched_output:
             panic(f"expected() ':' not in {untouched_output=}")
-        expected1 = untouched_output.split(":", maxsplit=1)
-        trace(f"{expected1 = }")
-        expected2 = expected1[1]
-        trace(f"{expected2 = }")
-        expected3 = expected2.strip()
-        trace(f"{expected3 = }")
-        self.__current.expected_output = expected3
+        if not untouched_output.startswith(
+                '"'
+        ) or not untouched_output.endswith('"'):
+            panic(
+                "Untouched_output not contained in "
+                f"double quotes: {untouched_output}"
+            )
+        if untouched_output.startswith(r'"""'):
+            output_str = untouched_output[3:-3]
+        else:
+            output_str = untouched_output[1:-1]
+        trace(f"{untouched_output = }, {output_str = }")
+        # expected1 = output_str.split(":", maxsplit=1)[1].strip()
+        # trace(f"{expected1 = }")
+        # expected2 = expected1[1]
+        # trace(f"{expected2 = }")
+        # expected3 = expected2.strip()
+        # trace(f"{expected3 = }")
+        self.__current.expected_output = output_str.split(":", maxsplit=1)[
+            1
+        ].strip()
         trace(f"{self.__current.expected_output = }")
         # Complete the __current Output and start a new one:
         self.__current.actual_output = self.__current.actual_output.strip()

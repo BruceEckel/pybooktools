@@ -9,7 +9,8 @@ from pybooktools.util import valid_python_file, panic
 
 
 def trace(msg: str):
-    print(msg)
+    pass
+    # print(msg)
 
 
 def add_output_tracking(example_path: Path) -> Path:
