@@ -31,23 +31,35 @@ def valid_python_file(pyfile: Path, msg: str = "") -> Path:
     return pyfile
 
 
-def get_artifact(
-        example_path: Path, id_ext: str, function_name: str = ""
+def fname(function_name: str) -> str:
+    return f"{function_name}: " if function_name else ""
+
+
+def artifact_path(
+        example_path: Path, id_ext: str, function_name: str = "", file_ext="py"
 ) -> Path:
-    msg = f"{function_name}: " if function_name else ""
     if not example_path.exists():
-        panic(f"{msg}{example_path} does not exist")
+        panic(f"{fname(function_name)}{example_path} does not exist")
     validate_dir = example_path.parent / "_validate"
     if not validate_dir.exists():
-        panic(f"{msg}{validate_dir} does not exist")
-    artifact_path = validate_dir / f"{example_path.stem}_{id_ext}.py"
-    if not artifact_path.exists():
-        panic(f"{msg}{artifact_path} does not exist")
+        panic(f"{fname(function_name)}{validate_dir} does not exist")
+    artifact_path = validate_dir / f"{example_path.stem}_{id_ext}.{file_ext}"
     return artifact_path
 
 
+def get_artifact(
+        example_path: Path, id_ext: str, function_name: str = "", file_ext="py"
+) -> Path:
+    artifact = artifact_path(example_path, id_ext, function_name, file_ext)
+    if not artifact.exists():
+        panic(f"{fname(function_name)}{artifact} does not exist")
+    return artifact
+
+
 def get_virtual_env_python() -> str:
-    """Return the Python interpreter path from the virtual environment if available"""
+    """
+    Return the Python interpreter path from the virtual environment if available
+    """
     venv_path = os.getenv("VIRTUAL_ENV")
     if venv_path:
         python_path = (
