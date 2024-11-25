@@ -17,6 +17,8 @@ z = "pybooktools.reminder:main"
 slug = "pybooktools.slug_line:main"
 exnum = "pybooktools.example_checker.number_output_strings:main"
 etrack = "pybooktools.example_checker.add_output_tracking:main"
+
+
 cstpy = "pybooktools.check_pyfile_outputs_cst:main"
 checkpy = "pybooktools.check_pyfile_outputs:main"
 upcon = "pybooktools.update_console_output:main"

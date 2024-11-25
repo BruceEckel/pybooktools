@@ -15,14 +15,16 @@ def panic(msg: str) -> None:
     sys.exit("EXITING")
 
 
-def valid_python_file(pyfile: Path) -> bool:
+def valid_python_file(pyfile: Path, msg: str = "") -> Path:
     if not pyfile.is_file():
-        print(f"{pyfile} not found")
-        return False
+        if msg:
+            print(msg)
+        panic(f"{pyfile} not found")
     if pyfile.suffix != ".py":
-        print(f"{pyfile} is not a Python file")
-        return False
-    return True
+        if msg:
+            print(msg)
+        panic(f"{pyfile} is not a Python file")
+    return pyfile
 
 
 def get_virtual_env_python() -> str:

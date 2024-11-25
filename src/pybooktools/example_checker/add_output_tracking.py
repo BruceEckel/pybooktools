@@ -3,6 +3,7 @@ import argparse
 from pathlib import Path
 
 import libcst as cst
+from typing_extensions import override
 
 from pybooktools.util import valid_python_file, panic
 
@@ -12,11 +13,12 @@ def add_output_tracking(example_path: Path):
     if not validate_dir.exists():
         panic(f"add_output_tracking: {validate_dir} does not exist")
     tracked_py_path = validate_dir / f"{example_path.stem}_tracked.py"
-    json_tracker = validate_dir / f"{example_path.stem}_tracker.json"
-    # Created by the previous step:
-    numbered_py_path = validate_dir / f"{example_path.stem}_numbered.py"
-    if not valid_python_file(numbered_py_path):
-        return
+
+    # Created by number_output_strings():
+    numbered_py_path = valid_python_file(
+        pyfile := validate_dir / f"{example_path.stem}_numbered.py",
+        f"add_output_tracking: {pyfile} invalid",
+    )
     numbered_py = numbered_py_path.read_text(encoding="utf-8")
 
     # Step 1: Add import statements and tracker initialization
@@ -27,6 +29,7 @@ def add_output_tracking(example_path: Path):
 
     # Step 2-4: Use libcst to modify the Python code
     class TrackerTransformer(cst.CSTTransformer):
+        @override
         def leave_SimpleString(
                 self,
                 original_node: cst.SimpleString,
@@ -46,6 +49,7 @@ def add_output_tracking(example_path: Path):
                     )
             return updated_node
 
+        @override
         def leave_Call(
                 self, original_node: cst.Call, updated_node: cst.Call
         ) -> cst.CSTNode:
@@ -54,7 +58,11 @@ def add_output_tracking(example_path: Path):
                     isinstance(original_node.func, cst.Name)
                     and original_node.func.value == "print"
             ):
-                return updated_node.with_changes(func=cst.Name("tracker.print"))
+                return updated_node.with_changes(
+                    func=cst.Attribute(
+                        value=cst.Name("tracker"), attr=cst.Name("print")
+                    )
+                )
             return updated_node
 
     # Parse the numbered_py code with libcst and apply the transformer

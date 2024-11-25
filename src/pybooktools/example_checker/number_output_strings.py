@@ -39,9 +39,7 @@ class StringNumberingTransformer(cst.CSTTransformer):
 
 
 def number_output_strings(example_path: Path) -> None:
-    if not valid_python_file(example_path):
-        return
-
+    valid_python_file(example_path)
     validate_dir = example_path.parent / "_validate"
     validate_dir.mkdir(exist_ok=True)
 

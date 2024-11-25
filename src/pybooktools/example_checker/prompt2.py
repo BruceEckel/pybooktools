@@ -12,9 +12,9 @@ def add_output_tracking(example_path: Path):
     tracked_py_path = validate_dir / f"{example_path.stem}_tracked.py"
     json_tracker = validate_dir / f"{example_path.stem}_tracker.json"
     # Created by the previous step:
-    numbered_py_path = validate_dir / f"{example_path.stem}_numbered.py"
-    if not valid_python_file(numbered_py_path):
-        return
+    numbered_py_path = valid_python_file(
+        validate_dir / f"{example_path.stem}_numbered.py"
+    )
     numbered_py = numbered_py_path.read_text(encoding="utf-8")
     """
     1. At top of numbered_py, add "from pybooktools.example_checker.tracker import Tracker" 
