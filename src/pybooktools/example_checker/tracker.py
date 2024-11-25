@@ -7,15 +7,21 @@ from typing import Union
 from pybooktools.util import panic
 
 
+def trace(msg: str):
+    print(msg)
+
+
 @dataclass
 class Output:
-    id_number: int
-    untouched_output: str
+    id_number: int | None = None
+    untouched_output: str = ""
     expected_output: str = ""
     actual_output: str = ""
     actual_output_written: bool = False
 
     def __post_init__(self):
+        if self.id_number is None:
+            return  # Uninitialized Output
         if self.untouched_output.startswith(f'"""{self.id_number}:'):
             start, self.expected_output = self.untouched_output.split(
                 ":", maxsplit=1
@@ -76,13 +82,19 @@ class Tracker:
     def print(self, *args, **kwargs):
         print(*args, **kwargs, file=self.__current)
 
-    def expected(self, expected_output: str):
-        # Call to expected() means compare all the current output
+    def expected(self, id_number: int, untouched_output: str):
+        # Call to expected() means add the accumulated output
         # to the expected output and start a new Output object.
-        if not expected_output.startswith(":"):
-            return
-        self.__current.expected_output = expected_output[1:].strip()
-        # Complete the current Output and start a new one:
+        trace(f"expected({id_number=}, {untouched_output=})")
+        self.__current.id_number = id_number
+        self.__current.untouched_output = untouched_output
+        if ":" not in untouched_output:
+            panic(f"expected() ':' not in {untouched_output=}")
+        self.__current.expected_output = untouched_output.split(
+            ":", maxsplit=1
+        )[1].strip()
+        trace(f"{self.__current.expected_output = }")
+        # Complete the __current Output and start a new one:
         self.__current.actual_output = self.__current.actual_output.strip()
         self.outputs.append(self.__current)
         self.__current = Output()

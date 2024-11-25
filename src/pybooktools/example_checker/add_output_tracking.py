@@ -8,6 +8,10 @@ from typing_extensions import override
 from pybooktools.util import valid_python_file, panic
 
 
+def trace(msg: str):
+    print(msg)
+
+
 def add_output_tracking(example_path: Path) -> Path:
     validate_dir = example_path.parent / "_validate"
     if not validate_dir.exists():
@@ -36,18 +40,34 @@ def add_output_tracking(example_path: Path) -> Path:
                 original_node: cst.SimpleString,
                 updated_node: cst.SimpleString,
         ) -> cst.CSTNode:
+            trace(f"testing {original_node.value}")
             # Step 2 & 3: Find unassigned strings that begin with an integral number followed by ':'
             if (
-                    original_node.value.startswith('"')
-                    and original_node.value[1:].isdigit()
+                    original_node.value.startswith('"""')
+                    and original_node.value[3].isdigit()
                     and ":" in original_node.value
             ):
+                trace(f"Found {original_node.value}")
                 parts = original_node.value.split(":", 1)
-                if parts[0][1:].isdigit():
-                    n = parts[0][1:]
-                    return cst.parse_expression(
-                        f"tracker.expected({n}, {original_node.value})"
-                    )
+                trace(f"{parts = }")
+                n = parts[0][3:]
+                trace(f"{n = }")
+                return cst.parse_expression(
+                    f"tracker.expected({n}, r'{original_node.value}')"
+                )
+            if (
+                    original_node.value.startswith('"')
+                    and original_node.value[1].isdigit()
+                    and ":" in original_node.value
+            ):
+                trace(f"Found {original_node.value}")
+                parts = original_node.value.split(":", 1)
+                trace(f"{parts = }")
+                n = parts[0][1:]
+                trace(f"{n = }")
+                return cst.parse_expression(
+                    f"tracker.expected({n}, {original_node.value})"
+                )
             return updated_node
 
         @override
@@ -73,7 +93,7 @@ def add_output_tracking(example_path: Path) -> Path:
     # Step 5: Add line to write the Tracker as a JSON file:
     modified_code = (
             modified_tree.code
-            + f"\ntracker.write_json_file('{json_tracker_path}')\n"
+            + f'\ntracker.write_json_file(r"{json_tracker_path}")\n'
     )
 
     # Step 6: Store the modified numbered_py in tracked_py_path
