@@ -1,11 +1,11 @@
 import argparse
 from pathlib import Path
 
-from pybooktools.add_output_tracking import add_output_tracking
-from pybooktools.incorporate_tracked_output import (
+from pybooktools.output_validator.add_output_tracking import add_output_tracking
+from pybooktools.output_validator.incorporate_tracked_output import (
     incorporate_tracked_output,
 )
-from pybooktools.number_output_strings import (
+from pybooktools.output_validator.number_output_strings import (
     number_output_strings,
 )
 from pybooktools.util import trace
