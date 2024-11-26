@@ -1,4 +1,8 @@
 #: test.py
+from util import panic
+
+panic("Testing one two three")
+
 print("test1")
 ":test1"
 print("test1")

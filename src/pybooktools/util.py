@@ -10,6 +10,7 @@ from pathlib import Path
 
 from rich import print
 from rich.console import Console
+from rich.panel import Panel
 from rich.pretty import Pretty
 from rich.syntax import Syntax
 
@@ -22,10 +23,10 @@ console = Console()
 
 @dataclass
 class Trace:
-    tracing: bool = False
+    on: bool = False
 
     def __call__(self, *args):
-        if not self.tracing:
+        if not self.on:
             return
         for arg in args:
             if (
@@ -63,8 +64,14 @@ class Trace:
 
 
 def panic(msg: str) -> None:
-    sys.stderr.write(msg + "\nEXITING\n")
-    sys.exit("EXITING")
+    panel = Panel(
+        f"[orange3]{msg}[/orange3]",
+        title="[bold red]Panic[/bold red]",
+        title_align="left",
+        style="bold red",
+    )
+    console.print(panel)
+    sys.exit()
 
 
 def valid_python_file(pyfile: Path, msg: str = "") -> Path:
