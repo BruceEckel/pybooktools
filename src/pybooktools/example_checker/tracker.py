@@ -4,12 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Union
 
-from pybooktools.util import panic
-
-
-def trace(msg: str):
-    # print(msg)
-    pass
+from pybooktools.util import panic, trace
 
 
 @dataclass

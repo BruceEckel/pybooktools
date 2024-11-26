@@ -11,6 +11,8 @@ def main() -> None:
         "    [yellow]Add/update sluglines in Python files[/yellow]\n"
         "[deep_sky_blue1]chapz  [/deep_sky_blue1]"
         "   [yellow]Renumber Markdown chapters & align chapter names[/yellow]\n"
+        "[deep_sky_blue1]pyup[/deep_sky_blue1]"
+        "      [yellow]Perform all steps to update examples with correct output[/yellow]\n\n"
         "[deep_sky_blue1]exnum[/deep_sky_blue1]"
         "     [yellow]Add numbers to[/yellow] [green]'\":' / '\"\"\":'[/green] [yellow]statements in Python files[/yellow]\n"
         "[deep_sky_blue1]etrack[/deep_sky_blue1]"

@@ -6,7 +6,7 @@ from typing import override
 
 import libcst as cst
 
-from pybooktools.util import valid_python_file
+from pybooktools.util import valid_python_file, artifact_path, trace
 
 
 @dataclass
@@ -38,20 +38,21 @@ class StringNumberingTransformer(cst.CSTTransformer):
         return updated_node
 
 
-def number_output_strings(example_path: Path) -> None:
+def number_output_strings(example_path: Path) -> Path:
     valid_python_file(example_path)
-    validate_dir = example_path.parent / "_validate"
-    validate_dir.mkdir(exist_ok=True)
-
     example_code = example_path.read_text(encoding="utf-8")
     parsed_module = cst.parse_module(example_code)
 
     transformer = StringNumberingTransformer()
     modified_tree = parsed_module.visit(transformer)
 
-    output_path = validate_dir / f"{example_path.stem}_numbered.py"
+    # output_path = validate_dir / f"{example_path.stem}_numbered.py"
+    output_path = artifact_path(
+        example_path, "numbered", "number_output_strings"
+    )
     output_path.write_text(modified_tree.code, encoding="utf-8")
-    print(f"Modified file saved to {output_path}")
+    trace(f"Numbered file saved to {output_path}")
+    return output_path
 
 
 def main():

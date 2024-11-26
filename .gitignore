@@ -169,3 +169,4 @@ cython_debug/
 *.lock
 src/pybooktools/test_temp_a.py
 /src/pybooktools/_validate
+/src/pybooktools/_validation

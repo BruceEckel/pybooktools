@@ -8,7 +8,6 @@ from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
 
-from rich import print
 from rich.console import Console
 from rich.panel import Panel
 from rich.pretty import Pretty
@@ -63,6 +62,9 @@ class Trace:
                         console.print(arg)
 
 
+trace = Trace()
+
+
 def panic(msg: str) -> None:
     panel = Panel(
         f"[orange3]{msg}[/orange3]",
@@ -74,31 +76,36 @@ def panic(msg: str) -> None:
     sys.exit()
 
 
+def opt_msg(msg: str) -> str:
+    return f"{msg}: " if msg else ""
+
+
+def validation_dir(example_path: Path) -> Path:
+    return example_path.parent / "_validation"
+
+
 def valid_python_file(pyfile: Path, msg: str = "") -> Path:
     if not pyfile.is_file():
-        if msg:
-            print(msg)
-        panic(f"{pyfile} not found")
+        panic(f"{opt_msg(msg)}{pyfile} not found")
     if pyfile.suffix != ".py":
-        if msg:
-            print(msg)
-        panic(f"{pyfile} is not a Python file")
+        panic(f"{opt_msg(msg)}{pyfile} is not a Python file")
+    validation_dir(pyfile).mkdir(exist_ok=True)
     return pyfile
-
-
-def fname(function_name: str) -> str:
-    return f"{function_name}: " if function_name else ""
 
 
 def artifact_path(
         example_path: Path, id_ext: str, function_name: str = "", file_ext="py"
 ) -> Path:
     if not example_path.exists():
-        panic(f"{fname(function_name)}{example_path} does not exist")
-    validate_dir = example_path.parent / "_validate"
-    if not validate_dir.exists():
-        panic(f"{fname(function_name)}{validate_dir} does not exist")
-    artifact_path = validate_dir / f"{example_path.stem}_{id_ext}.{file_ext}"
+        panic(f"{opt_msg(function_name)}{example_path} does not exist")
+    if not validation_dir(example_path).exists():
+        panic(
+            f"{opt_msg(function_name)}{validation_dir(example_path)} does not exist"
+        )
+    artifact_path = (
+            validation_dir(example_path)
+            / f"{example_path.stem}_{id_ext}.{file_ext}"
+    )
     return artifact_path
 
 
@@ -107,7 +114,7 @@ def get_artifact(
 ) -> Path:
     artifact = artifact_path(example_path, id_ext, function_name, file_ext)
     if not artifact.exists():
-        panic(f"{fname(function_name)}{artifact} does not exist")
+        panic(f"{opt_msg(function_name)}{artifact} does not exist")
     return artifact
 
 

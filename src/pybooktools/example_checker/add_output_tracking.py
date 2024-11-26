@@ -5,35 +5,23 @@ from pathlib import Path
 import libcst as cst
 from typing_extensions import override
 
-from pybooktools.util import valid_python_file, panic
-
-
-def trace(msg: str):
-    pass
-    # print(msg)
+from pybooktools.util import trace, artifact_path, get_artifact
 
 
 def add_output_tracking(example_path: Path) -> Path:
-    validate_dir = example_path.parent / "_validate"
-    if not validate_dir.exists():
-        panic(f"add_output_tracking: {validate_dir} does not exist")
-    tracked_py_path = validate_dir / f"{example_path.stem}_tracked.py"
-    json_tracker_path = validate_dir / f"{example_path.stem}_tracker.json"
-
     # Created by number_output_strings():
-    numbered_py_path = valid_python_file(
-        pyfile := validate_dir / f"{example_path.stem}_numbered.py",
-        f"add_output_tracking: {pyfile} invalid",
+    numbered_py_path = get_artifact(
+        example_path, "numbered", "add_output_tracking"
     )
     numbered_py = numbered_py_path.read_text(encoding="utf-8")
 
-    # Step 1: Add import statements and tracker initialization
+    # Add import statements and tracker initialization
     numbered_py = (
             "from pybooktools.example_checker.tracker import Tracker\n"
             "tracker = Tracker()\n" + numbered_py
     )
 
-    # Step 2-4: Use libcst to modify the Python code
+    # Use libcst to modify the Python code
     class TrackerTransformer(cst.CSTTransformer):
         @override
         def leave_SimpleString(
@@ -42,7 +30,7 @@ def add_output_tracking(example_path: Path) -> Path:
                 updated_node: cst.SimpleString,
         ) -> cst.CSTNode:
             trace(f"testing {original_node.value}")
-            # Step 2 & 3: Find unassigned strings that begin with an integral number followed by ':'
+            # Find unassigned strings that begin with an integral number followed by ':'
             if (
                     original_node.value.startswith('"""')
                     and original_node.value[3].isdigit()
@@ -75,7 +63,7 @@ def add_output_tracking(example_path: Path) -> Path:
         def leave_Call(
                 self, original_node: cst.Call, updated_node: cst.Call
         ) -> cst.CSTNode:
-            # Step 4: Replace all calls to `print` with `tracker.print`
+            # Replace all calls to `print` with `tracker.print`
             if (
                     isinstance(original_node.func, cst.Name)
                     and original_node.func.value == "print"
@@ -91,13 +79,19 @@ def add_output_tracking(example_path: Path) -> Path:
     cst_tree = cst.parse_module(numbered_py)
     modified_tree = cst_tree.visit(TrackerTransformer())
 
-    # Step 5: Add line to write the Tracker as a JSON file:
+    # Add line to write the Tracker as a JSON file:
+    json_tracker_path = artifact_path(
+        example_path, "tracker", "add_output_tracking", file_ext="json"
+    )
     modified_code = (
             modified_tree.code
             + f'\ntracker.write_json_file(r"{json_tracker_path}")\n'
     )
 
-    # Step 6: Store the modified numbered_py in tracked_py_path
+    # Store the modified code
+    tracked_py_path = artifact_path(
+        example_path, "tracked", "add_output_tracking"
+    )
     tracked_py_path.write_text(modified_code, encoding="utf-8")
     return tracked_py_path
 

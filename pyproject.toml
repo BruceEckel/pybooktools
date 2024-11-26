@@ -18,6 +18,7 @@ slug = "pybooktools.slug_line:main"
 exnum = "pybooktools.example_checker.number_output_strings:main"
 etrack = "pybooktools.example_checker.add_output_tracking:main"
 exup = "pybooktools.example_checker.incorporate_tracked_output:main"
+pyup = "pybooktools.example_checker.update_python_examples:main"
 
 
 cstpy = "pybooktools.check_pyfile_outputs_cst:main"
