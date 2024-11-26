@@ -1,4 +1,5 @@
 #: validate_output.py
+# Remove after updating everything to ": style
 # Ensure correctness of example output using:
 # from validate_output import console
 # ...
@@ -53,7 +54,7 @@ class OutputValidator:
         captured_text = self.captured_output.getvalue().strip()
         expected_text = other.strip()
         assert (
-            captured_text == expected_text
+                captured_text == expected_text
         ), f"\nExpected:\n{expected_text}\nGot:\n{captured_text}"
         self.start()
         return True
