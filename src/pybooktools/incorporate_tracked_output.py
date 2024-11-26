@@ -2,7 +2,7 @@
 import argparse
 from pathlib import Path
 
-from pybooktools.example_checker.tracker import Tracker
+from pybooktools.tracker import Tracker
 from pybooktools.util import (
     panic,
     run_script,

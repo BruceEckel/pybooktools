@@ -17,7 +17,7 @@ def add_output_tracking(example_path: Path) -> Path:
 
     # Add import statements and tracker initialization
     numbered_py = (
-            "from pybooktools.example_checker.tracker import Tracker\n"
+            "from pybooktools.tracker import Tracker\n"
             "tracker = Tracker()\n" + numbered_py
     )
 

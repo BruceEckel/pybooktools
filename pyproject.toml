@@ -15,18 +15,10 @@ requires-python = ">= 3.8"
 [project.scripts]
 z = "pybooktools.reminder:main"
 slug = "pybooktools.slug_line:main"
-exnum = "pybooktools.example_checker.number_output_strings:main"
-etrack = "pybooktools.example_checker.add_output_tracking:main"
-exup = "pybooktools.example_checker.incorporate_tracked_output:main"
-pyup = "pybooktools.example_checker.update_python_examples:main"
-
-
-cstpy = "pybooktools.check_pyfile_outputs_cst:main"
-checkpy = "pybooktools.check_pyfile_outputs:main"
-upcon = "pybooktools.update_console_output:main"
-uplist = "pybooktools.update_markdown_code_listings:main"
-chapz = "pybooktools.renumber_chapters:main"
-pyout = "pybooktools.python_output_tester:main"
+exnum = "pybooktools.number_output_strings:main"
+etrack = "pybooktools.add_output_tracking:main"
+exup = "pybooktools.incorporate_tracked_output:main"
+pyup = "pybooktools.update_python_examples:main"
 
 [build-system]
 requires = ["hatchling"]
