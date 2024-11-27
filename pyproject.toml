@@ -20,6 +20,7 @@ xv = "pybooktools.remove_validation_dir:main"
 exnum = "pybooktools.output_validator.number_output_strings:main"
 etrack = "pybooktools.output_validator.add_output_tracking:main"
 exup = "pybooktools.output_validator.incorporate_tracked_output:main"
+exadj = "pybooktools.output_validator.adjust_indentation:main"
 
 [build-system]
 requires = ["hatchling"]

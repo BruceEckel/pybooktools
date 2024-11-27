@@ -6,7 +6,7 @@ from typing import override
 
 import libcst as cst
 
-from pybooktools.util import valid_python_file, artifact_path, trace
+from pybooktools.util import trace
 
 
 @dataclass
@@ -39,6 +39,9 @@ class StringNumberingTransformer(cst.CSTTransformer):
 
 
 def number_output_strings(example_path: Path) -> Path:
+    # Import here to avoid circular dependency
+    from pybooktools.output_validator import valid_python_file, artifact_path
+
     valid_python_file(example_path)
     example_code = example_path.read_text(encoding="utf-8")
     parsed_module = cst.parse_module(example_code)
@@ -69,7 +72,7 @@ def main():
         parser.print_help()
         return
 
-    scripts_to_number = list(Path("..").glob(args.file_pattern))
+    scripts_to_number = list(Path(".").glob(args.file_pattern))
     if not scripts_to_number:
         print("No files matched the given file pattern.")
     else:

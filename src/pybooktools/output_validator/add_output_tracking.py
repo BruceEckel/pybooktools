@@ -6,10 +6,12 @@ import libcst as cst
 from typing_extensions import override
 
 from pybooktools.util import trace
-from . import get_artifact, artifact_path
 
 
 def add_tracking(example_path: Path) -> Path:
+    # Avoid circular imports:
+    from pybooktools.output_validator import get_artifact, artifact_path
+
     # Created by number_output_strings():
     numbered_py_path = get_artifact(
         example_path, "numbered", "add_output_tracking"
@@ -24,6 +26,7 @@ def add_tracking(example_path: Path) -> Path:
 
     # Use libcst to modify the Python code
     class TrackerTransformer(cst.CSTTransformer):
+
         @override
         def leave_SimpleString(
                 self,
