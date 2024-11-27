@@ -6,7 +6,6 @@ authors = [{ name = "Bruce Eckel", email = "MindviewInc@gmail.com" }]
 dependencies = [
     "rich>=13.9.4",
     "mypy>=1.11.1",
-    "pyparsing>=3.2.0",
     "libcst>=1.5.1",
 ]
 readme = "README.md"
@@ -15,10 +14,12 @@ requires-python = ">= 3.8"
 [project.scripts]
 z = "pybooktools.reminder:main"
 slug = "pybooktools.slug_line:main"
-exnum = "pybooktools.number_output_strings:main"
-etrack = "pybooktools.add_output_tracking:main"
-exup = "pybooktools.incorporate_tracked_output:main"
+chapz = "pybooktools.renumber_chapters:main"
 pyup = "pybooktools.update_python_examples:main"
+xv = "pybooktools.remove_validation_dir:main"
+exnum = "pybooktools.output_validator.number_output_strings:main"
+etrack = "pybooktools.output_validator.add_output_tracking:main"
+exup = "pybooktools.output_validator.incorporate_tracked_output:main"
 
 [build-system]
 requires = ["hatchling"]

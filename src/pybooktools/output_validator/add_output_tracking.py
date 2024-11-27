@@ -5,10 +5,11 @@ from pathlib import Path
 import libcst as cst
 from typing_extensions import override
 
-from pybooktools.util import trace, artifact_path, get_artifact
+from pybooktools.util import trace
+from . import get_artifact, artifact_path
 
 
-def add_output_tracking(example_path: Path) -> Path:
+def add_tracking(example_path: Path) -> Path:
     # Created by number_output_strings():
     numbered_py_path = get_artifact(
         example_path, "numbered", "add_output_tracking"
@@ -116,7 +117,7 @@ def main():
     else:
         for original_script in scripts_to_track:
             print(f"\nAdding tracking to script: {original_script}")
-            tracked_py_path = add_output_tracking(original_script)
+            tracked_py_path = add_tracking(original_script)
             print(f"Tracked version saved: {tracked_py_path}")
 
 

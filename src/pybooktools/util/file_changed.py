@@ -1,19 +1,4 @@
-#: util.py
-from dataclasses import dataclass
-from dataclasses import field
-
-
-# self.temp_script_path = Path(
-#     tempfile.NamedTemporaryFile(delete=False, suffix="_tmp.py").name
-# )
-
-
-@dataclass(frozen=True)
-class BoolStatus:
-    status: bool = False
-
-    def __bool__(self) -> bool:
-        return self.status
+from dataclasses import dataclass, field
 
 
 @dataclass

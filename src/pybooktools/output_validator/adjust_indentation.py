@@ -1,8 +1,10 @@
+#: adjust_indentation.py
 import argparse
 import re
 from pathlib import Path
 
-from pybooktools.util import trace, get_artifact, artifact_path
+from pybooktools.util import trace
+from .artifacts import get_artifact, artifact_path
 
 
 def adjust_multiline_strings_indent(code: str) -> str:

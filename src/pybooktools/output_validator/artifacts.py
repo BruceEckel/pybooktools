@@ -1,3 +1,4 @@
+#: artifacts.py
 from pathlib import Path
 
 from pybooktools.util.panic import panic

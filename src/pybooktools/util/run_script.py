@@ -6,6 +6,8 @@ from pathlib import Path
 from rich.console import Console
 from rich.syntax import Syntax
 
+from pybooktools.util.panic import panic
+
 console = Console()
 
 

@@ -1,15 +1,10 @@
-#: prompt3.py
+#: incorporate_tracked_output.py
 import argparse
 from pathlib import Path
 
-from pybooktools.output_validator.tracker import Tracker
-from pybooktools.util import (
-    panic,
-    run_script,
-    get_artifact,
-    artifact_path,
-    trace,
-)
+from pybooktools.util import panic, run_script, trace
+from .artifacts import get_artifact, artifact_path
+from .tracker import Tracker
 
 
 def incorporate_tracked_output(example_path: Path) -> Path:

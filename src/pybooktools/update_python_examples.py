@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from pybooktools.output_validator.add_output_tracking import add_output_tracking
+from pybooktools.output_validator.add_output_tracking import add_tracking
 from pybooktools.output_validator.incorporate_tracked_output import (
     incorporate_tracked_output,
 )
@@ -40,7 +40,7 @@ def main():
             print(f"\nUpdating {original_script}")
             numbered_py_path = number_output_strings(original_script)
             print(f"Numbered version saved: {numbered_py_path}")
-            tracked_py_path = add_output_tracking(original_script)
+            tracked_py_path = add_tracking(original_script)
             print(f"Tracked version saved: {tracked_py_path}")
             updated_py_path = incorporate_tracked_output(original_script)
             print(f"Updated version saved: {updated_py_path}")
