@@ -5,7 +5,7 @@ from pathlib import Path
 
 from rich.console import Console
 
-from pybooktools.util import FileChanged
+from pybooktools.util import FileChanged, display
 
 console = Console()
 
@@ -34,6 +34,7 @@ def ensure_slug_line(file_path: Path) -> FileChanged:
 
 
 def main():
+    display(f"{Path(__file__).name}")
     parser = argparse.ArgumentParser(
         description="Create or update slug lines (commented file name at top) in Python files"
     )

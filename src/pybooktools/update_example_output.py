@@ -1,17 +1,21 @@
 import argparse
 from pathlib import Path
 
-from pybooktools.output_validator.add_output_tracking import add_tracking
-from pybooktools.output_validator.incorporate_tracked_output import (
-    incorporate_tracked_output,
-)
-from pybooktools.output_validator.number_output_strings import (
+from pybooktools.output_validator.s1_number_output_strings import (
     number_output_strings,
 )
-from pybooktools.util import trace
+from pybooktools.output_validator.s2_add_output_tracking import add_tracking
+from pybooktools.output_validator.s3_incorporate_tracked_output import (
+    incorporate_tracked_output,
+)
+from pybooktools.output_validator.s4_adjust_indentation import (
+    adjust_multiline_strings_indent,
+)
+from pybooktools.util import trace, artifact_path, display
 
 
 def main():
+    display(f"{Path(__file__).name}")
     parser = argparse.ArgumentParser(
         description='Updates Python examples containing output strings that begin with ": or """:'
     )
@@ -44,6 +48,12 @@ def main():
             print(f"Tracked version saved: {tracked_py_path}")
             updated_py_path = incorporate_tracked_output(original_script)
             print(f"Updated version saved: {updated_py_path}")
+            adjusted = adjust_multiline_strings_indent(
+                updated_py_path.read_text(encoding="utf-8")
+            )
+            artifact_path(
+                original_script, "finished", "update_python_examples"
+            ).write_text(adjusted, encoding="utf-8")
 
 
 if __name__ == "__main__":

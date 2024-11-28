@@ -1,20 +1,20 @@
-#: add_output_tracking.py
+#: s2_add_output_tracking.py
+# Step 2
 import argparse
 from pathlib import Path
 
 import libcst as cst
 from typing_extensions import override
 
-from pybooktools.util import trace
+from pybooktools.util import trace, get_artifact, artifact_path, display
 
 
 def add_tracking(example_path: Path) -> Path:
     # Avoid circular imports:
-    from pybooktools.output_validator import get_artifact, artifact_path
 
     # Created by number_output_strings():
     numbered_py_path = get_artifact(
-        example_path, "numbered", "add_output_tracking"
+        example_path, "s1_numbered", "add_output_tracking"
     )
     numbered_py = numbered_py_path.read_text(encoding="utf-8")
 
@@ -94,13 +94,15 @@ def add_tracking(example_path: Path) -> Path:
 
     # Store the modified code
     tracked_py_path = artifact_path(
-        example_path, "tracked", "add_output_tracking"
+        example_path, "s2_tracked", "add_output_tracking"
     )
     tracked_py_path.write_text(modified_code, encoding="utf-8")
     return tracked_py_path
 
 
 def main():
+    display(f"{Path(__file__).name}")
+
     parser = argparse.ArgumentParser(
         description="Adds numbers to output strings starting with ':'"
     )

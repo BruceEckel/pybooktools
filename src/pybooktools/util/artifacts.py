@@ -1,7 +1,7 @@
 #: artifacts.py
 from pathlib import Path
 
-from pybooktools.util.panic import panic
+from .panic import panic
 
 
 def validation_dir(example_path: Path) -> Path:

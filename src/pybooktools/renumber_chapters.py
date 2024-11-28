@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List
 
+from pybooktools.util import display
+
 chapter_pattern = r"^(\d+[a-zA-Z]?)\s+(.+)\.md$"
 
 
@@ -91,6 +93,7 @@ class Book:
 
 
 def main() -> None:
+    display(f"{Path(__file__).name}")
     parser = ArgumentParser(description="Manage chapters in a Markdown book")
     parser.add_argument(
         "directory",

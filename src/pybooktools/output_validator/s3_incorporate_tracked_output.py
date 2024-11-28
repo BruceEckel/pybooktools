@@ -1,15 +1,15 @@
-#: incorporate_tracked_output.py
+#: s3_incorporate_tracked_output.py
 import argparse
 from pathlib import Path
 
-from pybooktools.util import panic, run_script, trace
-from .artifacts import get_artifact, artifact_path
+from pybooktools.util import panic, run_script, trace, display
+from pybooktools.util.artifacts import get_artifact, artifact_path
 from .tracker import Tracker
 
 
 def incorporate_tracked_output(example_path: Path) -> Path:
     tracked_py_path = get_artifact(
-        example_path, "tracked", "incorporate_tracked_output"
+        example_path, "s2_tracked", "incorporate_tracked_output"
     )
     # Step 1: Run tracked_py_path in its venv
     run_script(tracked_py_path)
@@ -20,7 +20,7 @@ def incorporate_tracked_output(example_path: Path) -> Path:
     tracker = Tracker.from_json_file(json_tracker)
     trace(tracker.outputs)
     numbered_example_path = get_artifact(
-        example_path, "numbered", "incorporate_tracked_output"
+        example_path, "s1_numbered", "incorporate_tracked_output"
     )
     updated = numbered_example_path.read_text(encoding="utf-8")
     for output in tracker.outputs:
@@ -40,14 +40,16 @@ def incorporate_tracked_output(example_path: Path) -> Path:
             trace(updated)
         else:
             panic(f"Bad output: {output}")
-    updated_example_path = artifact_path(
-        example_path, "updated", "incorporate_tracked_output"
+    incorporated_path = artifact_path(
+        example_path, "s3_incorporated", "incorporate_tracked_output"
     )
-    updated_example_path.write_text(updated, encoding="utf-8")
-    return updated_example_path
+    incorporated_path.write_text(updated, encoding="utf-8")
+    return incorporated_path
 
 
 def main():
+    display(f"{Path(__file__).name}")
+
     parser = argparse.ArgumentParser(
         description="Executes example_tracked.py and incorporates results"
     )

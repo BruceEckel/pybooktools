@@ -1,5 +1,5 @@
 #: validate_output.py
-# Remove after updating everything to ": style
+# TODO: Remove after updating everything to ": style
 
 
 # Ensure correctness of example output using:

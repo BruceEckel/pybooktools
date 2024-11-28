@@ -15,12 +15,12 @@ requires-python = ">= 3.8"
 z = "pybooktools.reminder:main"
 slug = "pybooktools.slug_line:main"
 chapz = "pybooktools.renumber_chapters:main"
-pyup = "pybooktools.update_python_examples:main"
+pyup = "pybooktools.update_example_output:main"
 xv = "pybooktools.remove_validation_dir:main"
-exnum = "pybooktools.output_validator.number_output_strings:main"
-etrack = "pybooktools.output_validator.add_output_tracking:main"
-exup = "pybooktools.output_validator.incorporate_tracked_output:main"
-exadj = "pybooktools.output_validator.adjust_indentation:main"
+exnum = "pybooktools.output_validator.s1_number_output_strings:main"
+etrack = "pybooktools.output_validator.s2_add_output_tracking:main"
+exup = "pybooktools.output_validator.s3_incorporate_tracked_output:main"
+exadj = "pybooktools.output_validator.s4_adjust_indentation:main"
 
 [build-system]
 requires = ["hatchling"]

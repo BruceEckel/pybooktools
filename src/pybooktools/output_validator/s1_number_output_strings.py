@@ -1,4 +1,5 @@
-#: number_output_strings.py
+#: s1_number_output_strings.py
+# Step 1
 import argparse
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -6,7 +7,7 @@ from typing import override
 
 import libcst as cst
 
-from pybooktools.util import trace
+from pybooktools.util import trace, valid_python_file, artifact_path, display
 
 trace.on = True
 
@@ -41,19 +42,14 @@ class StringNumberingTransformer(cst.CSTTransformer):
 
 
 def number_output_strings(example_path: Path) -> Path:
-    # Import here to avoid circular dependency
-    from pybooktools.output_validator import valid_python_file, artifact_path
-
     valid_python_file(example_path)
     example_code = example_path.read_text(encoding="utf-8")
     parsed_module = cst.parse_module(example_code)
 
     transformer = StringNumberingTransformer()
     modified_tree = parsed_module.visit(transformer)
-
-    # output_path = validate_dir / f"{example_path.stem}_numbered.py"
     output_path = artifact_path(
-        example_path, "numbered", "number_output_strings"
+        example_path, "s1_numbered", "number_output_strings"
     )
     output_path.write_text(modified_tree.code, encoding="utf-8")
     trace(f"Numbered file saved to {output_path}")
@@ -61,6 +57,7 @@ def number_output_strings(example_path: Path) -> Path:
 
 
 def main():
+    display(f"{Path(__file__).name}")
     parser = argparse.ArgumentParser(
         description="Adds numbers to output strings starting with ':'"
     )
@@ -80,7 +77,8 @@ def main():
     else:
         for original_script in scripts_to_number:
             print(f"\nNumbered script: {original_script}")
-            number_output_strings(original_script)
+            numbered_py_path = number_output_strings(original_script)
+            print(f"Wrote {numbered_py_path}")
 
 
 if __name__ == "__main__":

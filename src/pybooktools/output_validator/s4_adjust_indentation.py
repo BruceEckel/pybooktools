@@ -1,10 +1,10 @@
-#: adjust_indentation.py
+#: s4_adjust_indentation.py
+# Step 4
 import argparse
 import re
 from pathlib import Path
 
-from pybooktools.output_validator import get_artifact, artifact_path
-from pybooktools.util import trace
+from pybooktools.util import trace, get_artifact, artifact_path, display
 
 
 def adjust_multiline_strings_indent(code: str) -> str:
@@ -32,6 +32,8 @@ def adjust_multiline_strings_indent(code: str) -> str:
 
 
 def main():
+    display(f"{Path(__file__).name}")
+
     parser = argparse.ArgumentParser(
         description='Updates Python examples containing output strings that begin with ": or """:'
     )
@@ -58,9 +60,11 @@ def main():
     else:
         for original_script in scripts_to_update:
             print(f"\nAdjusting indentation for {original_script}")
-            updated_py_path = get_artifact(original_script, "updated")
+            incorporated_py_path = get_artifact(
+                original_script, "s3_incorporated"
+            )
             adjusted: str = adjust_multiline_strings_indent(
-                updated_py_path.read_text(encoding="utf-8")
+                incorporated_py_path.read_text(encoding="utf-8")
             )
             adjusted_py: Path = artifact_path(original_script, "adjusted")
             adjusted_py.write_text(adjusted, encoding="utf-8")
