@@ -162,11 +162,9 @@ cython_debug/
 #.idea/
 /.idea
 
-# The pyproject.toml file is the reference for correct build instructions. 
+# The pyproject.toml file is the reference for correct build instructions.
 # Lockfiles are the reference for a single successful deployment.
 # Thus lockfiles are not stored in the Github repository.
 
 *.lock
-src/pybooktools/test_temp_a.py
-/src/pybooktools/_validate
-/src/pybooktools/_validation
+**/_validation/

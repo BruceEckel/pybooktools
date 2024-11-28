@@ -8,6 +8,8 @@ import libcst as cst
 
 from pybooktools.util import trace
 
+trace.on = True
+
 
 @dataclass
 class StringNumberingTransformer(cst.CSTTransformer):
@@ -77,7 +79,7 @@ def main():
         print("No files matched the given file pattern.")
     else:
         for original_script in scripts_to_number:
-            print(f"\nNumbering script: {original_script}")
+            print(f"\nNumbered script: {original_script}")
             number_output_strings(original_script)
 
 

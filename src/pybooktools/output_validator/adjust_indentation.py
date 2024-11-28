@@ -52,7 +52,7 @@ def main():
         parser.print_help()
         return
 
-    scripts_to_update = list(Path("..").glob(args.file_pattern))
+    scripts_to_update = list(Path(".").glob(args.file_pattern))
     if not scripts_to_update:
         print("No files matched the given file pattern.")
     else:

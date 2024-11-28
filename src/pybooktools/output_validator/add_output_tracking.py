@@ -20,7 +20,7 @@ def add_tracking(example_path: Path) -> Path:
 
     # Add import statements and tracker initialization
     numbered_py = (
-            "from pybooktools.tracker import Tracker\n"
+            "from pybooktools.output_validator.tracker import Tracker\n"
             "tracker = Tracker()\n" + numbered_py
     )
 
@@ -113,8 +113,7 @@ def main():
     if not args.file_pattern:
         parser.print_help()
         return
-
-    scripts_to_track = list(Path("..").glob(args.file_pattern))
+    scripts_to_track = list(Path(".").glob(args.file_pattern))
     if not scripts_to_track:
         print("No files matched the given file pattern.")
     else:
