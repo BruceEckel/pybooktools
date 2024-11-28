@@ -51,9 +51,11 @@ def main():
             adjusted = adjust_multiline_strings_indent(
                 updated_py_path.read_text(encoding="utf-8")
             )
-            artifact_path(
-                original_script, "finished", "update_python_examples"
-            ).write_text(adjusted, encoding="utf-8")
+            finished = artifact_path(
+                original_script, "s4_finished", "update_python_examples"
+            )
+            finished.write_text(adjusted, encoding="utf-8")
+            print(f"Finished version saved: {finished}")
 
 
 if __name__ == "__main__":

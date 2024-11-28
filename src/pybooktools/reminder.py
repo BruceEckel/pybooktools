@@ -21,8 +21,8 @@ def main() -> None:
         "     [yellow]Add numbers to[/yellow] [green]'\":' / '\"\"\":'[/green] [yellow]statements in Python files[/yellow]\n"
         "[deep_sky_blue1]etrack[/deep_sky_blue1]"
         "    [yellow]Add tracking statements in Python files[/yellow]\n"
-        "[deep_sky_blue1]exup[/deep_sky_blue1]"
-        "      [yellow]Update examples with correct output[/yellow]\n"
+        # "[deep_sky_blue1]exup[/deep_sky_blue1]"
+        # "      [yellow]Update examples with correct output[/yellow]\n"
         "[deep_sky_blue1]exadj[/deep_sky_blue1]"
         '     [yellow]Adjust example formatting for """:[/yellow]\n'
         "[deep_sky_blue1]xv[/deep_sky_blue1]"
