@@ -4,7 +4,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Union
 
+from rich.columns import Columns
+from rich.console import Console
+from rich.panel import Panel
+
 from pybooktools.util import panic, trace
+
+console = Console()
 
 
 @dataclass
@@ -41,14 +47,20 @@ class Output:
     def compare(self):
         if not self.actual_output_written:
             panic(f"Actual output not written in {self}")
+        actual_panel = Panel(
+            self.actual_output,
+            title="Actual Output",
+            title_align="center",
+            border_style="bold green",
+        )
+        expected_panel = Panel(
+            self.expected_output,
+            title="Expected Output",
+            title_align="center",
+            border_style="bold blue",
+        )
         if self.actual_output != self.expected_output:
-            print(
-                f"actual: [{self.actual_output}] IS NOT expected: [{self.expected_output}]"
-            )
-        else:
-            print(
-                f"actual: [{self.actual_output}]     IS expected: [{self.expected_output}]"
-            )
+            console.print(Columns([actual_panel, expected_panel]))
 
     def to_dict(self) -> dict:
         return {
@@ -98,12 +110,6 @@ class Tracker:
         else:
             output_str = untouched_output[1:-1]
         trace(f"{untouched_output = }, {output_str = }")
-        # expected1 = output_str.split(":", maxsplit=1)[1].strip()
-        # trace(f"{expected1 = }")
-        # expected2 = expected1[1]
-        # trace(f"{expected2 = }")
-        # expected3 = expected2.strip()
-        # trace(f"{expected3 = }")
         self.__current.expected_output = output_str.split(":", maxsplit=1)[
             1
         ].strip()
