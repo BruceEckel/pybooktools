@@ -1,7 +1,7 @@
 import json
 import traceback
 from dataclasses import dataclass
-from typing import Callable
+from typing import Any
 
 from rich.console import Console
 from rich.pretty import Pretty
@@ -11,30 +11,16 @@ console = Console()
 
 @dataclass
 class Trace:
-    on: bool = False
+    tracing: bool = False
 
-    def __call__(self, *args):
-        if not self.on:
+    def __bool__(self) -> bool:
+        return self.tracing
+
+    def __call__(self, *args: Any) -> None:
+        if not self.tracing:
             return
         for arg in args:
             match arg:
-                case Callable():
-                    try:
-                        console.print(
-                            "[bold yellow]Executing function:[/bold yellow]",
-                            Pretty(arg),
-                        )
-                        result = arg()
-                        console.print(
-                            "[bold green]Function result:[/bold green]",
-                            Pretty(result),
-                        )
-                    except Exception as e:
-                        console.print(
-                            "[bold red]Exception while executing function:[/bold red]",
-                            Pretty(e),
-                        )
-                        console.print(traceback.format_exc())
                 case list() | tuple() | set():
                     console.print(Pretty(arg))
                 case dict():

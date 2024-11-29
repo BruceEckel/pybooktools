@@ -9,7 +9,7 @@ import libcst as cst
 
 from pybooktools.util import trace, valid_python_file, artifact_path, display
 
-trace.on = True
+trace.tracing = True
 
 
 @dataclass

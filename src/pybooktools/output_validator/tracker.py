@@ -10,6 +10,8 @@ from rich.panel import Panel
 
 from pybooktools.util import panic, trace
 
+trace.tracing = True
+
 console = Console()
 
 
@@ -59,6 +61,8 @@ class Output:
             title_align="center",
             border_style="bold blue",
         )
+        if trace:
+            console.print(Columns([actual_panel, expected_panel]))
         if self.actual_output != self.expected_output:
             console.print(Columns([actual_panel, expected_panel]))
 
