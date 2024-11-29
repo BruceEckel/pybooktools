@@ -2,7 +2,7 @@
 import argparse
 from pathlib import Path
 
-from pybooktools.util import run_script, trace, display
+from pybooktools.util import run_script, display, trace
 from pybooktools.util.artifacts import get_artifact
 from .tracker import Tracker
 
@@ -21,15 +21,6 @@ def validate_tracked_output(example_path: Path) -> None:
     )
     trace(tracker.outputs)
     tracker.compare()
-    # for output in tracker.outputs:
-    #     if output.untouched_output.startswith('"""'):
-    #         trace(f"3 quotes {output.untouched_output = }")
-    #         trace(f"3 quotes {output.actual_output = }")
-    #     elif output.untouched_output.startswith('"'):
-    #         trace(f"1 quote {output.untouched_output = }")
-    #         trace(f"1 quote {output.actual_output = }")
-    #     else:
-    #         panic(f"Bad output: {output}")
 
 
 def main():

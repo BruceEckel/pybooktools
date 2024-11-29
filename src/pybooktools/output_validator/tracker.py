@@ -46,7 +46,7 @@ class Output:
         self.actual_output += s
         self.actual_output_written = True
 
-    def compare(self):
+    def compare(self) -> bool:
         if not self.actual_output_written:
             panic(f"Actual output not written in {self}")
         actual_panel = Panel(
@@ -61,10 +61,11 @@ class Output:
             title_align="center",
             border_style="bold blue",
         )
-        if trace:
-            console.print(Columns([actual_panel, expected_panel]))
         if self.actual_output != self.expected_output:
             console.print(Columns([actual_panel, expected_panel]))
+            return False
+        else:
+            return True
 
     def to_dict(self) -> dict:
         return {
