@@ -16,7 +16,24 @@ class Trace:
         if not self.on:
             return
         for arg in args:
-            if (
+            if callable(arg):
+                try:
+                    console.print(
+                        "[bold yellow]Executing function:[/bold yellow]",
+                        Pretty(arg),
+                    )
+                    result = arg()
+                    console.print(
+                        "[bold green]Function result:[/bold green]",
+                        Pretty(result),
+                    )
+                except Exception as e:
+                    console.print(
+                        "[bold red]Exception while executing function:[/bold red]",
+                        Pretty(e),
+                    )
+                    console.print(traceback.format_exc())
+            elif (
                     isinstance(arg, list)
                     or isinstance(arg, tuple)
                     or isinstance(arg, set)
