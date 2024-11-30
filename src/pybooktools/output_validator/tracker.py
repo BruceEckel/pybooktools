@@ -8,7 +8,8 @@ from rich.columns import Columns
 from rich.console import Console
 from rich.panel import Panel
 
-from pybooktools.util import panic, trace
+from pybooktools.tracing import trace
+from pybooktools.util import panic
 
 console = Console()
 
@@ -47,20 +48,20 @@ class Output:
     def compare(self) -> bool:
         if not self.actual_output_written:
             panic(f"Actual output not written in {self}")
-        actual_panel = Panel(
-            self.actual_output,
-            title="Actual Output",
-            title_align="center",
-            border_style="bold green",
-        )
-        expected_panel = Panel(
-            self.expected_output,
-            title="Expected Output",
-            title_align="center",
-            border_style="bold blue",
-        )
+        # actual_panel = Panel(
+        #     self.actual_output,
+        #     title="Actual Output",
+        #     title_align="center",
+        #     border_style="bold green",
+        # )
+        # expected_panel = Panel(
+        #     self.expected_output,
+        #     title="Expected Output",
+        #     title_align="center",
+        #     border_style="bold blue",
+        # )
         if self.actual_output != self.expected_output:
-            console.print(Columns([actual_panel, expected_panel]))
+            # console.print(Columns([actual_panel, expected_panel]))
             return False
         else:
             return True
@@ -123,9 +124,11 @@ class Tracker:
         self.__current = Output()
 
     def compare(self):
+        trace("-0-")
         non_equivalent_outputs = [
             output for output in self.outputs if not output.compare()
         ]
+        trace("-1-")
         if non_equivalent_outputs:
             panels = []
             for output in non_equivalent_outputs:
@@ -142,23 +145,23 @@ class Tracker:
                     border_style="bold blue",
                 )
                 panels.append(Columns([actual_panel, expected_panel]))
+            trace("-2-")
             mismatch_panel = Panel(
                 Columns(panels),
-                title="Non-Equivalent Outputs",
+                title="Mismatch",
                 title_align="center",
                 border_style="bold red",
             )
-            if trace.on():
-                console.print(mismatch_panel)
+            trace("-3-")
+            console.print(mismatch_panel)
         else:
             match_panel = Panel(
-                "[bold green]Outputs match Expected[/bold green]",
+                "[bold green]Outputs Match[/bold green]",
                 title="Comparison Result",
                 title_align="center",
                 border_style="green",
             )
-            if trace.on():
-                console.print(match_panel)
+            console.print(match_panel)
 
     def write_json_file(self, tracker_json_file: str) -> None:
         data = {

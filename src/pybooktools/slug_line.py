@@ -5,7 +5,8 @@ from pathlib import Path
 
 from rich.console import Console
 
-from pybooktools.util import FileChanged, display
+from pybooktools.tracing import trace
+from pybooktools.util import FileChanged, trace_function_name
 
 console = Console()
 
@@ -34,7 +35,6 @@ def ensure_slug_line(file_path: Path) -> FileChanged:
 
 
 def main():
-    display(f"{Path(__file__).name}")
     parser = argparse.ArgumentParser(
         description="Create or update slug lines (commented file name at top) in Python files"
     )
@@ -50,8 +50,15 @@ def main():
         nargs="+",
         help="Specify one or more files to process",
     )
-    args = parser.parse_args()
+    parser.add_argument(
+        "-t", "--trace", action="store_true", help="Enable tracing"
+    )
 
+    args = parser.parse_args()
+    if args.trace:
+        trace.enable()
+
+    trace_function_name(f"{Path(__file__).name}")
     if args.files:
         # code_files = [Path(file) for file in args.files]
         code_files = map(Path, args.files)

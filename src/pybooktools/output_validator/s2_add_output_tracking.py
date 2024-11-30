@@ -6,7 +6,8 @@ from pathlib import Path
 import libcst as cst
 from typing_extensions import override
 
-from pybooktools.util import trace, get_artifact, artifact_path, display
+from pybooktools.tracing import trace
+from pybooktools.util import get_artifact, artifact_path, trace_function_name
 
 
 def add_tracking(example_path: Path) -> Path:
@@ -101,8 +102,6 @@ def add_tracking(example_path: Path) -> Path:
 
 
 def main():
-    display(f"{Path(__file__).name}")
-
     parser = argparse.ArgumentParser(
         description="Adds numbers to output strings starting with ':'"
     )
@@ -111,10 +110,19 @@ def main():
         type=str,
         help="File or pattern to match Python scripts to test.",
     )
+    parser.add_argument(
+        "-t", "--trace", action="store_true", help="Enable tracing"
+    )
     args = parser.parse_args()
+
+    if args.trace:
+        trace.enable()
+
     if not args.file_pattern:
         parser.print_help()
         return
+
+    trace_function_name(f"{Path(__file__).name}")
     scripts_to_track = list(Path(".").glob(args.file_pattern))
     if not scripts_to_track:
         print("No files matched the given file pattern.")

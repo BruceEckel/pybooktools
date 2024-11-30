@@ -7,7 +7,12 @@ from typing import override
 
 import libcst as cst
 
-from pybooktools.util import trace, valid_python_file, artifact_path, display
+from pybooktools.tracing import trace
+from pybooktools.util import (
+    valid_python_file,
+    artifact_path,
+    trace_function_name,
+)
 
 
 @dataclass
@@ -55,7 +60,6 @@ def number_output_strings(example_path: Path) -> Path:
 
 
 def main():
-    display(f"{Path(__file__).name}")
     parser = argparse.ArgumentParser(
         description="Adds numbers to output strings starting with ':'"
     )
@@ -64,11 +68,19 @@ def main():
         type=str,
         help="File or pattern to match Python scripts to test.",
     )
+    parser.add_argument(
+        "-t", "--trace", action="store_true", help="Enable tracing"
+    )
     args = parser.parse_args()
+
+    if args.trace:
+        trace.enable()
+
     if not args.file_pattern:
         parser.print_help()
         return
 
+    trace_function_name(f"{Path(__file__).name}")
     scripts_to_number = list(Path(".").glob(args.file_pattern))
     if not scripts_to_number:
         print("No files matched the given file pattern.")

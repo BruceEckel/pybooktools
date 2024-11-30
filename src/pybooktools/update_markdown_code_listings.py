@@ -23,7 +23,8 @@ from typing import LiteralString
 
 from rich.console import Console
 
-from pybooktools.util import display
+from pybooktools.tracing import trace
+from pybooktools.util import trace_function_name
 
 width = 65
 console = Console()
@@ -175,7 +176,6 @@ def update_markdown_listings(
 
 
 def main():
-    display(f"{Path(__file__).name}")
     parser = argparse.ArgumentParser(
         description="Update Python slugline-marked source-code listings within a markdown file."
     )
@@ -183,8 +183,15 @@ def main():
         "markdown_file",
         help="Path to the markdown file to be updated.",
     )
+    parser.add_argument(
+        "-t", "--trace", action="store_true", help="Enable tracing output"
+    )
     args = parser.parse_args()
 
+    if args.trace:
+        trace.enable()
+
+    trace_function_name(f"{Path(__file__).name}")
     markdown_file = Path(args.markdown_file)
     markdown_content = markdown_file.read_text(encoding="utf-8")
     listings = find_python_files_and_listings(markdown_content)

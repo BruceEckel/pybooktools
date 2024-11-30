@@ -11,15 +11,13 @@ console = Console()
 
 @dataclass
 class Trace:
-    tracing: bool = False
+    __tracing: bool = False
 
-    # def __bool__(self) -> bool:
-    #     return bool(self.tracing)
-    def on(self) -> bool:
-        return self.tracing
+    def __bool__(self) -> bool:
+        return bool(self.__tracing)
 
     def __call__(self, *args: Any) -> None:
-        if not self.tracing:
+        if not self.__tracing:
             return
         for arg in args:
             match arg:
@@ -57,7 +55,9 @@ class Trace:
                         console.print(arg)
 
     def enable(self) -> None:
-        self.tracing = True
+        console.print(f"[red]trace enabled[/red]")
+        self.__tracing = True
 
     def disable(self) -> None:
-        self.tracing = False
+        console.print(f"[red]trace disabled[/red]")
+        self.__tracing = False

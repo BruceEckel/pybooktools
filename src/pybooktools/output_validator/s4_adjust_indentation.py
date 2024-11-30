@@ -4,7 +4,8 @@ import argparse
 import re
 from pathlib import Path
 
-from pybooktools.util import trace, get_artifact, artifact_path, display
+from pybooktools.tracing import trace
+from pybooktools.util import get_artifact, artifact_path, trace_function_name
 
 
 def adjust_multiline_strings_indent(code: str) -> str:
@@ -32,8 +33,6 @@ def adjust_multiline_strings_indent(code: str) -> str:
 
 
 def main():
-    display(f"{Path(__file__).name}")
-
     parser = argparse.ArgumentParser(
         description='Updates Python examples containing output strings that begin with ": or """:'
     )
@@ -54,6 +53,7 @@ def main():
         parser.print_help()
         return
 
+    trace_function_name(f"{Path(__file__).name}")
     scripts_to_update = list(Path(".").glob(args.file_pattern))
     if not scripts_to_update:
         print("No files matched the given file pattern.")

@@ -6,7 +6,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List
 
-from pybooktools.util import display
+from pybooktools.tracing import trace
+from pybooktools.util import trace_function_name
 
 chapter_pattern = r"^(\d+[a-zA-Z]?)\s+(.+)\.md$"
 
@@ -93,7 +94,6 @@ class Book:
 
 
 def main() -> None:
-    display(f"{Path(__file__).name}")
     parser = ArgumentParser(description="Manage chapters in a Markdown book")
     parser.add_argument(
         "directory",
@@ -115,12 +115,19 @@ def main() -> None:
         action="store_true",
         help="Display the chapters in the directory without renumbering",
     )
+    parser.add_argument(
+        "-t", "--trace", action="store_true", help="Enable tracing output"
+    )
     args = parser.parse_args()
+
+    if args.trace:
+        trace.enable()
 
     if not (args.renumber or args.display):
         parser.print_help()
         return
 
+    trace_function_name(f"{Path(__file__).name}")
     directory = Path(args.directory) if args.directory else Path(os.getcwd())
     book = Book(directory)
 

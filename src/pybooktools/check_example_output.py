@@ -8,13 +8,12 @@ from pybooktools.output_validator.s2_add_output_tracking import add_tracking
 from pybooktools.output_validator.s3_validate_tracked_output import (
     validate_tracked_output,
 )
-from pybooktools.util import trace, display
+from pybooktools.tracing import trace
+from pybooktools.util import trace_function_name
 
 
 def main():
     prog_id = f"{Path(__file__).stem}"
-    print(f"{trace.on() = }")
-    display(prog_id)
     parser = argparse.ArgumentParser(
         description='Updates Python examples containing output strings that begin with ": or """:'
     )
@@ -24,7 +23,7 @@ def main():
         help="File or pattern to match Python scripts to test",
     )
     parser.add_argument(
-        "-t", "--trace", action="store_true", help="Enable tracing output"
+        "-t", "--trace", action="store_true", help="Enable tracing"
     )
     args = parser.parse_args()
 
@@ -35,6 +34,7 @@ def main():
         parser.print_help()
         return
 
+    trace_function_name()
     scripts_to_update = list(Path(".").glob(args.file_pattern))
     if not scripts_to_update:
         print("No files matched the given file pattern.")
@@ -46,7 +46,6 @@ def main():
             tracked_py_path = add_tracking(original_script)
             trace(f"{prog_id}: Tracked version saved: {tracked_py_path}")
             validate_tracked_output(original_script)
-    print(f"{trace.on() = }")
 
 
 if __name__ == "__main__":
