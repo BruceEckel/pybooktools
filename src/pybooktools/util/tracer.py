@@ -13,7 +13,9 @@ console = Console()
 class Trace:
     tracing: bool = False
 
-    def __bool__(self) -> bool:
+    # def __bool__(self) -> bool:
+    #     return bool(self.tracing)
+    def on(self) -> bool:
         return self.tracing
 
     def __call__(self, *args: Any) -> None:
@@ -54,5 +56,8 @@ class Trace:
                     else:
                         console.print(arg)
 
+    def enable(self) -> None:
+        self.tracing = True
 
-trace = Trace()
+    def disable(self) -> None:
+        self.tracing = False

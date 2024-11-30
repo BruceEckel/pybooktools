@@ -4,7 +4,9 @@ from .display import display
 from .file_changed import FileChanged
 from .panic import panic
 from .run_script import get_virtual_env_python, run_script
-from .trace import trace
+from .tracer import Trace
+
+trace = Trace()
 
 __all__ = [
     "panic",

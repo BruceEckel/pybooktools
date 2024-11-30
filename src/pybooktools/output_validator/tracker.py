@@ -10,8 +10,6 @@ from rich.panel import Panel
 
 from pybooktools.util import panic, trace
 
-trace.tracing = True
-
 console = Console()
 
 
@@ -125,8 +123,42 @@ class Tracker:
         self.__current = Output()
 
     def compare(self):
-        for output in self.outputs:
-            output.compare()
+        non_equivalent_outputs = [
+            output for output in self.outputs if not output.compare()
+        ]
+        if non_equivalent_outputs:
+            panels = []
+            for output in non_equivalent_outputs:
+                actual_panel = Panel(
+                    output.actual_output,
+                    title="Actual Output",
+                    title_align="center",
+                    border_style="bold green",
+                )
+                expected_panel = Panel(
+                    output.expected_output,
+                    title="Expected Output",
+                    title_align="center",
+                    border_style="bold blue",
+                )
+                panels.append(Columns([actual_panel, expected_panel]))
+            mismatch_panel = Panel(
+                Columns(panels),
+                title="Non-Equivalent Outputs",
+                title_align="center",
+                border_style="bold red",
+            )
+            if trace.on():
+                console.print(mismatch_panel)
+        else:
+            match_panel = Panel(
+                "[bold green]Outputs match Expected[/bold green]",
+                title="Comparison Result",
+                title_align="center",
+                border_style="green",
+            )
+            if trace.on():
+                console.print(match_panel)
 
     def write_json_file(self, tracker_json_file: str) -> None:
         data = {

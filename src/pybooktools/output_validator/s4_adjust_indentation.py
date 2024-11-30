@@ -48,7 +48,7 @@ def main():
     args = parser.parse_args()
 
     if args.trace:
-        trace.tracing = True
+        trace.enable()
 
     if not args.file_pattern:
         parser.print_help()

@@ -9,8 +9,6 @@ import libcst as cst
 
 from pybooktools.util import trace, valid_python_file, artifact_path, display
 
-trace.tracing = True
-
 
 @dataclass
 class StringNumberingTransformer(cst.CSTTransformer):

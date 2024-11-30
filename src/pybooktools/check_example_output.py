@@ -12,7 +12,9 @@ from pybooktools.util import trace, display
 
 
 def main():
-    display(f"{Path(__file__).name}")
+    prog_id = f"{Path(__file__).stem}"
+    print(f"{trace.on() = }")
+    display(prog_id)
     parser = argparse.ArgumentParser(
         description='Updates Python examples containing output strings that begin with ": or """:'
     )
@@ -27,7 +29,7 @@ def main():
     args = parser.parse_args()
 
     if args.trace:
-        trace.tracing = True
+        trace.enable()
 
     if not args.file_pattern:
         parser.print_help()
@@ -38,12 +40,13 @@ def main():
         print("No files matched the given file pattern.")
     else:
         for original_script in scripts_to_update:
-            print(f"\nUpdating {original_script}")
+            trace(f"\n{prog_id}: Updating {original_script}")
             numbered_py_path = number_output_strings(original_script)
-            print(f"Numbered version saved: {numbered_py_path}")
+            trace(f"{prog_id}: Numbered version saved: {numbered_py_path}")
             tracked_py_path = add_tracking(original_script)
-            print(f"Tracked version saved: {tracked_py_path}")
+            trace(f"{prog_id}: Tracked version saved: {tracked_py_path}")
             validate_tracked_output(original_script)
+    print(f"{trace.on() = }")
 
 
 if __name__ == "__main__":
