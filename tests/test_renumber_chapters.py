@@ -1,3 +1,4 @@
+#: test_renumber_chapters.py
 # This is still not testing differing file titles vs. Markdown titles
 
 from pathlib import Path

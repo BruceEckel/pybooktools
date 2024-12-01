@@ -1,3 +1,4 @@
+#: remove_validation_dir.py
 # TODO: Add recursive removal
 from pathlib import Path
 from shutil import rmtree

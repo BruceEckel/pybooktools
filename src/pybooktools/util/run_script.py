@@ -1,3 +1,4 @@
+#: run_script.py
 import os
 import subprocess
 import sys

@@ -1,3 +1,4 @@
+#: check_example_output.py
 import argparse
 from pathlib import Path
 

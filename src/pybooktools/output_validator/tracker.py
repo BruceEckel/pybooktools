@@ -48,20 +48,7 @@ class Output:
     def compare(self) -> bool:
         if not self.actual_output_written:
             panic(f"Actual output not written in {self}")
-        # actual_panel = Panel(
-        #     self.actual_output,
-        #     title="Actual Output",
-        #     title_align="center",
-        #     border_style="bold green",
-        # )
-        # expected_panel = Panel(
-        #     self.expected_output,
-        #     title="Expected Output",
-        #     title_align="center",
-        #     border_style="bold blue",
-        # )
         if self.actual_output != self.expected_output:
-            # console.print(Columns([actual_panel, expected_panel]))
             return False
         else:
             return True
