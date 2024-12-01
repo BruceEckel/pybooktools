@@ -5,13 +5,13 @@ from shutil import rmtree
 from rich.console import Console
 from rich.panel import Panel
 
-from pybooktools.util import panic, trace_function_name
+from pybooktools.util import panic, display_function_name
 
 console = Console()
 
 
 def main():
-    trace_function_name(f"{Path(__file__).name}")
+    display_function_name()
     validation_dir = Path(".") / "_validation"
     if not validation_dir.exists():
         panic(f"Does not exist: {validation_dir}")

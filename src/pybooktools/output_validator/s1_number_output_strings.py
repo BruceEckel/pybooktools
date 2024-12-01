@@ -11,7 +11,7 @@ from pybooktools.tracing import trace
 from pybooktools.util import (
     valid_python_file,
     artifact_path,
-    trace_function_name,
+    display_function_name,
 )
 
 
@@ -60,6 +60,7 @@ def number_output_strings(example_path: Path) -> Path:
 
 
 def main():
+    display_function_name()
     parser = argparse.ArgumentParser(
         description="Adds numbers to output strings starting with ':'"
     )
@@ -80,13 +81,12 @@ def main():
         parser.print_help()
         return
 
-    trace_function_name(f"{Path(__file__).name}")
     scripts_to_number = list(Path(".").glob(args.file_pattern))
     if not scripts_to_number:
         print("No files matched the given file pattern.")
     else:
         for original_script in scripts_to_number:
-            print(f"\nNumbered script: {original_script}")
+            print(f"\nOriginal script: {original_script}")
             numbered_py_path = number_output_strings(original_script)
             print(f"Wrote {numbered_py_path}")
 

@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 
 from pybooktools.tracing import trace
-from pybooktools.util import get_artifact, artifact_path, trace_function_name
+from pybooktools.util import get_artifact, artifact_path, display_function_name
 
 
 def adjust_multiline_strings_indent(code: str) -> str:
@@ -15,24 +15,31 @@ def adjust_multiline_strings_indent(code: str) -> str:
 
     def adjust_indent(match: re.Match) -> str:
         multiline_string = match.group(0)
+        trace("multiline_string:", multiline_string)
         # Find the indentation level by inspecting the preceding line
         preceding_whitespace = match.group(1)
+        trace(f"preceding_whitespace: [{preceding_whitespace}]")
         # Adjust each line after the first with the correct indentation level
         lines = multiline_string.splitlines()
+        trace("lines:", lines)
         if len(lines) > 1:
             lines = [lines[0]] + [
                 f"{preceding_whitespace}{line.strip()}" for line in lines[1:]
             ]
-        return "\n".join(lines)
+            trace("lines:", lines)
+        result = "\n".join(lines)
+        trace("result:", result)
+        return result
 
     # Regular expression to find multiline strings starting with '""": '
-    pattern = re.compile(r'(\n[ \t]*)""":\n((?:.*\n?)+?)"""', re.MULTILINE)
+    pattern = re.compile(r'\n([ \t]*)""":\n((?:.*\n?)+?)"""', re.MULTILINE)
     modified_code = re.sub(pattern, adjust_indent, code)
 
     return modified_code
 
 
 def main():
+    display_function_name()
     parser = argparse.ArgumentParser(
         description='Updates Python examples containing output strings that begin with ": or """:'
     )
@@ -53,7 +60,6 @@ def main():
         parser.print_help()
         return
 
-    trace_function_name(f"{Path(__file__).name}")
     scripts_to_update = list(Path(".").glob(args.file_pattern))
     if not scripts_to_update:
         print("No files matched the given file pattern.")
@@ -66,6 +72,7 @@ def main():
             adjusted: str = adjust_multiline_strings_indent(
                 incorporated_py_path.read_text(encoding="utf-8")
             )
+            trace("adjusted:", adjusted)
             adjusted_py: Path = artifact_path(original_script, "adjusted")
             adjusted_py.write_text(adjusted, encoding="utf-8")
             print(f"Indented version saved: {adjusted_py}")

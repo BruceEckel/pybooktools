@@ -12,10 +12,11 @@ from pybooktools.output_validator.s4_adjust_indentation import (
     adjust_multiline_strings_indent,
 )
 from pybooktools.tracing import trace
-from pybooktools.util import artifact_path, trace_function_name
+from pybooktools.util import artifact_path, display_function_name
 
 
 def main():
+    display_function_name()
     parser = argparse.ArgumentParser(
         description='Updates Python examples containing output strings that begin with ": or """:'
     )
@@ -36,7 +37,6 @@ def main():
         parser.print_help()
         return
 
-    trace_function_name(f"{Path(__file__).name}")
     scripts_to_update = list(Path(".").glob(args.file_pattern))
     if not scripts_to_update:
         print("No files matched the given file pattern.")

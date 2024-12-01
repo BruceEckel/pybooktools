@@ -1,13 +1,13 @@
 #: __init__.py
 from .artifacts import artifact_path, get_artifact, valid_python_file
-from .display import trace_function_name
+from .display import display_function_name
 from .file_changed import FileChanged
 from .panic import panic
 from .run_script import get_virtual_env_python, run_script
 
 __all__ = [
     "panic",
-    "trace_function_name",
+    "display_function_name",
     "get_virtual_env_python",
     "run_script",
     "FileChanged",

@@ -124,11 +124,9 @@ class Tracker:
         self.__current = Output()
 
     def compare(self):
-        trace("-0-")
         non_equivalent_outputs = [
             output for output in self.outputs if not output.compare()
         ]
-        trace("-1-")
         if non_equivalent_outputs:
             panels = []
             for output in non_equivalent_outputs:
@@ -145,14 +143,12 @@ class Tracker:
                     border_style="bold blue",
                 )
                 panels.append(Columns([actual_panel, expected_panel]))
-            trace("-2-")
             mismatch_panel = Panel(
                 Columns(panels),
                 title="Mismatch",
                 title_align="center",
                 border_style="bold red",
             )
-            trace("-3-")
             console.print(mismatch_panel)
         else:
             match_panel = Panel(

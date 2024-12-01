@@ -15,14 +15,16 @@ def dbg(msg: str) -> None:
     # )
 
 
-def trace_function_name(title="") -> None:
-    dbg(f"In trace_function_name, {bool(trace) = }")
-    if not trace:
-        dbg("Early return from trace_function_name")
-        return
+def display_function_name(title="", only_while_tracing=False) -> None:
+    dbg(f"In display_function_name, {bool(trace) = } {only_while_tracing = }")
+    if only_while_tracing:
+        if not trace:
+            dbg("Early return from display_function_name")
+            return
+
     import inspect
 
-    dbg("Continuing trace_function_name")
+    dbg("Continuing display_function_name")
     caller_frame = inspect.stack()[1]
     fname = f"{Path(caller_frame.filename).name}"
     panel_title = f"[green]{title}[/green]" if title else None

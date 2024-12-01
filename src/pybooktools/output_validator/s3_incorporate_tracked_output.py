@@ -3,7 +3,7 @@ import argparse
 from pathlib import Path
 
 from pybooktools.tracing import trace
-from pybooktools.util import panic, run_script, trace_function_name
+from pybooktools.util import panic, run_script, display_function_name
 from pybooktools.util.artifacts import get_artifact, artifact_path
 from .tracker import Tracker
 
@@ -49,6 +49,7 @@ def incorporate_tracked_output(example_path: Path) -> Path:
 
 
 def main():
+    display_function_name()
     parser = argparse.ArgumentParser(
         description="Executes example_tracked.py and incorporates results"
     )
@@ -69,13 +70,12 @@ def main():
         parser.print_help()
         return
 
-    trace_function_name(f"{Path(__file__).name}")
     scripts_to_update = list(Path(".").glob(args.file_pattern))
     if not scripts_to_update:
         print("No files matched the given file pattern.")
     else:
         for original_script in scripts_to_update:
-            print(f"\nModifying {original_script}")
+            print(f"\nIncorporating tracked output for: {original_script}")
             updated_py_path = incorporate_tracked_output(original_script)
             print(f"Updated version saved: {updated_py_path}")
 

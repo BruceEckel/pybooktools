@@ -3,7 +3,7 @@ import argparse
 from pathlib import Path
 
 from pybooktools.tracing import trace
-from pybooktools.util import run_script, trace_function_name
+from pybooktools.util import run_script, display_function_name
 from pybooktools.util.artifacts import get_artifact
 from .tracker import Tracker
 
@@ -25,6 +25,7 @@ def validate_tracked_output(example_path: Path) -> None:
 
 
 def main():
+    display_function_name()
     parser = argparse.ArgumentParser(
         description="Executes example_s2_tracked.py and verifies results"
     )
@@ -45,7 +46,6 @@ def main():
         parser.print_help()
         return
 
-    trace_function_name(f"{Path(__file__).name}")
     scripts_to_update = list(Path(".").glob(args.file_pattern))
     if not scripts_to_update:
         print("No files matched the given file pattern.")

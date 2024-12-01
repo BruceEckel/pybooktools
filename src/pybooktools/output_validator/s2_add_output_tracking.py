@@ -7,7 +7,7 @@ import libcst as cst
 from typing_extensions import override
 
 from pybooktools.tracing import trace
-from pybooktools.util import get_artifact, artifact_path, trace_function_name
+from pybooktools.util import get_artifact, artifact_path, display_function_name
 
 
 def add_tracking(example_path: Path) -> Path:
@@ -102,6 +102,7 @@ def add_tracking(example_path: Path) -> Path:
 
 
 def main():
+    display_function_name()
     parser = argparse.ArgumentParser(
         description="Adds numbers to output strings starting with ':'"
     )
@@ -122,7 +123,6 @@ def main():
         parser.print_help()
         return
 
-    trace_function_name(f"{Path(__file__).name}")
     scripts_to_track = list(Path(".").glob(args.file_pattern))
     if not scripts_to_track:
         print("No files matched the given file pattern.")

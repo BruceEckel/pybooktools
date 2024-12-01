@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import List
 
 from pybooktools.tracing import trace
-from pybooktools.util import trace_function_name
+from pybooktools.util import display_function_name
 
 chapter_pattern = r"^(\d+[a-zA-Z]?)\s+(.+)\.md$"
 
@@ -94,6 +94,7 @@ class Book:
 
 
 def main() -> None:
+    display_function_name()
     parser = ArgumentParser(description="Manage chapters in a Markdown book")
     parser.add_argument(
         "directory",
@@ -127,7 +128,6 @@ def main() -> None:
         parser.print_help()
         return
 
-    trace_function_name(f"{Path(__file__).name}")
     directory = Path(args.directory) if args.directory else Path(os.getcwd())
     book = Book(directory)
 
