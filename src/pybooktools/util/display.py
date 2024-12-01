@@ -10,6 +10,7 @@ console = Console()
 
 def dbg(msg: str) -> None:
     pass
+    # Uncomment to enable dbg:
     # console.print(
     #     f"[medium_turquoise]dbg:[/medium_turquoise] [yellow]{msg}[/yellow]"
     # )

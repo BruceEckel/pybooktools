@@ -21,7 +21,7 @@ def validate_tracked_output(example_path: Path) -> None:
         )
     )
     trace(tracker.outputs)
-    tracker.compare()
+    tracker.compare(str(example_path.name))
 
 
 def main():

@@ -123,7 +123,7 @@ class Tracker:
         self.outputs.append(self.__current)
         self.__current = Output()
 
-    def compare(self):
+    def compare(self, file_name: str = ""):
         non_equivalent_outputs = [
             output for output in self.outputs if not output.compare()
         ]
@@ -145,8 +145,8 @@ class Tracker:
                 panels.append(Columns([actual_panel, expected_panel]))
             mismatch_panel = Panel(
                 Columns(panels),
-                title="Mismatch",
-                title_align="center",
+                title=file_name if file_name else "Mismatch",
+                title_align="left",
                 border_style="bold red",
             )
             console.print(mismatch_panel)
