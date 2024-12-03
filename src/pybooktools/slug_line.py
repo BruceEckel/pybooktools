@@ -68,7 +68,10 @@ def main():
             for file in Path(".").rglob(
                 "*.py"
             )  # Exclude directories starting with '.' or '_':
-            if not any((part.startswith(".") or part.startswith("_")) for part in file.parts)
+            if not any(
+                (part.startswith(".") or part.startswith("_"))
+                for part in file.parts
+            )
         ]
     else:  # No flags == find all files in the current directory:
         code_files = list(Path(".").glob("*.py"))
