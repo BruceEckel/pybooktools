@@ -21,8 +21,8 @@ def add_tracking(example_path: Path) -> Path:
 
     # Add import statements and tracker initialization
     numbered_py = (
-            "from pybooktools.output_validator.tracker import Tracker\n"
-            "tracker = Tracker()\n" + numbered_py
+        "from pybooktools.output_validator.tracker import Tracker\n"
+        "tracker = Tracker()\n" + numbered_py
     )
 
     # Use libcst to modify the Python code
@@ -30,16 +30,16 @@ def add_tracking(example_path: Path) -> Path:
 
         @override
         def leave_SimpleString(
-                self,
-                original_node: cst.SimpleString,
-                updated_node: cst.SimpleString,
+            self,
+            original_node: cst.SimpleString,
+            updated_node: cst.SimpleString,
         ) -> cst.CSTNode:
             trace(f"testing {original_node.value}")
             # Find unassigned strings that begin with an integral number followed by ':'
             if (
-                    original_node.value.startswith('"""')
-                    and original_node.value[3].isdigit()
-                    and ":" in original_node.value
+                original_node.value.startswith('"""')
+                and original_node.value[3].isdigit()
+                and ":" in original_node.value
             ):
                 trace(f"Found {original_node.value}")
                 parts = original_node.value.split(":", 1)
@@ -50,9 +50,9 @@ def add_tracking(example_path: Path) -> Path:
                     f"tracker.expected({n}, r'{original_node.value}')"
                 )
             if (
-                    original_node.value.startswith('"')
-                    and original_node.value[1].isdigit()
-                    and ":" in original_node.value
+                original_node.value.startswith('"')
+                and original_node.value[1].isdigit()
+                and ":" in original_node.value
             ):
                 trace(f"Found {original_node.value}")
                 parts = original_node.value.split(":", 1)
@@ -66,12 +66,12 @@ def add_tracking(example_path: Path) -> Path:
 
         @override
         def leave_Call(
-                self, original_node: cst.Call, updated_node: cst.Call
+            self, original_node: cst.Call, updated_node: cst.Call
         ) -> cst.CSTNode:
             # Replace all calls to `print` with `tracker.print`
             if (
-                    isinstance(original_node.func, cst.Name)
-                    and original_node.func.value == "print"
+                isinstance(original_node.func, cst.Name)
+                and original_node.func.value == "print"
             ):
                 return updated_node.with_changes(
                     func=cst.Attribute(
@@ -89,8 +89,8 @@ def add_tracking(example_path: Path) -> Path:
         example_path, "tracker", "add_output_tracking", file_ext="json"
     )
     modified_code = (
-            modified_tree.code
-            + f'\ntracker.write_json_file(r"{json_tracker_path}")\n'
+        modified_tree.code
+        + f'\ntracker.write_json_file(r"{json_tracker_path}")\n'
     )
 
     # Store the modified code

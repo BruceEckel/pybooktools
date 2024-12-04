@@ -22,7 +22,7 @@ class StringNumberingTransformer(cst.CSTTransformer):
 
     @override
     def leave_SimpleString(
-            self, original_node: cst.SimpleString, updated_node: cst.SimpleString
+        self, original_node: cst.SimpleString, updated_node: cst.SimpleString
     ) -> cst.CSTNode:
         value: str = original_node.value
         if value.startswith('""":'):

@@ -90,7 +90,7 @@ class Tracker:
         if ":" not in untouched_output:
             panic(f"expected() ':' not in {untouched_output=}")
         if not untouched_output.startswith(
-                '"'
+            '"'
         ) or not untouched_output.endswith('"'):
             panic(
                 "Untouched_output not contained in "
@@ -159,7 +159,7 @@ class Tracker:
 
     @classmethod
     def from_json_file(
-            cls, tracker_json_file_path: Path | str
+        cls, tracker_json_file_path: Path | str
     ) -> Union["Tracker", None]:
         if isinstance(tracker_json_file_path, str):
             json_path = Path(tracker_json_file_path)
