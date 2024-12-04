@@ -1,0 +1,23 @@
+Create a Python file containing a class `Show` with a `__call__` method that has the same signature as print(). 
+
+For `show = Show()`, a call to `show("example output")` will:
+
+1. Display the argument(s) using print() as in, print("example output")
+
+2. Capture the output and compare it to the "output comment lines" that immediately follow it.
+   - Each output comment line begins with `#: ` so in this case the comment line should be:
+     #: example output
+   - The show() call compares the contents of `#: example output` with the "example output" argument to show()
+   - If the call to show() produces multiple output lines, each line is represented with its own `#: ` output comment line.
+
+3. The output comment line(s) are indented the same as the `show()` on the previous line.
+
+4. If there are no output comment lines immediately after the call to show(), the appropriate lines
+   are created and added to the Python source file containing the call to show().
+
+5. If output comment lines do exist immediately after the call to show() but they are incorrect,
+   then they are replaced by the corrected lines in the Python source file containing the call to show().
+
+Everything does not need to be in the `Show` class, there can be extra functions or applications to solve this problem.
+You may use libraries such as libcst if that helps.
+My highest priority is a well-designed, elegant, easy-to-understand and easy-to-modify solution.
