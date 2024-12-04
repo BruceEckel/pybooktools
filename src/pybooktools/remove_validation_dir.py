@@ -1,5 +1,4 @@
 #: remove_validation_dir.py
-# TODO: Add recursive removal
 import argparse
 from pathlib import Path
 from shutil import rmtree
@@ -15,13 +14,13 @@ console = Console()
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Remove '_validation' directory"
+        description="Recursively remove '_validation' directories"
     )
     parser.add_argument(
-        "-r",
-        "--recursive",
+        "-n",
+        "--no_recurse",
         action="store_true",
-        help="Recursively remove _validation directories",
+        help="Only look in local directory",
     )
     parser.add_argument(
         "-t", "--trace", action="store_true", help="Enable tracing"
@@ -32,22 +31,37 @@ def main():
         trace.enable()
         display_function_name()
 
-    validation_dir = Path(".") / "_validation"
-    if not validation_dir.exists():
-        panic(f"Does not exist: {validation_dir}")
-    if not validation_dir.is_dir():
-        panic(f"Is not a directory: {validation_dir}")
-
-    # Use rmtree to remove the directory and its contents
-    rmtree(validation_dir)
-    console.print(
-        Panel(
-            f"[dark_slate_gray2]{validation_dir}[/dark_slate_gray2]",
-            title="[bold light_green]Removed[/bold light_green]",
-            title_align="left",
-            border_style="light_green",
+    if args.no_recurse:
+        validation_dirs = Path(".") / "_validation"
+    else:
+        validation_dirs = [
+            dir_path
+            for dir_path in Path(".").rglob("_validation")
+            if dir_path.is_dir()
+        ]
+    if not validation_dirs:
+        console.print(
+            Panel(
+                f"[dark_slate_gray2]No _validation dirs found[/dark_slate_gray2]",
+                border_style="light_green",
+            )
         )
-    )
+    for val_dir in validation_dirs:
+        if not val_dir.exists():
+            panic(f"Does not exist: {val_dir}")
+        if not val_dir.is_dir():
+            panic(f"Is not a directory: {val_dir}")
+
+        # Use rmtree to remove the directory and its contents
+        rmtree(val_dir)
+        console.print(
+            Panel(
+                f"[dark_slate_gray2]{val_dir}[/dark_slate_gray2]",
+                title="[bold light_green]Removed[/bold light_green]",
+                title_align="left",
+                border_style="light_green",
+            )
+        )
 
 
 if __name__ == "__main__":
