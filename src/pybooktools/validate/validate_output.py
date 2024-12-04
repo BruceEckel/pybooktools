@@ -78,10 +78,22 @@ def _update_comments(file_path: Path, call_line: int, output_lines: List[str]) -
     file_path.write_text("\n".join(new_lines), encoding="utf-8")
 
 
-def demo():
-    show("example output")  #
+def demo1():
+    show("example output\nbo's yer uncle")
+    #: example output
+    #: bo's yer uncle
+
+
+def demo2():
+    #: example output
+    show("""
+    #: example
+    #:     output
+    example
+    output""")
     #: example output
 
 
 if __name__ == "__main__":
-    demo()
+    demo1()
+    demo2()
