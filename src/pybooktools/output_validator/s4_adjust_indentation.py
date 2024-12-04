@@ -39,7 +39,6 @@ def adjust_multiline_strings_indent(code: str) -> str:
 
 
 def main():
-    display_function_name()
     parser = argparse.ArgumentParser(
         description='Updates Python examples containing output strings that begin with ": or """:'
     )
@@ -55,6 +54,7 @@ def main():
 
     if args.trace:
         trace.enable()
+        display_function_name()
 
     if not args.file_pattern:
         parser.print_help()

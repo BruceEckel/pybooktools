@@ -102,7 +102,6 @@ def add_tracking(example_path: Path) -> Path:
 
 
 def main():
-    display_function_name()
     parser = argparse.ArgumentParser(
         description="Adds numbers to output strings starting with ':'"
     )
@@ -118,6 +117,7 @@ def main():
 
     if args.trace:
         trace.enable()
+        display_function_name()
 
     if not args.file_pattern:
         parser.print_help()

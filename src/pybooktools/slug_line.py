@@ -35,7 +35,6 @@ def ensure_slug_line(file_path: Path) -> FileChanged:
 
 
 def main():
-    display_function_name()
     parser = argparse.ArgumentParser(
         description="Create or update slug lines (commented file name at top) in Python files"
     )
@@ -58,6 +57,7 @@ def main():
 
     if args.trace:
         trace.enable()
+        display_function_name()
 
     if args.files:
         # code_files = [Path(file) for file in args.files]

@@ -94,7 +94,6 @@ class Book:
 
 
 def main() -> None:
-    display_function_name()
     parser = ArgumentParser(description="Manage chapters in a Markdown book")
     parser.add_argument(
         "directory",
@@ -123,6 +122,7 @@ def main() -> None:
 
     if args.trace:
         trace.enable()
+        display_function_name()
 
     if not (args.renumber or args.display):
         parser.print_help()

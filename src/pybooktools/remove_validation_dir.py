@@ -14,7 +14,6 @@ console = Console()
 
 
 def main():
-    display_function_name()
     parser = argparse.ArgumentParser(
         description="Remove '_validation' directory"
     )
@@ -31,6 +30,7 @@ def main():
 
     if args.trace:
         trace.enable()
+        display_function_name()
 
     validation_dir = Path(".") / "_validation"
     if not validation_dir.exists():

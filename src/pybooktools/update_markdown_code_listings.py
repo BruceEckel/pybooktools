@@ -176,7 +176,6 @@ def update_markdown_listings(
 
 
 def main():
-    display_function_name()
     parser = argparse.ArgumentParser(
         description="Update Python slugline-marked source-code listings within a markdown file."
     )
@@ -191,6 +190,7 @@ def main():
 
     if args.trace:
         trace.enable()
+        display_function_name()
 
     markdown_file = Path(args.markdown_file)
     markdown_content = markdown_file.read_text(encoding="utf-8")

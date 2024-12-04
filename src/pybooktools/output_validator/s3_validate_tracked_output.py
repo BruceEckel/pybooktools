@@ -25,7 +25,6 @@ def validate_tracked_output(example_path: Path) -> None:
 
 
 def main():
-    display_function_name()
     parser = argparse.ArgumentParser(
         description="Executes example_s2_tracked.py and verifies results"
     )
@@ -41,6 +40,7 @@ def main():
 
     if args.trace:
         trace.enable()
+        display_function_name()
 
     if not args.file_pattern:
         parser.print_help()
