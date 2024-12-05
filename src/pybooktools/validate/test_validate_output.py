@@ -1,4 +1,6 @@
-from pybooktools.validate.validate_output import show
+from pybooktools.validate.validate_output import Show
+
+show = Show()
 
 
 def demo1():
