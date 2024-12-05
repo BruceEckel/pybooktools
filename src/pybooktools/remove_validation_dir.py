@@ -7,7 +7,7 @@ from rich.console import Console
 from rich.panel import Panel
 
 from pybooktools.tracing import trace
-from pybooktools.util import panic, display_function_name
+from pybooktools.util import display_function_name
 
 console = Console()
 
@@ -46,22 +46,17 @@ def main():
                 border_style="light_green",
             )
         )
-    for val_dir in validation_dirs:
-        if not val_dir.exists():
-            panic(f"Does not exist: {val_dir}")
-        if not val_dir.is_dir():
-            panic(f"Is not a directory: {val_dir}")
-
-        # Use rmtree to remove the directory and its contents
-        rmtree(val_dir)
-        console.print(
-            Panel(
-                f"[dark_slate_gray2]{val_dir}[/dark_slate_gray2]",
-                title="[bold light_green]Removed[/bold light_green]",
-                title_align="left",
-                border_style="light_green",
+    else:
+        for val_dir in validation_dirs:
+            rmtree(val_dir)
+            console.print(
+                Panel(
+                    f"[dark_slate_gray2]{val_dir}[/dark_slate_gray2]",
+                    title="[bold light_green]Removed[/bold light_green]",
+                    title_align="left",
+                    border_style="light_green",
+                )
             )
-        )
 
 
 if __name__ == "__main__":
