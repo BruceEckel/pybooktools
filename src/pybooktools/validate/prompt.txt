@@ -18,6 +18,9 @@ For `show = Show()`, a call to `show("example output")` will:
 5. If output comment lines do exist immediately after the call to show() but they are incorrect,
    then they are replaced by the corrected lines in the Python source file containing the call to show().
 
-Everything does not need to be in the `Show` class, there can be extra functions or applications to solve this problem.
-You may use libraries such as libcst if that helps.
 My highest priority is a well-designed, elegant, easy-to-understand and easy-to-modify solution.
+
+Update: Find the first show() that is followed by incorrect or nonexistent output comment lines.
+Fix the output comment lines for only that version of show. 
+Then re-run the file, which will be successful until the next incorrect or nonexistent output comment lines.
+Fix the new case, then repeat until there are no more show()s to correct.
