@@ -98,7 +98,7 @@ class ExampleOutput:
 
     @staticmethod
     def _strip_ocls(code: str) -> str:
-        pass
+        pass  # Add code here
 
     def write(self, output_path: Path = None):
         if not output_path:
@@ -109,14 +109,17 @@ class ExampleOutput:
 To process a Python example file to include OCLs:
 
 1. Create a global `eo = ExampleOutput(example_path)` at the top of the text of `self.ocl_stripped_example`
-2. Find all the `print()` statements in `self.ocl_stripped_example` using `libcst`
+2. Using `libcst`, find all the `print()` statements in `self.ocl_stripped_example`.
 3. For each `print()` statement in `self.ocl_stripped_example`, 
    add a `PrintStatment` object to `eo.print_statements`, and replace the `print()` with
-   a call to `eo.run()`, passing the original `print()` arguments to `eo.run()`
+   a call to that `PrintStatment` object's `run()`, passing the original `print()` arguments to the `run()`
 4. Write the result of step 3 to `self.adapted_example`
 5. `exec()` the `self.adapted_example` code to generate and capture the outputs for each `run()` call.
 6. Add the outputs from each run after the `print()` statements in `self.example_with_updated_ocls`.
    Perform this from the end going backwards, so there will be no line-numbering problems
+
+
+-------
 
 Create a program ensure_output.py that uses argparse for the command line. 
 The program searches the current directory and recursively into subdirectories.

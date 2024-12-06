@@ -49,7 +49,7 @@ class ExampleOutput:
 
     @staticmethod
     def _strip_ocls(code: str) -> str:
-        pass
+        pass  # Add code here
 
     def write(self, output_path: Path = None):
         if not output_path:
