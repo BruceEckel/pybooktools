@@ -40,6 +40,8 @@ if __name__ == "__main__":
     g()
 ```
 
+Please create a program that will create OCLs for Python examples.
+
 We will need two dataclasses. Here are the starting points, and you may add fields and methods to them as necessary:
 
 ```python
@@ -106,30 +108,18 @@ class ExampleOutput:
 
 To process a Python example file to include OCLs:
 
-1. Create `eo = ExampleOutput(example_path)` in `self.adapted_example`
-2. Remove any existing OCLs from `self.adapted_example`
-3. Find all the `print()` statements in `self.adapted_example` using `libcst`
-4. For each `print()` statement in `self.adapted_example`, 
+1. Create a global `eo = ExampleOutput(example_path)` at the top of the text of `self.ocl_stripped_example`
+2. Find all the `print()` statements in `self.ocl_stripped_example` using `libcst`
+3. For each `print()` statement in `self.ocl_stripped_example`, 
    add a `PrintStatment` object to `eo.print_statements`, and replace the `print()` with
-   a call to that `PrintStatment`s `run()`, passing the original `print()` arguments to `run()`
-5. `exec()` the `self.adapted_example` to generate and capture the outputs for each `run()`
-6. Restore the original `print()` statements in 
+   a call to `eo.run()`, passing the original `print()` arguments to `eo.run()`
+4. Write the result of step 3 to `self.adapted_example`
+5. `exec()` the `self.adapted_example` code to generate and capture the outputs for each `run()` call.
+6. Add the outputs from each run after the `print()` statements in `self.example_with_updated_ocls`.
+   Perform this from the end going backwards, so there will be no line-numbering problems
 
 Create a program ensure_output.py that uses argparse for the command line. 
 The program searches the current directory and recursively into subdirectories.
 If you give it a file name on the command line, it will only look for that file.
 It looks for Python files that contain calls to `print()`.
 For each python file containing `print()` calls:
-1. It locates the first call to `print()` that isn't followed by correct OCLs.
-2. It corrects those OCLs, saves the file, and then restarts the analysis by going back to #1.
-3. It repeats this process until all OCLs are correct. 
-
-
-
-----
-My highest priority is a well-designed, elegant, easy-to-understand and easy-to-modify solution.
-
-Update: Find the first `print()` that is followed by incorrect or nonexistent OCLs.
-Fix the OCLs for only that version of print. 
-Then re-run the file, which will be successful until the next incorrect or nonexistent OCLs.
-Fix the new case, then repeat until there are no more `print()`s to correct.
