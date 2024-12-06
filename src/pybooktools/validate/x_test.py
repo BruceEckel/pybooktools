@@ -1,16 +1,12 @@
-from pybooktools.validate.validate_output import Show
-
-show = Show()
-
-
 def demo1():
-    show("example output\nbo's yer uncle")
-    #: example output
+    print("example output\nbo's yer uncle")
+#: example output
+bo's yer uncle
     #: bo's yer uncle
 
 
 # def demo2():
-#     show(
+#     print(
 #     """
 #     example
 #     output
@@ -19,9 +15,9 @@ def demo1():
 
 
 if __name__ == "__main__":
-    show("step 1")
+    print("step 1")
     demo1()
-    show("step 2")
+    print("step 2")
     # demo2()
     demo1()
-    show("done")
+    print("done")

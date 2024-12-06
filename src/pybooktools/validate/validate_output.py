@@ -91,12 +91,12 @@ class ShowTransformer(cst.CSTTransformer):
         self.found_incorrect = False
 
     def leave_Call(
-            self, original_node: cst.Call, updated_node: cst.Call
+        self, original_node: cst.Call, updated_node: cst.Call
     ) -> cst.CSTNode:
         # Check if this is a `show()` call
         if (
-                isinstance(original_node.func, cst.Name)
-                and original_node.func.value == "show"
+            isinstance(original_node.func, cst.Name)
+            and original_node.func.value == "show"
         ):
             # Find existing comments after the `show()` call
             parent = self.get_metadata(ParentNodeProvider, original_node)
