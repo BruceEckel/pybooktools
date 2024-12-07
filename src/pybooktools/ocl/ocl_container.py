@@ -16,14 +16,19 @@ class OCL:
     output: Optional[str] = None
 
     def __post_init__(self):
-        self.result = pformat(self.arg, width=47).splitlines()
+        formatted_arg = pformat(self.arg, width=47)
+        # Split into lines, handling escaped newlines properly
+        lines = []
+        for line in formatted_arg.splitlines():
+            parts = line.split("\\n")
+            for part in parts:
+                stripped = part.strip()
+                if stripped:
+                    lines.append(stripped)
+
+        self.result = lines
         ic(self.result)
-        self.output_lines = [
-            "#| " + subline
-            for line in self.result
-            for subline in line.split("\n")
-            if subline.strip()
-        ]
+        self.output_lines = ["#| " + line for line in lines if line.strip()]
         ic(self.output_lines)
         self.output = "\n".join(self.output_lines)
         ic(self.output)

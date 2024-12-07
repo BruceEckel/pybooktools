@@ -43,6 +43,7 @@ class Order:
 
 pizza = Pizza(Size.LARGE, [Add.PEPPERONI, Add.OLIVES])
 print(pizza)
-print(order := Order(pizza))
+order = Order(pizza)
+print(order)
 print(order.update(Status.IN_OVEN))
 print(order.update(Status.READY))
