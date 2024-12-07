@@ -16,7 +16,13 @@ class OCL:
     output: Optional[str] = None
 
     def __post_init__(self):
+        # Use pformat for formatted output with line width
         formatted_arg = pformat(self.arg, width=47)
+
+        # Check if the entire argument is wrapped in quotes and remove them
+        if formatted_arg.startswith("'") and formatted_arg.endswith("'"):
+            formatted_arg = formatted_arg[1:-1]
+
         # Split into lines, handling escaped newlines properly
         lines = []
         for line in formatted_arg.splitlines():
