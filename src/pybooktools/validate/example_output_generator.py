@@ -83,7 +83,7 @@ class ExampleOutput:
                 return updated_node
 
             def leave_Call(
-                    self, original_node: cst.Call, updated_node: cst.Call
+                self, original_node: cst.Call, updated_node: cst.Call
             ) -> cst.BaseExpression:
                 if m.matches(original_node.func, m.Name("print")):
                     line_number = self.current_line
