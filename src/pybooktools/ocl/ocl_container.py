@@ -19,8 +19,8 @@ def serialize_arg(arg: Any) -> Any:
         return repr(arg)  # Use repr for non-standard types
     elif isinstance(arg, dict):
         return {
-            k: serialize_arg(v) for k, v in arg.items()
-        }  # Handle nested serialization
+            str(k): serialize_arg(v) for k, v in arg.items()
+        }  # Convert keys to strings and handle nested serialization
     elif hasattr(arg, "__iter__") and not isinstance(arg, (str, bytes)):
         return [item for item in arg]  # Convert generators to lists
     return arg
@@ -50,8 +50,9 @@ def deserialize_arg(arg: Any) -> Any:
         return set(arg) if all(isinstance(item, str) for item in arg) else arg
     elif isinstance(arg, dict):
         return {
-            k: deserialize_arg(v) for k, v in arg.items()
-        }  # Handle nested deserialization
+            int(k) if k.isdigit() else k: deserialize_arg(v)
+            for k, v in arg.items()
+        }  # Restore numeric keys
     return arg
 
 
