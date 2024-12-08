@@ -28,9 +28,9 @@ that spans multiple lines
     with indentation""",
         )
         container("6", OCLContainer)
-        # container("7", (x * 2 for x in range(3)))  # A generator expression
-        # container("8", (1, 2, 3))  # A tuple
-        # container("9", {1, 2, 3})  # A set
+        # container("7", (x * 2 for x in range(3)))  # Generator expressions are not allowed
+        container("8", (1, 2, 3))  # A tuple
+        container("9", {1, 2, 3})  # A set
 
         # Write to the JSON file
         ic("container before writing to JSON", container)

@@ -2,15 +2,19 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 from pprint import pformat
-from typing import Any, Optional
+from typing import Any, Optional, Generator
 
 from icecream import ic
+
+from pybooktools.util import error
 
 
 def serialize_arg(arg: Any) -> Any:
     """Custom serializer to handle non-JSON-serializable objects."""
     if isinstance(arg, set):
-        return list(arg)  # Convert sets to lists for JSON serialization
+        return {
+            "__set__": list(arg)
+        }  # Convert sets to a JSON-compatible format
     elif isinstance(arg, (tuple, range, type(lambda: None), type)):
         return repr(arg)  # Use repr for non-standard types
     elif isinstance(arg, dict):
@@ -18,12 +22,14 @@ def serialize_arg(arg: Any) -> Any:
             k: serialize_arg(v) for k, v in arg.items()
         }  # Handle nested serialization
     elif hasattr(arg, "__iter__") and not isinstance(arg, (str, bytes)):
-        return list(arg)
+        return [item for item in arg]  # Convert generators to lists
     return arg
 
 
 def deserialize_arg(arg: Any) -> Any:
     """Custom deserializer to restore specific types from their serialized forms."""
+    if isinstance(arg, dict) and "__set__" in arg:
+        return set(arg["__set__"])  # Restore sets from JSON-compatible format
     if isinstance(arg, str):
         # Handle <class ...> specifically
         if arg.startswith("<class ") and arg.endswith(">"):
@@ -107,6 +113,8 @@ class OCLContainer:
     ocls: list[OCL] = field(default_factory=list)
 
     def __call__(self, ident: str, arg: Any) -> None:
+        if isinstance(arg, Generator):
+            error("Generator expressions are not allowed as arguments.")
         self.ocls.append(OCL(ident, arg))
 
     def write(self) -> None:
