@@ -4,6 +4,9 @@ from pathlib import Path
 from icecream import ic
 
 from ocl_container_pickle import OCLContainer
+from pybooktools.util import icc
+
+ic.enable()
 
 
 def test_ocl_container_write_read():
@@ -38,15 +41,15 @@ that spans multiple lines
 """,
         )
 
-        ic("OCLContainer before writing to file", container)
+        # ic("OCLContainer before writing to file", container)
         container.write(temp_path)
 
         read_container = OCLContainer.read(temp_path)
-        ic("read_container", read_container)
+        # ic("read_container", read_container)
 
         # Assert that the written and read data are equivalent
-        # assert len(read_container.ocls) == len(container.ocls)
-        ic(list(zip(container.ocls, read_container.ocls)))
+        assert len(read_container.ocls) == len(container.ocls)
+        icc(list(zip(container.ocls, read_container.ocls)))
 
         for original, read in zip(container.ocls, read_container.ocls):
             if original.arg != read.arg:

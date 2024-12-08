@@ -4,7 +4,10 @@ from pathlib import Path
 from pprint import pformat
 from typing import Any, Optional
 
-from icecream import ic
+
+def ic(*args: Any) -> None:
+    pass
+    # icecream.ic(*args)
 
 
 @dataclass
@@ -18,22 +21,23 @@ class OCL:
     def __post_init__(self):
         self.formatted_arg = pformat(self.arg, width=47)
 
-        # For string arguments, handle multiline strings gracefully
-        if isinstance(self.arg, str):
-            lines = [line for line in self.arg.splitlines() if line.strip()]
-        else:
-            # Split into lines, handling escaped newlines properly
-            lines = []
-            for line in self.formatted_arg.splitlines():
-                parts = line.split("\\n")
-                for part in parts:
-                    stripped = part.strip()
-                    if stripped:
-                        lines.append(stripped)
+        match self.arg:
+            case str():  # An f-string arg is evaluated before it is passed
+                self.result = [
+                    line for line in self.arg.splitlines() if line.strip()
+                ]
+            case _:
+                for line in self.formatted_arg.splitlines():
+                    parts = line.split("\\n")
+                    for part in parts:
+                        stripped = part.strip()
+                        if stripped:
+                            self.result.append(stripped)
 
-        self.result = lines
         ic(self.result)
-        self.output_lines = ["#| " + line for line in lines if line.strip()]
+        self.output_lines = [
+            "#| " + line for line in self.result if line.strip()
+        ]
         ic(self.output_lines)
 
 

@@ -1,12 +1,24 @@
 #: display.py
 from pathlib import Path
+from typing import Any
 
+from icecream import ic
 from rich.console import Console
 from rich.panel import Panel
 
 from pybooktools.tracing import trace
 
 console = Console()
+
+
+def icc(*_: Any) -> None:
+    """Call ic() without the variable name prefix."""
+    original_prefix = ic.prefix
+    ic.configureOutput(prefix="")
+    try:
+        ic(*_)
+    finally:
+        ic.configureOutput(prefix=original_prefix)
 
 
 def dbg(msg: str) -> None:
