@@ -10,20 +10,26 @@ from pybooktools.util import error
 
 
 def serialize_arg(arg: Any) -> Any:
-    """Custom serializer to handle non-JSON-serializable objects."""
-    if isinstance(arg, set):
-        return {
-            "__set__": list(arg)
-        }  # Convert sets to a JSON-compatible format
-    elif isinstance(arg, (tuple, range, type(lambda: None), type)):
-        return repr(arg)  # Use repr for non-standard types
-    elif isinstance(arg, dict):
-        return {
-            str(k): serialize_arg(v) for k, v in arg.items()
-        }  # Convert keys to strings and handle nested serialization
-    elif hasattr(arg, "__iter__") and not isinstance(arg, (str, bytes)):
-        return [item for item in arg]  # Convert generators to lists
-    return arg
+    """Custom serializer to handle non-JSON-serializable objects using pattern matching."""
+    match arg:
+        case set():
+            return {
+                "__set__": list(arg)
+            }  # Convert sets to a JSON-compatible format
+        case tuple() | range():
+            return repr(arg)  # Use repr for non-standard types
+        case _ if isinstance(arg, (type(lambda: None), type)):
+            return repr(arg)  # Use repr for lambdas and types
+        case dict():
+            return {  # Handle nested serialization
+                str(k): serialize_arg(v) for k, v in arg.items()
+            }
+        case _ if hasattr(arg, "__iter__") and not isinstance(
+                arg, (str, bytes)
+        ):
+            return [item for item in arg]  # Convert generators to lists
+        case _:
+            return arg
 
 
 def deserialize_arg(arg: Any) -> Any:
