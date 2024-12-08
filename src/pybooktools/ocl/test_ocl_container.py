@@ -6,8 +6,6 @@ from icecream import ic
 from ocl_container_pickle import OCLContainer
 from pybooktools.util import icc
 
-ic.enable()
-
 
 def test_ocl_container_write_read():
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -40,6 +38,11 @@ that spans multiple lines
 {x = },\n{y = }
 """,
         )
+        container("15", 'Special characters: \t tab, \n newline, " quotes')
+        container("16", None)  # NoneType
+        container("17", 42)  # Integer
+        container("18", 3.14)  # Float
+        container("19", True)  # Boolean
 
         # ic("OCLContainer before writing to file", container)
         container.write(temp_path)
