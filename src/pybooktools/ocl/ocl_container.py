@@ -9,8 +9,14 @@ from icecream import ic
 
 def serialize_arg(arg: Any) -> Any:
     """Custom serializer to handle non-JSON-serializable objects."""
-    if isinstance(arg, (set, tuple, type, range, type(lambda: None))):
-        return repr(arg)
+    if isinstance(arg, set):
+        return list(arg)  # Convert sets to lists for JSON serialization
+    elif isinstance(arg, (tuple, range, type(lambda: None), type)):
+        return repr(arg)  # Use repr for non-standard types
+    elif isinstance(arg, dict):
+        return {
+            k: serialize_arg(v) for k, v in arg.items()
+        }  # Handle nested serialization
     elif hasattr(arg, "__iter__") and not isinstance(arg, (str, bytes)):
         return list(arg)
     return arg
@@ -21,12 +27,25 @@ def deserialize_arg(arg: Any) -> Any:
     if isinstance(arg, str):
         # Handle <class ...> specifically
         if arg.startswith("<class ") and arg.endswith(">"):
-            return arg  # Leave the string as-is
+            try:
+                # Extract the class name and resolve it
+                class_name = arg[8:-2]  # Remove <class '...'>' brackets
+                module_name, class_name = class_name.rsplit(".", 1)
+                module = __import__(module_name)
+                return getattr(module, class_name)
+            except (ImportError, AttributeError, ValueError):
+                return arg  # Fallback to the string if class resolution fails
         try:
             # Attempt to eval for types like tuple, set, etc., that were serialized with repr
             return eval(arg) if any(c in arg for c in "{},()") else arg
         except (SyntaxError, NameError):
             return arg
+    elif isinstance(arg, list):
+        return set(arg) if all(isinstance(item, str) for item in arg) else arg
+    elif isinstance(arg, dict):
+        return {
+            k: deserialize_arg(v) for k, v in arg.items()
+        }  # Handle nested deserialization
     return arg
 
 

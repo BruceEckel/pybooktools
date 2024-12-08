@@ -45,11 +45,21 @@ that spans multiple lines
         ic(list(zip(container.ocls, read_container.ocls)))
 
         for original, read in zip(container.ocls, read_container.ocls):
-            assert original.arg == read.arg
-            assert original.ident == read.ident
-            assert original.result == read.result
-            assert original.output_lines == read.output_lines
-            assert original.output == read.output
+            if original.arg != read.arg:
+                ic("Not equal:", original.arg, read.arg)
+                return
+            if original.ident != read.ident:
+                ic("Not equal:", original.ident, read.ident)
+                return
+            if original.result != read.result:
+                ic("Not equal:", original.result, read.result)
+                return
+            if original.output_lines != read.output_lines:
+                ic("Not equal:", original.output_lines, read.output_lines)
+                return
+            if original.output != read.output:
+                ic("Not equal:", original.output, read.output)
+                return
 
 
 if __name__ == "__main__":
