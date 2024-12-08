@@ -7,6 +7,29 @@ from typing import Any, Optional
 from icecream import ic
 
 
+def serialize_arg(arg: Any) -> Any:
+    """Custom serializer to handle non-JSON-serializable objects."""
+    if isinstance(arg, (set, tuple, type, range, type(lambda: None))):
+        return repr(arg)
+    elif hasattr(arg, "__iter__") and not isinstance(arg, (str, bytes)):
+        return list(arg)
+    return arg
+
+
+def deserialize_arg(arg: Any) -> Any:
+    """Custom deserializer to restore specific types from their serialized forms."""
+    if isinstance(arg, str):
+        # Handle <class ...> specifically
+        if arg.startswith("<class ") and arg.endswith(">"):
+            return arg  # Leave the string as-is
+        try:
+            # Attempt to eval for types like tuple, set, etc., that were serialized with repr
+            return eval(arg) if any(c in arg for c in "{},()") else arg
+        except (SyntaxError, NameError):
+            return arg
+    return arg
+
+
 @dataclass
 class OCL:
     ident: str
@@ -19,18 +42,18 @@ class OCL:
         # Use pformat for formatted output with line width
         formatted_arg = pformat(self.arg, width=47)
 
-        # Check if the entire argument is wrapped in quotes and remove them
-        if formatted_arg.startswith("'") and formatted_arg.endswith("'"):
-            formatted_arg = formatted_arg[1:-1]
-
-        # Split into lines, handling escaped newlines properly
-        lines = []
-        for line in formatted_arg.splitlines():
-            parts = line.split("\\n")
-            for part in parts:
-                stripped = part.strip()
-                if stripped:
-                    lines.append(stripped)
+        # For string arguments, handle multiline strings gracefully
+        if isinstance(self.arg, str):
+            lines = [line for line in self.arg.splitlines() if line.strip()]
+        else:
+            # Split into lines, handling escaped newlines properly
+            lines = []
+            for line in formatted_arg.splitlines():
+                parts = line.split("\\n")
+                for part in parts:
+                    stripped = part.strip()
+                    if stripped:
+                        lines.append(stripped)
 
         self.result = lines
         ic(self.result)
@@ -42,7 +65,7 @@ class OCL:
     def to_dict(self) -> dict:
         return {
             "ident": self.ident,
-            "arg": self.arg,
+            "arg": serialize_arg(self.arg),
             "result": self.result,
             "output_lines": self.output_lines,
             "output": self.output,
@@ -52,7 +75,7 @@ class OCL:
     def from_dict(cls, data: dict) -> "OCL":
         return cls(
             ident=data["ident"],
-            arg=data["arg"],
+            arg=deserialize_arg(data["arg"]),
             result=data.get("result", []),
             output_lines=data.get("output_lines", []),
             output=data.get("output"),
@@ -77,4 +100,5 @@ class OCLContainer:
     def read(cls, json_ocl_container: Path) -> "OCLContainer":
         data = json.loads(json_ocl_container.read_text(encoding="utf-8"))
         ocls = [OCL.from_dict(item) for item in data]
+        ic(ocls)
         return cls(output_json=json_ocl_container, ocls=ocls)

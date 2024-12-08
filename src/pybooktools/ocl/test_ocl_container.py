@@ -21,17 +21,28 @@ def test_ocl_container_write_read():
         container("2", [1, 2, 3])
         container("3", {"key": "value"})
         container("4", "contains\na line break\n    and another")
+        container(
+            "5",
+            """This is a triple-quoted string
+that spans multiple lines
+    with indentation""",
+        )
+        container("6", OCLContainer)
+        # container("7", (x * 2 for x in range(3)))  # A generator expression
+        # container("8", (1, 2, 3))  # A tuple
+        # container("9", {1, 2, 3})  # A set
 
         # Write to the JSON file
+        ic("container before writing to JSON", container)
         container.write()
-        ic(container)
 
         # Read back the container from the JSON file
         read_container = OCLContainer.read(temp_path)
-        ic(read_container)
+        ic("read_container", read_container)
 
         # Assert that the written and read data are equivalent
         assert len(read_container.ocls) == len(container.ocls)
+        ic(list(zip(container.ocls, read_container.ocls)))
 
         for original, read in zip(container.ocls, read_container.ocls):
             assert original.arg == read.arg
