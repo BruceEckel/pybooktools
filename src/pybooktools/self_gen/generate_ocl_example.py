@@ -51,16 +51,19 @@ def add_output_comments(script_path: Path, modified_script_path: Path) -> None:
     )
     output_lines = process.stdout.splitlines()
 
-    # Add output comments after print statements
+    # Match outputs to print statements only
     lines = script_code.splitlines()
-    for lineno in sorted(finder.top_level_prints, reverse=True):
-        if lineno - 1 < len(lines):
-            output_comment = (
-                f"#| {output_lines.pop(0)}"
-                if output_lines
-                else "#| <no output>"
-            )
-            lines.insert(lineno, output_comment)
+    outputs = iter(output_lines)
+    for lineno in sorted(finder.top_level_prints):
+        while True:
+            try:
+                output_comment = next(outputs)
+                if output_comment.strip():  # Skip empty lines
+                    lines.insert(lineno, f"#| {output_comment}")
+                    break
+            except StopIteration:
+                lines.insert(lineno, "#| <no output>")
+                break
 
     # Write the modified script
     modified_script_path.write_text("\n".join(lines), encoding="utf-8")
