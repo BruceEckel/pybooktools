@@ -1,31 +1,105 @@
-"""
-Using `libcst`, find all top-level (i.e., non-indented) `print()` statements.
-Ensure that those top-level `print()` statements contain only a single argument.
-Create a new string `ocl_printer` that contains the program with each `print()` replaced 
-by a call to `oclgen()` that is passed, as its second argument, the argument of that `print()`.
-The first argument to `oclgen()` is an incremented `int`.
-For example:
+import argparse
+from pathlib import Path
 
-```python
-print("foo")
-print("bar")
-```
+import libcst as cst
+from icecream import ic
+from libcst.metadata import MetadataWrapper
 
-Becomes:
+from pybooktools.ocl import OCLContainer
+from pybooktools.util import run_script
 
-```python
-oclgen("1", "foo")
-oclgen("2", "bar")
-```
 
-Create a new directory beneath the directory of the file being tested.
-Give that directory the name of the original script followed by `_check`.
-Store all the following files in that directory.
+class OCLTransformer(cst.CSTTransformer):
+    def __init__(self):
+        super().__init__()
+        self.ocl_statements = []
+        self.counter = 0
 
-Store `ocl_printer` in a file with the name of the original script followed by a `_1.py`.
-Add imports and command at the end store the JSON data in a file with the name of the original script followed by `_3.json`.
-Store that new thing  in a file with the name of the original script followed by a `_2.py`.
-Run that file.
-Read the JSON file into xxx and replace the oclgen calls in `_1.py` with the original print + the output lines.
-Store that in a file with the name of the original script followed by a `_4.py`.
-"""
+    def leave_Call(
+            self, original_node: cst.Call, updated_node: cst.Call
+    ) -> cst.BaseExpression:
+        if (
+                isinstance(updated_node.func, cst.Name)
+                and updated_node.func.value == "print"
+        ):
+            args = updated_node.args
+            if len(args) == 1:
+                self.counter += 1
+                original_source = cst.Module([]).code_for_node(original_node)
+                # Convert argument to a string if it's a SimpleString
+                arg_value = args[0].value
+                if isinstance(arg_value, cst.SimpleString):
+                    arg_value = arg_value.value
+                ocl_call = cst.parse_expression(
+                    f"oclgen(\"{self.counter}\", {arg_value}, r'''{original_source}''')"
+                )
+                self.ocl_statements.append(
+                    (self.counter, original_source, arg_value)
+                )
+                return ocl_call
+        return updated_node
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Generate OCL script and transform."
+    )
+    parser.add_argument("filename", type=str, help="Python file to process.")
+    args = parser.parse_args()
+
+    input_path = Path(args.filename).resolve()
+    script_name = input_path.stem
+    check_dir = input_path.parent / f".check_{script_name}"
+    check_dir.mkdir(exist_ok=True)
+
+    source_code = input_path.read_text(encoding="utf-8")
+
+    # Process with libcst
+    module = cst.parse_module(source_code)
+    transformer = OCLTransformer()
+    wrapped = MetadataWrapper(module)
+    transformed_module = wrapped.module.visit(transformer)
+
+    # Generate transformed versions
+    ocl_printer_1 = transformed_module.code
+
+    ocl_printer_2 = (
+            "from pybooktools.ocl import OCLContainer\n"
+            "from pathlib import Path\n"
+            "oclgen = OCLContainer()\n\n"
+            + ocl_printer_1
+            + f"\noclgen.write(Path(r'{check_dir}') / 'ocl_container.pickle')\n"
+    )
+
+    # Write transformed versions
+    ocl_printer_1_path = check_dir / f"{script_name}_1.py"
+    ocl_printer_1_path.write_text(ocl_printer_1, encoding="utf-8")
+
+    ocl_printer_2_path = check_dir / f"{script_name}_2.py"
+    ocl_printer_2_path.write_text(ocl_printer_2, encoding="utf-8")
+
+    run_script(ocl_printer_2_path)
+
+    # Load the OCL container
+    ocl_container_path = check_dir / "ocl_container.pickle"
+    ocl_container = OCLContainer.read(ocl_container_path)
+    ic(ocl_container)
+
+    # Generate ocl_results
+    ocl_results = ocl_printer_1
+    ic(ocl_results)
+    for ocl in ocl_container.ocls:
+        ic(ocl)
+        search = f"oclgen(\"{ocl.ident}\", {ocl.raw_print[6:-1]}, r'''{ocl.raw_print}''')"
+        replace = f"{ocl.raw_print}\n{"\n".join(ocl.output_lines)}"
+        ic(search)
+        ic(replace)
+        ocl_results = ocl_results.replace(search, replace)
+        ic(ocl_results)
+
+    ocl_results_path = check_dir / input_path.name
+    ocl_results_path.write_text(ocl_results, encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

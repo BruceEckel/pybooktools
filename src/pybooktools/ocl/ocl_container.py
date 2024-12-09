@@ -1,70 +1,59 @@
-import json
+import pickle
+from dataclasses import dataclass, field
 from pathlib import Path
 from pprint import pformat
-from typing import Any, Generator, Optional
-
-from icecream import ic
-from pydantic import BaseModel, ValidationError, model_validator
-
-from pybooktools.util import error
+from typing import Any, Optional
 
 
-class OCL(BaseModel):
+def ic(*args: Any) -> None:
+    pass
+    # icecream.ic(*args)
+
+
+@dataclass
+class OCL:
     ident: str
     arg: Any
-    result: list[str] = []
-    output_lines: list[str] = []
-    output: Optional[str] = None
+    raw_print: str
+    formatted_arg: Optional[str] = None
+    result: list[str] = field(default_factory=list)
+    output_lines: list[str] = field(default_factory=list)
 
-    @model_validator(mode="before")
-    def compute_fields(cls, values):
-        arg = values.get("arg")
-        formatted_arg = pformat(arg, width=47)
+    def __post_init__(self):
+        self.formatted_arg = pformat(self.arg, width=47)
 
-        if isinstance(arg, str):
-            lines = [line for line in arg.splitlines() if line.strip()]
-        else:
-            lines = []
-            for line in formatted_arg.splitlines():
-                parts = line.split("\\n")
-                for part in parts:
-                    stripped = part.strip()
-                    if stripped:
-                        lines.append(stripped)
+        match self.arg:
+            case str():  # An f-string arg is evaluated before it is passed
+                self.result = [
+                    line for line in self.arg.splitlines() if line.strip()
+                ]
+            case _:
+                for line in self.formatted_arg.splitlines():
+                    parts = line.split("\\n")
+                    for part in parts:
+                        stripped = part.strip()
+                        if stripped:
+                            self.result.append(stripped)
 
-        output_lines = ["#| " + line for line in lines if line.strip()]
-        output = "\n".join(output_lines)
-
-        values["result"] = lines
-        values["output_lines"] = output_lines
-        values["output"] = output
-        return values
-
-    class Config:
-        arbitrary_types_allowed = True  # Allow non-standard types
+        ic(self.result)
+        self.output_lines = [
+            "#| " + line for line in self.result if line.strip()
+        ]
+        ic(self.output_lines)
 
 
-class OCLContainer(BaseModel):
-    output_json: Path
-    ocls: list[OCL] = []
+@dataclass
+class OCLContainer:
+    ocls: list[OCL] = field(default_factory=list)
 
-    def __call__(self, ident: str, arg: Any) -> None:
-        if isinstance(arg, Generator):
-            error("Generator expressions are not allowed as arguments.")
-        try:
-            self.ocls.append(OCL(ident=ident, arg=arg))
-        except ValidationError as e:
-            error(f"Validation error: {e}")
+    def __call__(self, ident: str, arg: Any, raw_print: str) -> None:
+        self.ocls.append(OCL(ident, arg, raw_print))
 
-    def write(self) -> None:
-        data = [ocl.dict() for ocl in self.ocls]
-        self.output_json.write_text(
-            json.dumps(data, indent=4), encoding="utf-8"
-        )
+    def write(self, pickle_file: Path) -> None:
+        pickle_file.write_bytes(pickle.dumps(self))
 
     @classmethod
-    def read(cls, json_ocl_container: Path) -> "OCLContainer":
-        data = json.loads(json_ocl_container.read_text(encoding="utf-8"))
-        ocls = [OCL(**item) for item in data]
-        ic(ocls)
-        return cls(output_json=json_ocl_container, ocls=ocls)
+    def read(cls, pickle_file: Path) -> "OCLContainer":
+        container = pickle.loads(pickle_file.read_bytes())
+        ic(container)
+        return container
