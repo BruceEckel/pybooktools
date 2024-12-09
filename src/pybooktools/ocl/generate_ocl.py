@@ -1,4 +1,5 @@
 import argparse
+import shutil
 from pathlib import Path
 
 import libcst as cst
@@ -26,15 +27,13 @@ class OCLTransformer(cst.CSTTransformer):
             if len(args) == 1:
                 self.counter += 1
                 original_source = cst.Module([]).code_for_node(original_node)
-                # Convert argument to a string if it's a SimpleString
-                arg_value = args[0].value
-                if isinstance(arg_value, cst.SimpleString):
-                    arg_value = arg_value.value
+                # Serialize the argument to Python source code
+                arg_source = cst.Module([]).code_for_node(args[0].value)
                 ocl_call = cst.parse_expression(
-                    f"oclgen(\"{self.counter}\", {arg_value}, r'''{original_source}''')"
+                    f"oclgen({self.counter}, {arg_source}, r'''{original_source}''')"
                 )
                 self.ocl_statements.append(
-                    (self.counter, original_source, arg_value)
+                    (self.counter, original_source, arg_source)
                 )
                 return ocl_call
         return updated_node
@@ -50,6 +49,8 @@ def main():
     input_path = Path(args.filename).resolve()
     script_name = input_path.stem
     check_dir = input_path.parent / f".check_{script_name}"
+    if check_dir.exists():
+        shutil.rmtree(check_dir)
     check_dir.mkdir(exist_ok=True)
 
     source_code = input_path.read_text(encoding="utf-8")
@@ -90,7 +91,7 @@ def main():
     ic(ocl_results)
     for ocl in ocl_container.ocls:
         ic(ocl)
-        search = f"oclgen(\"{ocl.ident}\", {ocl.raw_print[6:-1]}, r'''{ocl.raw_print}''')"
+        search = f"oclgen({ocl.ident}, {ocl.raw_print[6:-1]}, r'''{ocl.raw_print}''')"
         replace = f"{ocl.raw_print}\n{"\n".join(ocl.output_lines)}"
         ic(search)
         ic(replace)

@@ -7,12 +7,14 @@ from typing import Any, Optional
 
 def ic(*args: Any) -> None:
     pass
+    # import icecream
+    #
     # icecream.ic(*args)
 
 
 @dataclass
 class OCL:
-    ident: str
+    ident: int
     arg: Any
     raw_print: str
     formatted_arg: Optional[str] = None
@@ -46,7 +48,7 @@ class OCL:
 class OCLContainer:
     ocls: list[OCL] = field(default_factory=list)
 
-    def __call__(self, ident: str, arg: Any, raw_print: str) -> None:
+    def __call__(self, ident: int, arg: Any, raw_print: str) -> None:
         self.ocls.append(OCL(ident, arg, raw_print))
 
     def write(self, pickle_file: Path) -> None:
