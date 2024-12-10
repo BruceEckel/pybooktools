@@ -1,9 +1,3 @@
-
-from pybooktools.auto_ocl import ocl_format
-from pathlib import Path
-
-outfile = Path('.') / f"pizza_order_ocl.py"
-outfile.write_text(f"""
 from dataclasses import dataclass
 from enum import Enum, auto
 
@@ -47,16 +41,14 @@ class Order:
 
 pizza = Pizza(Size.LARGE, [Add.PEPPERONI, Add.OLIVES])
 print(pizza)
-{ocl_format(pizza)}
+#| Pizza(size=<Size.LARGE: 2>,
+#| toppings=[<Add.PEPPERONI: 1>, <Add.OLIVES: 3>])
 order = Order(pizza)
 print(order)
-{ocl_format(order)}
+#| Ordered
 order.update(Status.IN_OVEN)
 print(order)
-{ocl_format(order)}
+#| In Oven
 order.update(Status.READY)
 print(order)
-{ocl_format(order)}
-
-""", encoding="utf-8")
-    
+#| Ready

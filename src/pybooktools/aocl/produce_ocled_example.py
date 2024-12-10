@@ -2,37 +2,42 @@
 from argparse import ArgumentParser
 from pathlib import Path
 
-from pybooktools.aocl import add_ocl
-from pybooktools.util import run_script, valid_python
+from pybooktools.aocl import add_ocl, embed_ocl_results
+from pybooktools.util import run_script, valid_python, cleaned_dir
 
 
 def main() -> None:
-    parser = ArgumentParser(
-        description="Process a Python file for OCL formatting."
-    )
-    parser.add_argument(
-        "file", type=str, help="The path to the Python file to process."
-    )
+    parser = ArgumentParser(description="Add OCLs to a Python example")
+    parser.add_argument("pyfile", type=str, help="The Python example file")
     args = parser.parse_args()
 
-    example_path = Path(args.file)
-    source_code_1 = add_ocl(valid_python(example_path))
+    example_path = Path(args.pyfile).resolve()
 
-    # Prepare source_code_3
-    source_code_3 = f'''
-from pybooktools.auto_ocl import ocl_format
+    check_dir = cleaned_dir(example_path, ".check")
+
+    def write_with_ext(python_script: str, ext: str) -> Path:
+        outpath = check_dir / f"{example_path.stem}_{ext}.py"
+        outpath.write_text(python_script, encoding="utf-8")
+        return outpath
+
+    original_source = valid_python(example_path)
+    with_ocls = add_ocl(original_source)
+    write_with_ext(with_ocls, "ocls")
+    embedded_ocl_results = embed_ocl_results(with_ocls)
+
+    ocl_generator = f'''
+from pybooktools.aocl import ocl_format
 from pathlib import Path
 
-outfile = Path('.') / f"{example_path.stem}_ocl.py"
-outfile.write_text(f"""
-{source_code_2a}
+{with_ocls}
+
+outfile = Path("{check_dir}") / "{example_path.stem}_ocled.py"
+outfile.write_text(f"""\
+{embedded_ocl_results}\
 """, encoding="utf-8")
     '''
 
-    output_path = example_path.parent / f"{example_path.stem}_3.py"
-    output_path.write_text(source_code_3, encoding="utf-8")
-
-    run_script(output_path)
+    run_script(write_with_ext(ocl_generator, "generator"))
 
 
 if __name__ == "__main__":
