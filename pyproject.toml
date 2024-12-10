@@ -16,6 +16,7 @@ readme = "README.md"
 requires-python = ">= 3.8"
 
 [project.scripts]
+addocl = "pybooktools.aocl.add_ocl:main"
 pocl = "pybooktools.auto_ocl.produce_ocl:main"
 autocl = "pybooktools.auto_ocl.auto_ocl:main"
 selfgen = "pybooktools.self_gen.generate_ocl_example:main"

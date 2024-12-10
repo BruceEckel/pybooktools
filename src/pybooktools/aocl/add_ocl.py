@@ -12,9 +12,11 @@ If a top-level `print()` has more than one argument, `add_ocl` a warning and ign
 Returns the modified `python_source_code` string.
 """
 
+import argparse
 import ast
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
 import astor
 
@@ -39,7 +41,7 @@ class PrintTransformer(ast.NodeTransformer):
                     self.counter += 1
                     ocl_line = ast.Expr(
                         value=ast.Call(
-                            func=ast.Name(id="_ocl_format", ctx=ast.Load()),
+                            func=ast.Name(id="ocl_format", ctx=ast.Load()),
                             args=[args[0]],
                             keywords=[],
                         )
@@ -106,5 +108,20 @@ print("This will be ignored", x)
     print(modified_code)
 
 
+def main():
+    parser = argparse.ArgumentParser(
+        description="Process a Python file with add_ocl."
+    )
+    parser.add_argument("file", type=str, help="The Python file to process.")
+    args = parser.parse_args()
+    file_path = Path(args.file)
+    if not file_path.exists():
+        print(f"Error: The file {file_path} does not exist.")
+    else:
+        source_code = file_path.read_text(encoding="utf-8")
+        modified_code = add_ocl(source_code)
+        print(modified_code)
+
+
 if __name__ == "__main__":
-    test_add_ocl()
+    main()
