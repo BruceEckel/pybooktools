@@ -19,7 +19,7 @@ class TopLevelPrintFinder(ast.NodeVisitor):
 
     def visit_Expr(self, node: ast.Expr) -> None:
         if isinstance(node.value, ast.Call) and isinstance(
-                node.value.func, ast.Name
+            node.value.func, ast.Name
         ):
             if node.value.func.id == "print":
                 self.top_level_prints.append(node.lineno)

@@ -15,11 +15,11 @@ class OCLTransformer(cst.CSTTransformer):
         self.counter = 0
 
     def leave_Call(
-            self, original_node: cst.Call, updated_node: cst.Call
+        self, original_node: cst.Call, updated_node: cst.Call
     ) -> cst.BaseExpression:
         if (
-                isinstance(updated_node.func, cst.Name)
-                and updated_node.func.value == "print"
+            isinstance(updated_node.func, cst.Name)
+            and updated_node.func.value == "print"
         ):
             args = updated_node.args
             if len(args) == 1:

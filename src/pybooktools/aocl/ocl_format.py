@@ -68,7 +68,7 @@ def test_ocl_format():
     print(ocl_format(complex_num))
 
     # Large integer
-    large_int = 10 ** 100
+    large_int = 10**100
     print(ocl_format(large_int))
 
     # Bytes

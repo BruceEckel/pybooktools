@@ -14,9 +14,9 @@ class OCLTransformer(ast.NodeTransformer):
 
     def visit_Expr(self, node: ast.Expr):
         if (
-                isinstance(node.value, ast.Call)
-                and isinstance(node.value.func, ast.Name)
-                and node.value.func.id == "print"
+            isinstance(node.value, ast.Call)
+            and isinstance(node.value.func, ast.Name)
+            and node.value.func.id == "print"
         ):
             self.counter += 1
             arg = node.value.args[0] if node.value.args else None
