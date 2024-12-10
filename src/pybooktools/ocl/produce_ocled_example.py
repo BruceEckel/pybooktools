@@ -1,14 +1,18 @@
 #: produce_ocled_example.py
+import shutil
 from argparse import ArgumentParser
 from pathlib import Path
 
-from pybooktools.aocl import add_ocl, embed_ocl_results
+from pybooktools.ocl import add_ocl, embed_ocl_results
 from pybooktools.util import run_script, valid_python, cleaned_dir
 
 
 def main() -> None:
     parser = ArgumentParser(description="Add OCLs to a Python example")
     parser.add_argument("pyfile", type=str, help="The Python example file")
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Add informative output"
+    )
     args = parser.parse_args()
     example_path = Path(args.pyfile).resolve()
     check_dir = cleaned_dir(example_path, ".check_")
@@ -37,7 +41,11 @@ outfile.write_text(f"""\
     '''
 
     run_script(write_with_ext(ocl_generator, "generator"))
-    print(outfile.read_text(encoding="utf-8"))
+    # print(outfile.read_text(encoding="utf-8"))
+    shutil.copy(outfile, example_path)
+    shutil.rmtree(check_dir)
+    if args.verbose:
+        print(example_path.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

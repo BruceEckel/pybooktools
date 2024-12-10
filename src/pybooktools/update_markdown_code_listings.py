@@ -23,7 +23,7 @@ from typing import LiteralString
 
 from rich.console import Console
 
-from pybooktools.tracing import trace
+from pybooktools.trace import trace
 from pybooktools.util import display_function_name
 
 width = 65
@@ -50,9 +50,9 @@ class MarkdownListing:
             console.print(pformat(python_files))
             raise ValueError("source_file cannot be None")
         self.source_file_contents = (
-            "```python\n"
-            + self.source_file_path.read_text(encoding="utf-8")
-            + "```"
+                "```python\n"
+                + self.source_file_path.read_text(encoding="utf-8")
+                + "```"
         )
         self.changed = self.markdown_listing != self.source_file_contents
         if self.changed:
@@ -85,7 +85,7 @@ class MarkdownListing:
 
 
 def find_python_files_and_listings(
-    markdown_content: str,
+        markdown_content: str,
 ) -> list[MarkdownListing]:
     """
     Find all #[code_location] paths in the Markdown content and
@@ -159,7 +159,7 @@ def find_python_files_and_listings(
 
 
 def update_markdown_listings(
-    markdown_content: str, listings: list[MarkdownListing]
+        markdown_content: str, listings: list[MarkdownListing]
 ) -> str:
     updated_markdown = markdown_content
     for listing in listings:

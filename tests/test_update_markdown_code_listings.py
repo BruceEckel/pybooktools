@@ -48,7 +48,7 @@ def test_markdown_listing_change_detection():
         "slugname", "```print('Hi, World!')```", source_file
     )
 
-    assert markdown_listing.changed == True
+    assert markdown_listing.changed
     assert markdown_listing.diffs != ""
 
 

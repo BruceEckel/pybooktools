@@ -5,7 +5,7 @@ from pathlib import Path
 
 from rich.console import Console
 
-from pybooktools.tracing import trace
+from pybooktools.trace import trace
 from pybooktools.util import FileChanged, display_function_name
 
 console = Console()

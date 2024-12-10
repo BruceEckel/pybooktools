@@ -1,6 +1,5 @@
 """
 Take `python_source_code` and find every top-level (i.e., non-indented) `print(arg)` statement.
-To avoid problems with the `arg` containing multiple lines and/or parentheses, use an appropriate syntax manipulation library.
 Add a line directly after it like this:
 
 print(arg)
@@ -30,13 +29,13 @@ class PrintTransformer(ast.NodeTransformer):
     def visit_Expr(self, node: ast.Expr) -> ast.AST:
         # Check if this is a `print()` call
         if isinstance(node.value, ast.Call) and isinstance(
-            node.value.func, ast.Name
+                node.value.func, ast.Name
         ):
             if node.value.func.id == "print":
                 args = node.value.args
 
                 if (
-                    len(args) == 1
+                        len(args) == 1
                 ):  # Handle only single-argument `print()` calls
                     self.counter += 1
                     ocl_line = ast.Expr(

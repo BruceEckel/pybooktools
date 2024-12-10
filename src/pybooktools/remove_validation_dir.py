@@ -6,7 +6,7 @@ from shutil import rmtree
 from rich.console import Console
 from rich.panel import Panel
 
-from pybooktools.tracing import trace
+from pybooktools.trace import trace
 from pybooktools.util import display_function_name
 
 console = Console()

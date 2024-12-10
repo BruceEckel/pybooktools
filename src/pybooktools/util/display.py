@@ -6,7 +6,7 @@ from icecream import ic
 from rich.console import Console
 from rich.panel import Panel
 
-from pybooktools.tracing import trace
+from pybooktools.trace import trace
 
 console = Console()
 
@@ -49,3 +49,11 @@ def display_function_name(title="", only_while_tracing=False) -> None:
         style="green",
     )
     console.print(panel)
+
+
+def test_display_function_name():
+    print(f"{trace = }")
+    display_function_name("Foo")
+    trace.enable()
+    print(f"{trace = }")
+    display_function_name("Bar")
