@@ -21,7 +21,7 @@ def ocl_format(arg: Any) -> str:
     return result
 
 
-if __name__ == "__main__":
+def test_ocl_format():
     # Test examples
     a_1 = 1
     a_2 = "foo"
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     print(ocl_format(complex_num))
 
     # Large integer
-    large_int = 10**100
+    large_int = 10 ** 100
     print(ocl_format(large_int))
 
     # Bytes
@@ -78,3 +78,7 @@ if __name__ == "__main__":
     # Escape characters
     escape_str = "Line1\nLine2\tTabbed"
     print(ocl_format(escape_str))
+
+
+if __name__ == "__main__":
+    test_ocl_format()
