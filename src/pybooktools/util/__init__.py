@@ -4,6 +4,7 @@ from .display import display_function_name, icc
 from .file_changed import FileChanged
 from .panic import panic, error, warn
 from .run_script import get_virtual_env_python, run_script
+from .validate_python_file import valid_python
 
 __all__ = [
     "panic",
@@ -17,4 +18,5 @@ __all__ = [
     "artifact_path",
     "get_artifact",
     "valid_python_file",
+    "valid_python",
 ]
