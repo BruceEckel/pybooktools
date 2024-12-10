@@ -54,7 +54,7 @@ class PrintTransformer(ast.NodeTransformer):
                         ],
                         value=ocl_line.value,
                     )
-                    return [node, assignment]
+                    return [node, assignment]  # type: ignore
                 else:
                     warn(
                         f"Args: {[astor.to_source(arg).strip() for arg in args]}",
