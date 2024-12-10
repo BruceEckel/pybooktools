@@ -4,6 +4,8 @@ from pathlib import Path
 
 import astor
 
+from pybooktools.util import run_script
+
 
 class OCLTransformer(ast.NodeTransformer):
     def __init__(self):
@@ -54,7 +56,20 @@ def main():
     ast.fix_missing_locations(transformed_tree)
 
     # Generate the transformed code
-    updated_code = astor.to_source(transformed_tree)
+    transformed = astor.to_source(transformed_tree)
+
+    updated_code = f"""
+from pybooktools.auto_ocl import ocl_format
+from pathlib import Path
+
+outfile = Path(.) / f"{example_path.stem}_ocl.py"
+
+{transformed}
+
+outfile.write_text(f\"\"\"
+# ChatGpt please complete this part as described in the previous prompt
+\"\"\"
+"""
 
     # Write the transformed code to a new file
     new_file = example_path.with_stem(example_path.stem + "_2")
@@ -62,10 +77,7 @@ def main():
 
     print(f"Processed file written to {new_file}")
 
-    # Execute the new file
-    import subprocess
-
-    subprocess.run(["python", str(new_file)], check=True)
+    run_script(new_file)
 
 
 if __name__ == "__main__":
