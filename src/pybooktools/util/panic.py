@@ -20,3 +20,14 @@ def panic(msg: str, title="Panic") -> None:
 
 def error(msg: str) -> None:
     panic(msg, title="Error")
+
+
+def warn(msg: str, title="Warning") -> None:
+    console.print(
+        Panel(
+            f"[dark_goldenrod]{msg}[/dark_goldenrod]",
+            title=f"[cornflower_blue]{title}[cornflower_blue]",
+            title_align="left",
+            style="light_slate_blue",
+        )
+    )

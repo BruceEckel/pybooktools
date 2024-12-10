@@ -18,6 +18,8 @@ from dataclasses import dataclass
 
 import astor
 
+from pybooktools.util import warn
+
 
 @dataclass
 class PrintTransformer(ast.NodeTransformer):
@@ -52,8 +54,9 @@ class PrintTransformer(ast.NodeTransformer):
                     )
                     return [node, assignment]
                 else:
-                    print(
-                        f"Warning: Ignored multi-argument print() with args: {[astor.to_source(arg).strip() for arg in args]}"
+                    warn(
+                        f"Args: {[astor.to_source(arg).strip() for arg in args]}",
+                        "Ignoring multi-argument print()",
                     )
 
         return node
