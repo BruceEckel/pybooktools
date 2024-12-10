@@ -24,10 +24,10 @@ It will evaluate the result and produce the same output as `print()`, but format
 For the above examples, `ocl_format` will produce:
 
 For | ocl_format produces this string 
-a_1: "#| 1"
-a_2: "#| foo"
-a_3: "#| A really long line that just keeps going am\n#| I finished yet? Yes!"
-a_4: "#| {1:2, 3:4}
-a_5: '#| {"a", "b", "c"}'
-a_6: "#| 3.14159"
-a_7: "#| The value of pi is 3.14159. Of course that\n#|has been rounded off"
+a_1 | "#| 1"
+a_2 | "#| foo"
+a_3 | "#| A really long line that just keeps going am\n#| I finished yet? Yes!"
+a_4 | "#| {1:2, 3:4}
+a_5 | '#| {"a", "b", "c"}'
+a_6 | "#| 3.14159"
+a_7 | "#| The value of pi is 3.14159. Of course that\n#|has been rounded off"
