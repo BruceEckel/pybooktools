@@ -62,13 +62,13 @@ def main():
 from pybooktools.auto_ocl import ocl_format
 from pathlib import Path
 
-outfile = Path(.) / f"{example_path.stem}_ocl.py"
+outfile = Path('.') / {example_path.stem}_ocl.py
 
 {transformed}
 
-outfile.write_text(f\"\"\"
-# ChatGpt please complete this part as described in the previous prompt
-\"\"\"
+outfile.write_text(\"\"\"
+{transformed}
+\"\"\", encoding="utf-8")
 """
 
     # Write the transformed code to a new file
