@@ -171,4 +171,4 @@ cython_debug/
 */_validation/
 /src/pybooktools/output_validator/testing/_validation
 .check_*
-/src/pybooktools/ocl/demos/.check_simple
+/src/pybooktools/demos/.check_simple
