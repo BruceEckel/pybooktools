@@ -36,8 +36,10 @@ Displays a quick reminder of these commands.
 
 > Shortcut: **ocl**
 
+**Note**: The `pybooktools` library must be a dependency in your project to enable `ocl`.
+
 For top-level `print()` statements (no indentation) in Python examples,
-clears and then updates `#|` output lines. 
+clears and then updates `#|` output lines.
 
 When updating, produces the actual output from the example and inserts it, 
 so the output is correct and the example runs successfully.
