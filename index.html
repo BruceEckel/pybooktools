@@ -59,11 +59,11 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#slug-line" class="nav-link">Slug Line</a>
+            <li class="nav-item" data-bs-level="2"><a href="#command-reminder" class="nav-link">Command Reminder</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#validate-output" class="nav-link">Validate Output</a>
+            <li class="nav-item" data-bs-level="2"><a href="#slug-line" class="nav-link">Slug Line</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -76,10 +76,6 @@
               </ul>
             </li>
             <li class="nav-item" data-bs-level="2"><a href="#renumber-chapters-and-chapter-names" class="nav-link">Renumber Chapters and Chapter Names</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#recommended-usage" class="nav-link">Recommended Usage</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -98,10 +94,6 @@
 <h2 id="installation">Installation</h2>
 <ul>
 <li>
-<p>If you are only using <code>validate_output.py</code> you do not need
-  to <code>pip</code> install this package, but just include it in your project.</p>
-</li>
-<li>
 <p>If you install the package using:<br />
 <code>pip install git+https://github.com/BruceEckel/pybooktools.git</code>
   You will get the command-line shortcuts shown in the subsections below.</p>
@@ -114,6 +106,13 @@
   can make changes to the code, but these will not be reflected in the running installation.</p>
 </li>
 </ul>
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
+
+<h2 id="command-reminder">Command Reminder</h2>
+<blockquote>
+<p>Shortcut: <strong>c</strong></p>
+</blockquote>
+<p>Displays a quick reminder of these commands.</p>
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
 <h2 id="slug-line">Slug Line</h2>
@@ -134,24 +133,6 @@ in the form:</p>
 </ol>
 <p>Changes are reported by the program.</p>
 <p>Run <code>slug -h</code> for details on how to use it.</p>
-<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
-
-<h2 id="validate-output">Validate Output</h2>
-<p>This tool allows you to include console output in your examples, and
-to ensure the output is correct when the program runs. To use, include
-this import in your example:</p>
-<pre><code class="language-python">from validate_output import console
-</code></pre>
-<p>Then, at any point in your example, you can add this:</p>
-<pre><code class="language-python">console == &quot;&quot;&quot;
-output string
-&quot;&quot;&quot;
-</code></pre>
-<p>The output string will be checked against the actual console output when
-the program runs.</p>
-<p>You may use multiple <code>console ==</code> expressions throughout your example.</p>
-<p>You can also insert empty <code>console == """"""</code> expressions and use
-<code>upcon</code> to initialize the outputs.</p>
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
 <h2 id="update-console-output">Update Console Output</h2>
@@ -190,11 +171,11 @@ as a Markdown comment in the form:</p>
 
 <h2 id="renumber-chapters-and-chapter-names">Renumber Chapters and Chapter Names</h2>
 <blockquote>
-<p>Shortcut: <strong>chapz</strong></p>
+<p>Shortcut: <strong>chapnum</strong></p>
 </blockquote>
 <p>Only works with Markdown (<code>.md</code>) files with names beginning with a chapter number, which is digits, possibly followed by a letter.
 This is followed by a space and the name of the file followed by <code>.md</code>.
-If you run the <code>chapz</code> command inside the directory containing such markdown files, it will:</p>
+If you run the <code>chapnum</code> command inside the directory containing such markdown files, it will:</p>
 <ol>
 <li>
 <p>Renumber the chapters, choosing the appropriate number of leading zeroes so that all chapter numbers have the same width.
@@ -207,25 +188,11 @@ If you run the <code>chapz</code> command inside the directory containing such m
 <p>B. If there is a chapter name, and it uses title capitalization, the program makes the file name match the chapter name, including correct title capitalization.</p>
 <p>C. If the chapter name doesn't use title capitalization, it is changed to use title capitalization and step B. is applied.</p>
 </li>
+<li>
+<p>To recursively run on all subdirectories, use the <code>-r</code> flag.</p>
+</li>
 </ol>
-<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
-
-<h2 id="recommended-usage">Recommended Usage</h2>
-<p>The easiest way to use these tools is to incorporate them in either
-your automated build or in a script that you run whenever you need to
-update. For example:</p>
-<pre><code class="language-bat">@REM refresh.bat
-@REM From https://github.com/BruceEckel/functional_error_handling
-@REM Doesn't work here, only for reference.
-cd .\src\functional_error_handling\
-rye test
-upcon *
-rye test
-cd ..\..
-uplist &quot;.\Slides2.md&quot;
-uplist &quot;.\Slides.md&quot;
-uplist &quot;.\Functional Error Handling.md&quot;
-</code></pre></div>
+<p>Use the <code>-h</code> flag for command details.</p></div>
             </div>
         </div>
 
@@ -307,5 +274,5 @@ uplist &quot;.\Functional Error Handling.md&quot;
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2024-11-12 20:37:35.135869+00:00
+Build Date UTC : 2024-12-11 18:01:03.524702+00:00
 -->
