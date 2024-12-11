@@ -1,3 +1,4 @@
+# For uv @ https://docs.astral.sh/uv/
 [project]
 name = "pybooktools"
 version = "0.1.0"
