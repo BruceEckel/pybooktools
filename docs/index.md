@@ -32,13 +32,56 @@ Displays a quick reminder of these commands.
 
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
+## Update Console Output
+
+> Shortcut: **ocl**
+
+For top-level `print()` statements (no indentation) in Python examples,
+clears and then updates `#|` output lines. 
+
+When updating, produces the actual output from the example and inserts it, 
+so the output is correct and the example runs successfully.
+
+Run `ocl -h` for details on how to use it.
+
+**Note**: This works only on the Python files, and not
+the examples embedded in Markdown documents. To update those after
+you've run this program, use `bookup`.
+
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
+
+## Update Markdown Code Listings
+
+> Shortcut: **bookup**
+
+Looks in Markdown files for listings with sluglines (listings without sluglines are ignored),
+and updates those listings from the source code repository.
+You must use the `#[code_location]` tag to provide the path to at least one source code repository,
+as a Markdown comment in the form:
+
+```text
+<!-- #[code_location] ./src/functional_error_handling -->
+```
+
+- The above is a relative path; You can also use absolute paths
+- These can appear anywhere in the file.
+- The program searches across all the specified directories for the file name
+  in the slugline.
+- If you provide more than one source code repository, the program ensures
+  there are no duplicate file names across those directories.
+
+Run `bookup -h` for details on how to use it.
+
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
+
+
 ## Slug Line
 
 > Shortcut: **slug**
 
 The "Slug Line" (a term from journalism) not only tells the reader which file
-this is, it also enables `update_markdown_code_listings.py` to update the
-code listing in the book from the source file.
+this is, it also enables `bookup` (`update_markdown_code_listings.py`) 
+to update the code listing in the book from the source file.
 
 Automatically adds the commented file name at the top of each Python file,
 in the form:
@@ -54,46 +97,6 @@ in the form:
 Changes are reported by the program.
 
 Run `slug -h` for details on how to use it.
-
-<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
-
-## Update Console Output
-
-> Shortcut: **upcon**
-
-Updates or clears 'console ==' output sections in Python examples that use
-`validate_output`. When updating, produces the actual output from the example since
-the last `console ==` and inserts it, so that the output is correct and the example
-will run successfully without reporting any errors in the `console ==` output.
-
-Run `upcon -h` for details on how to use it.
-
-**Note**: This works only on the Python files, and not
-the examples embedded in Markdown documents. To update those after
-you've run this program, use `uplist`.
-
-<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
-
-## Update Markdown Code Listings
-
-> Shortcut: **uplist**
-
-Looks in Markdown files for listings with sluglines (listings without sluglines are ignored),
-and updates those listings from the source code repository.
-You must use the `#[code_location]` tag to provide the path to at least one source code repository,
-as a Markdown comment in the form:
-
-```text
-<!-- #[code_location] ./src/functional_error_handling -->
-```
-
-- The above is a relative path; You can also use absolute paths
-- These can appear anywhere in the file.
-- The program searches across all the specified directories for the file name in the slugline.
-- If you provide more than one source code repository, the program ensures
-  there are no duplicate file names across those directories.
-
-Run `uplist -h` for details on how to use it.
 
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 

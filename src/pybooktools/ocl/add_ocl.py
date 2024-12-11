@@ -30,7 +30,7 @@ class PrintTransformer(ast.NodeTransformer):
     def visit_Expr(self, node: ast.Expr) -> ast.AST:
         # Check if this is a `print()` call
         if isinstance(node.value, ast.Call) and isinstance(
-                node.value.func, ast.Name
+            node.value.func, ast.Name
         ):
             if node.value.func.id == "print":
                 args = node.value.args

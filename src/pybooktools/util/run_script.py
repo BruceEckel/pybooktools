@@ -19,9 +19,9 @@ def get_virtual_env_python() -> str:
     venv_path = os.getenv("VIRTUAL_ENV")
     if venv_path:
         python_path = (
-                Path(venv_path)
-                / ("Scripts" if os.name == "nt" else "bin")
-                / "python"
+            Path(venv_path)
+            / ("Scripts" if os.name == "nt" else "bin")
+            / "python"
         )
         return str(python_path)
     return sys.executable
