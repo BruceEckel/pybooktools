@@ -21,6 +21,7 @@ def icc(*_: Any) -> None:
         ic.configureOutput(prefix=original_prefix)
 
 
+# noinspection PyUnusedLocal
 def dbg(msg: str) -> None:
     pass
     # Uncomment to enable dbg:

@@ -32,11 +32,11 @@ def main():
         display_function_name()
 
     if args.no_recurse:
-        validation_dirs = Path(".") / "_validation"
+        validation_dirs = Path("..") / "_validation"
     else:
         validation_dirs = [
             dir_path
-            for dir_path in Path(".").rglob("_validation")
+            for dir_path in Path("..").rglob("_validation")
             if dir_path.is_dir()
         ]
     if not validation_dirs:

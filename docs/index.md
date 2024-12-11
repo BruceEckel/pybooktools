@@ -8,9 +8,6 @@ Tools I use for writing Python books.
 
 ## Installation
 
-- If you are only using `validate_output.py` you do not need
-  to `pip` install this package, but just include it in your project.
-
 - If you install the package using:  
       ```
       pip install git+https://github.com/BruceEckel/pybooktools.git
@@ -24,6 +21,14 @@ Tools I use for writing Python books.
       ```
   The `-e` is optional but it makes the installation editable. Without the `-e` you
   can make changes to the code, but these will not be reflected in the running installation.
+
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
+
+## Command Reminder
+
+> Shortcut: **c**
+
+Displays a quick reminder of these commands.
 
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
@@ -49,34 +54,6 @@ in the form:
 Changes are reported by the program.
 
 Run `slug -h` for details on how to use it.
-
-<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
-
-## Validate Output
-
-This tool allows you to include console output in your examples, and
-to ensure the output is correct when the program runs. To use, include
-this import in your example:
-
-```python
-from validate_output import console
-```
-
-Then, at any point in your example, you can add this:
-
-```python
-console == """
-output string
-"""
-```
-
-The output string will be checked against the actual console output when
-the program runs.
-
-You may use multiple `console ==` expressions throughout your example.
-
-You can also insert empty `console == """"""` expressions and use
-`upcon` to initialize the outputs.
 
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
@@ -122,11 +99,11 @@ Run `uplist -h` for details on how to use it.
 
 ## Renumber Chapters and Chapter Names
 
-> Shortcut: **chapz**
+> Shortcut: **chapnum**
 
 Only works with Markdown (`.md`) files with names beginning with a chapter number, which is digits, possibly followed by a letter.
 This is followed by a space and the name of the file followed by `.md`.
-If you run the `chapz` command inside the directory containing such markdown files, it will:
+If you run the `chapnum` command inside the directory containing such markdown files, it will:
 
 1. Renumber the chapters, choosing the appropriate number of leading zeroes so that all chapter numbers have the same width.
     If a chapter number includes a trailing letter, that letter will be used to establish the resulting numerical order.
@@ -140,24 +117,8 @@ If you run the `chapz` command inside the directory containing such markdown fil
 
     C. If the chapter name doesn't use title capitalization, it is changed to use title capitalization and step B. is applied.
 
+3. To recursively run on all subdirectories, use the `-r` flag.
+
+Use the `-h` flag for command details.
+
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
-
-## Recommended Usage
-
-The easiest way to use these tools is to incorporate them in either
-your automated build or in a script that you run whenever you need to
-update. For example:
-
-```bat
-@REM refresh.bat
-@REM From https://github.com/BruceEckel/functional_error_handling
-@REM Doesn't work here, only for reference.
-cd .\src\functional_error_handling\
-rye test
-upcon *
-rye test
-cd ..\..
-uplist ".\Slides2.md"
-uplist ".\Slides.md"
-uplist ".\Functional Error Handling.md"
-```

@@ -1,3 +1,4 @@
+#: add_ocl.py
 """
 Take `python_source_code` and find every top-level (i.e., non-indented) `print(arg)` statement.
 Add a line directly after it like this:
@@ -7,7 +8,7 @@ _on = ocl_format(arg)
 
 Where the `n` in `_on` is an `int` that is incremented for each subsequent `print(arg)` that `add_ocl` modifies.
 
-If a top-level `print()` has more than one argument, `add_ocl` a warning and ignores that `print()`.
+If a top-level `print()` has more than one argument, `add_ocl` issues a warning and ignores that `print()`.
 Returns the modified `python_source_code` string.
 """
 
@@ -19,7 +20,7 @@ from pathlib import Path
 
 import astor
 
-from pybooktools.util import warn
+from pybooktools.error_reporting import warn
 
 
 @dataclass
@@ -29,14 +30,12 @@ class PrintTransformer(ast.NodeTransformer):
     def visit_Expr(self, node: ast.Expr) -> ast.AST:
         # Check if this is a `print()` call
         if isinstance(node.value, ast.Call) and isinstance(
-            node.value.func, ast.Name
+                node.value.func, ast.Name
         ):
             if node.value.func.id == "print":
                 args = node.value.args
-
-                if (
-                    len(args) == 1
-                ):  # Handle only single-argument `print()` calls
+                # Handle only single-argument `print()` calls:
+                if len(args) == 1:
                     self.counter += 1
                     ocl_line = ast.Expr(
                         value=ast.Call(
@@ -45,7 +44,6 @@ class PrintTransformer(ast.NodeTransformer):
                             keywords=[],
                         )
                     )
-
                     # Insert new `_on = _ocl_format(arg)` line
                     assignment = ast.Assign(
                         targets=[
@@ -56,8 +54,8 @@ class PrintTransformer(ast.NodeTransformer):
                     return [node, assignment]  # type: ignore
                 else:
                     warn(
-                        f"Args: {[astor.to_source(arg).strip() for arg in args]}",
-                        "Ignoring multi-argument print()",
+                        f"Args: {[astor.to_source(arg).strip() for arg in args]}\n"
+                        "Ignoring multi-argument print()"
                     )
 
         return node
@@ -65,8 +63,8 @@ class PrintTransformer(ast.NodeTransformer):
 
 def add_ocl(python_source_code: str) -> str:
     """
-    Strips old OCL comments.
-    Modifies the provided Python source code to add `_on = ocl_format(arg)` lines after each top-level print(arg).
+    Strips old OCL comments, then modifies the provided Python source code to add
+    `_on = ocl_format(arg)` lines after each top-level print(arg).
 
     Args:
         python_source_code (str): The Python source code to modify.
@@ -90,7 +88,6 @@ def add_ocl(python_source_code: str) -> str:
 
     # Convert the modified AST back to source code
     modified_source = astor.to_source(modified_tree)
-
     return modified_source
 
 

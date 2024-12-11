@@ -1,6 +1,7 @@
+#: check_python_file.py
 from pathlib import Path
 
-from pybooktools.util import error
+from pybooktools.error_reporting import error
 
 
 def optional_message(msg: str) -> str:

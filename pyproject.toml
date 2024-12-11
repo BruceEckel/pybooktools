@@ -12,12 +12,11 @@ readme = "README.md"
 requires-python = ">= 3.8"
 
 [project.scripts]
-z = "pybooktools.reminder:main"
-genocl = "pybooktools.ocl.produce_ocled_example:main"
-addocl = "pybooktools.ocl.add_ocl:main"
+c = "pybooktools.reminder:main"
+ocl = "pybooktools.ocl.produce_ocled_example:main"
+bookup = "pybooktools.update_markdown_code_listings:main"
 slug = "pybooktools.slug_line:main"
-chapz = "pybooktools.renumber_chapters:main"
-pyup = "pybooktools.update_markdown_code_listings:main"
+chapnum = "pybooktools.renumber_chapters:main"
 
 [build-system]
 requires = ["hatchling"]
