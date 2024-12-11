@@ -24,8 +24,8 @@ def test_markdown_listing_initialization(markdown_file):
     assert markdown_listing.markdown_listing == "```print('Hello, World!')```"
     assert markdown_listing.source_file_path == markdown_file
     assert (
-            markdown_listing.source_file_contents
-            == "```python\n```\nprint('Hello, World!')\n``````"
+        markdown_listing.source_file_contents
+        == "```python\n```\nprint('Hello, World!')\n``````"
     )
     assert markdown_listing.changed
     # assert markdown_listing.diffs == ""
