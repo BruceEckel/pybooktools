@@ -29,7 +29,7 @@ def main() -> None:
     outfile = check_dir / f"{example_path.stem}_ocled.py"
 
     ocl_generator = f'''
-from pybooktools.aocl import ocl_format
+from pybooktools.ocl import ocl_format
 from pathlib import Path
 
 {with_ocls}
