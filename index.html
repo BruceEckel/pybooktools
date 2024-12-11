@@ -63,15 +63,15 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#slug-line" class="nav-link">Slug Line</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
             <li class="nav-item" data-bs-level="2"><a href="#update-console-output" class="nav-link">Update Console Output</a>
               <ul class="nav flex-column">
               </ul>
             </li>
             <li class="nav-item" data-bs-level="2"><a href="#update-markdown-code-listings" class="nav-link">Update Markdown Code Listings</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#slug-line" class="nav-link">Slug Line</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -115,13 +115,48 @@
 <p>Displays a quick reminder of these commands.</p>
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
+<h2 id="update-console-output">Update Console Output</h2>
+<blockquote>
+<p>Shortcut: <strong>ocl</strong></p>
+</blockquote>
+<p>For top-level <code>print()</code> statements (no indentation) in Python examples,
+clears and then updates <code>#|</code> output lines. </p>
+<p>When updating, produces the actual output from the example and inserts it, 
+so the output is correct and the example runs successfully.</p>
+<p>Run <code>ocl -h</code> for details on how to use it.</p>
+<p><strong>Note</strong>: This works only on the Python files, and not
+the examples embedded in Markdown documents. To update those after
+you've run this program, use <code>bookup</code>.</p>
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
+
+<h2 id="update-markdown-code-listings">Update Markdown Code Listings</h2>
+<blockquote>
+<p>Shortcut: <strong>bookup</strong></p>
+</blockquote>
+<p>Looks in Markdown files for listings with sluglines (listings without sluglines are ignored),
+and updates those listings from the source code repository.
+You must use the <code>#[code_location]</code> tag to provide the path to at least one source code repository,
+as a Markdown comment in the form:</p>
+<pre><code class="language-text">&lt;!-- #[code_location] ./src/functional_error_handling --&gt;
+</code></pre>
+<ul>
+<li>The above is a relative path; You can also use absolute paths</li>
+<li>These can appear anywhere in the file.</li>
+<li>The program searches across all the specified directories for the file name
+  in the slugline.</li>
+<li>If you provide more than one source code repository, the program ensures
+  there are no duplicate file names across those directories.</li>
+</ul>
+<p>Run <code>bookup -h</code> for details on how to use it.</p>
+<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
+
 <h2 id="slug-line">Slug Line</h2>
 <blockquote>
 <p>Shortcut: <strong>slug</strong></p>
 </blockquote>
 <p>The "Slug Line" (a term from journalism) not only tells the reader which file
-this is, it also enables <code>update_markdown_code_listings.py</code> to update the
-code listing in the book from the source file.</p>
+this is, it also enables <code>bookup</code> (<code>update_markdown_code_listings.py</code>) 
+to update the code listing in the book from the source file.</p>
 <p>Automatically adds the commented file name at the top of each Python file,
 in the form:</p>
 <pre><code class="language-text">#: file_name.py
@@ -133,40 +168,6 @@ in the form:</p>
 </ol>
 <p>Changes are reported by the program.</p>
 <p>Run <code>slug -h</code> for details on how to use it.</p>
-<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
-
-<h2 id="update-console-output">Update Console Output</h2>
-<blockquote>
-<p>Shortcut: <strong>upcon</strong></p>
-</blockquote>
-<p>Updates or clears 'console ==' output sections in Python examples that use
-<code>validate_output</code>. When updating, produces the actual output from the example since
-the last <code>console ==</code> and inserts it, so that the output is correct and the example
-will run successfully without reporting any errors in the <code>console ==</code> output.</p>
-<p>Run <code>upcon -h</code> for details on how to use it.</p>
-<p><strong>Note</strong>: This works only on the Python files, and not
-the examples embedded in Markdown documents. To update those after
-you've run this program, use <code>uplist</code>.</p>
-<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
-
-<h2 id="update-markdown-code-listings">Update Markdown Code Listings</h2>
-<blockquote>
-<p>Shortcut: <strong>uplist</strong></p>
-</blockquote>
-<p>Looks in Markdown files for listings with sluglines (listings without sluglines are ignored),
-and updates those listings from the source code repository.
-You must use the <code>#[code_location]</code> tag to provide the path to at least one source code repository,
-as a Markdown comment in the form:</p>
-<pre><code class="language-text">&lt;!-- #[code_location] ./src/functional_error_handling --&gt;
-</code></pre>
-<ul>
-<li>The above is a relative path; You can also use absolute paths</li>
-<li>These can appear anywhere in the file.</li>
-<li>The program searches across all the specified directories for the file name in the slugline.</li>
-<li>If you provide more than one source code repository, the program ensures
-  there are no duplicate file names across those directories.</li>
-</ul>
-<p>Run <code>uplist -h</code> for details on how to use it.</p>
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
 <h2 id="renumber-chapters-and-chapter-names">Renumber Chapters and Chapter Names</h2>
@@ -274,5 +275,5 @@ If you run the <code>chapnum</code> command inside the directory containing such
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2024-12-11 18:01:03.524702+00:00
+Build Date UTC : 2024-12-11 22:17:17.153552+00:00
 -->
