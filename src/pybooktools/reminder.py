@@ -10,7 +10,7 @@ def main() -> None:
         "[deep_sky_blue1]c       [/deep_sky_blue1]"
         "    [yellow]Display these commands[/yellow]\n"
         "[deep_sky_blue1]ocl   [/deep_sky_blue1]"
-        "      [yellow]Update examples with Output Comment Lines[/yellow]\n"
+        "      [yellow]Add/Update Output Comment Lines in Python examples[/yellow]\n"
         "[deep_sky_blue1]bookup[/deep_sky_blue1]"
         "      [yellow]Update book examples from source repository[/yellow]\n"
         "[deep_sky_blue1]slug    [/deep_sky_blue1]"

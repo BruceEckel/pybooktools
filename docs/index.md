@@ -120,5 +120,3 @@ If you run the `chapnum` command inside the directory containing such markdown f
 3. To recursively run on all subdirectories, use the `-r` flag.
 
 Use the `-h` flag for command details.
-
-<hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
