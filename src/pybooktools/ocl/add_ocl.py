@@ -26,19 +26,20 @@ class PrintTransformer(cst.CSTTransformer):
     counter: int = 0
 
     def leave_SimpleStatementLine(
-        self,
-        node: cst.SimpleStatementLine,
-        updated_node: cst.SimpleStatementLine,
+            self, node: cst.SimpleStatementLine, updated_node: cst.SimpleStatementLine
     ) -> cst.FlattenSentinel[cst.BaseStatement]:
-        if m.matches(
-            node,
-            m.SimpleStatementLine(
-                body=[m.Expr(value=m.Call(func=m.Name("print")))]
-            ),
-        ):
+        if m.matches(node, m.SimpleStatementLine(body=[m.Expr(value=m.Call(func=m.Name("print")))])):
             call = node.body[0].value  # type: ignore
             if isinstance(call, cst.Call) and len(call.args) == 1:
                 self.counter += 1
+                # Handle walrus operator or direct values
+                arg = call.args[0].value
+                if isinstance(arg, cst.NamedExpr):
+                    # For assignment expressions (e.g., `balance := deposit(...)`), use the variable name
+                    formatted_arg = arg.target
+                else:
+                    formatted_arg = arg
+
                 ocl_assignment = cst.SimpleStatementLine(
                     body=[
                         cst.Assign(
@@ -48,7 +49,7 @@ class PrintTransformer(cst.CSTTransformer):
                                 )
                             ],
                             value=cst.Call(
-                                func=cst.Name("ocl_format"), args=call.args
+                                func=cst.Name("ocl_format"), args=[cst.Arg(value=formatted_arg)]
                             ),
                         )
                     ]
@@ -56,8 +57,7 @@ class PrintTransformer(cst.CSTTransformer):
                 return cst.FlattenSentinel([updated_node, ocl_assignment])
             else:
                 warn(
-                    f"Ignoring multi-argument or invalid print() statement: {node.code}"
-                )
+                    f"Ignoring multi-argument or invalid print() statement: {node.code}")
         return updated_node
 
 
