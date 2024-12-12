@@ -11,10 +11,9 @@ Where the `n` in `_on` is an `int` that is incremented for each subsequent `prin
 If a top-level `print()` has more than one argument, `add_ocl` issues a warning and ignores that `print()`.
 Returns the modified `python_source_code` string.
 """
-import argparse
+
 import re
 from dataclasses import dataclass
-from pathlib import Path
 
 import libcst as cst
 import libcst.matchers as m
@@ -109,12 +108,35 @@ print(withdraw(balance, 30.0))
 
 
 def main():
-    # test_add_ocl()
+    import argparse
+    from pathlib import Path
+
     parser = argparse.ArgumentParser(
         description="Process a Python file with add_ocl."
     )
-    parser.add_argument("file", type=str, help="The Python file to process.")
+    parser.add_argument(
+        "file",
+        type=str,
+        nargs="?",
+        help="The Python file to process. Required unless using -t.",
+    )
+    parser.add_argument(
+        "-t",
+        "--test",
+        action="store_true",
+        help="Run the test_add_ocl function.",
+    )
     args = parser.parse_args()
+
+    if args.test:
+        test_add_ocl()
+        return
+
+    if not args.file:
+        parser.error(
+            "the following arguments are required: file (unless using -t)"
+        )
+
     file_path = Path(args.file)
     if not file_path.exists():
         print(f"Error: The file {file_path} does not exist.")
