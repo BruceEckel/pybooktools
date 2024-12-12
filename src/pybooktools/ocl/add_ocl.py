@@ -11,9 +11,10 @@ Where the `n` in `_on` is an `int` that is incremented for each subsequent `prin
 If a top-level `print()` has more than one argument, `add_ocl` issues a warning and ignores that `print()`.
 Returns the modified `python_source_code` string.
 """
-
+import argparse
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
 import libcst as cst
 import libcst.matchers as m
@@ -26,9 +27,16 @@ class PrintTransformer(cst.CSTTransformer):
     counter: int = 0
 
     def leave_SimpleStatementLine(
-            self, node: cst.SimpleStatementLine, updated_node: cst.SimpleStatementLine
+            self,
+            node: cst.SimpleStatementLine,
+            updated_node: cst.SimpleStatementLine,
     ) -> cst.FlattenSentinel[cst.BaseStatement]:
-        if m.matches(node, m.SimpleStatementLine(body=[m.Expr(value=m.Call(func=m.Name("print")))])):
+        if m.matches(
+                node,
+                m.SimpleStatementLine(
+                    body=[m.Expr(value=m.Call(func=m.Name("print")))]
+                ),
+        ):
             call = node.body[0].value  # type: ignore
             if isinstance(call, cst.Call) and len(call.args) == 1:
                 self.counter += 1
@@ -49,7 +57,8 @@ class PrintTransformer(cst.CSTTransformer):
                                 )
                             ],
                             value=cst.Call(
-                                func=cst.Name("ocl_format"), args=[cst.Arg(value=formatted_arg)]
+                                func=cst.Name("ocl_format"),
+                                args=[cst.Arg(value=formatted_arg)],
                             ),
                         )
                     ]
@@ -57,7 +66,8 @@ class PrintTransformer(cst.CSTTransformer):
                 return cst.FlattenSentinel([updated_node, ocl_assignment])
             else:
                 warn(
-                    f"Ignoring multi-argument or invalid print() statement: {node.code}")
+                    f"Ignoring multi-argument or invalid print() statement: {node.code}"
+                )
         return updated_node
 
 
@@ -99,19 +109,19 @@ print(withdraw(balance, 30.0))
 
 
 def main():
-    test_add_ocl()
-    # parser = argparse.ArgumentParser(
-    #     description="Process a Python file with add_ocl."
-    # )
-    # parser.add_argument("file", type=str, help="The Python file to process.")
-    # args = parser.parse_args()
-    # file_path = Path(args.file)
-    # if not file_path.exists():
-    #     print(f"Error: The file {file_path} does not exist.")
-    # else:
-    #     source_code = file_path.read_text(encoding="utf-8")
-    #     modified_code = add_ocl(source_code)
-    #     print(modified_code)
+    # test_add_ocl()
+    parser = argparse.ArgumentParser(
+        description="Process a Python file with add_ocl."
+    )
+    parser.add_argument("file", type=str, help="The Python file to process.")
+    args = parser.parse_args()
+    file_path = Path(args.file)
+    if not file_path.exists():
+        print(f"Error: The file {file_path} does not exist.")
+    else:
+        source_code = file_path.read_text(encoding="utf-8")
+        modified_code = add_ocl(source_code)
+        print(modified_code)
 
 
 if __name__ == "__main__":
