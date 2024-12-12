@@ -12,53 +12,53 @@ If a top-level `print()` has more than one argument, `add_ocl` issues a warning 
 Returns the modified `python_source_code` string.
 """
 
-import argparse
-import ast
 import re
 from dataclasses import dataclass
-from pathlib import Path
 
-import astor
+import libcst as cst
+import libcst.matchers as m
 
-from pybooktools.error_reporting import warn
+warn = print
 
 
 @dataclass
-class PrintTransformer(ast.NodeTransformer):
+class PrintTransformer(cst.CSTTransformer):
     counter: int = 0
 
-    def visit_Expr(self, node: ast.Expr) -> ast.AST:
-        # Check if this is a `print()` call
-        if isinstance(node.value, ast.Call) and isinstance(
-            node.value.func, ast.Name
+    def leave_SimpleStatementLine(
+        self,
+        node: cst.SimpleStatementLine,
+        updated_node: cst.SimpleStatementLine,
+    ) -> cst.FlattenSentinel[cst.BaseStatement]:
+        if m.matches(
+            node,
+            m.SimpleStatementLine(
+                body=[m.Expr(value=m.Call(func=m.Name("print")))]
+            ),
         ):
-            if node.value.func.id == "print":
-                args = node.value.args
-                # Handle only single-argument `print()` calls:
-                if len(args) == 1:
-                    self.counter += 1
-                    ocl_line = ast.Expr(
-                        value=ast.Call(
-                            func=ast.Name(id="ocl_format", ctx=ast.Load()),
-                            args=[args[0]],
-                            keywords=[],
+            call = node.body[0].value  # type: ignore
+            if isinstance(call, cst.Call) and len(call.args) == 1:
+                self.counter += 1
+                ocl_assignment = cst.SimpleStatementLine(
+                    body=[
+                        cst.Assign(
+                            targets=[
+                                cst.AssignTarget(
+                                    target=cst.Name(f"_o{self.counter}")
+                                )
+                            ],
+                            value=cst.Call(
+                                func=cst.Name("ocl_format"), args=call.args
+                            ),
                         )
-                    )
-                    # Insert new `_on = _ocl_format(arg)` line
-                    assignment = ast.Assign(
-                        targets=[
-                            ast.Name(id=f"_o{self.counter}", ctx=ast.Store())
-                        ],
-                        value=ocl_line.value,
-                    )
-                    return [node, assignment]  # type: ignore
-                else:
-                    warn(
-                        f"Args: {[astor.to_source(arg).strip() for arg in args]}\n"
-                        "Ignoring multi-argument print()"
-                    )
-
-        return node
+                    ]
+                )
+                return cst.FlattenSentinel([updated_node, ocl_assignment])
+            else:
+                warn(
+                    f"Ignoring multi-argument or invalid print() statement: {node.code}"
+                )
+        return updated_node
 
 
 def add_ocl(python_source_code: str) -> str:
@@ -76,47 +76,42 @@ def add_ocl(python_source_code: str) -> str:
     de_ocl_code = re.sub(
         r"^#\| .*$", "", python_source_code, flags=re.MULTILINE
     )
-    # Parse the Python source code
-    tree = ast.parse(de_ocl_code)
 
-    # Apply transformations
+    tree = cst.parse_module(de_ocl_code)
     transformer = PrintTransformer()
-    modified_tree = transformer.visit(tree)
+    modified_tree = tree.visit(transformer)
 
-    # Ensure the tree is consistent
-    ast.fix_missing_locations(modified_tree)
-
-    # Convert the modified AST back to source code
-    modified_source = astor.to_source(modified_tree)
-    return modified_source
+    return modified_tree.code
 
 
 def test_add_ocl():
     sample_code = """
-print("Hello")
-#| Bob's yer
-x = 10
-print(x)
-#| Uncle
-print("This will be ignored", x)
+def deposit(x, y):
+  return 10.0
+def withdraw(x, y):
+  return 10.0
+print(balance := deposit(100.0, 50.0))
+print(withdraw(balance, 30.0))
 """
+    print("\n--- sample_code ---\n", sample_code)
     modified_code = add_ocl(sample_code)
-    print(modified_code)
+    print("\n--- modified_code ---\n", modified_code)
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Process a Python file with add_ocl."
-    )
-    parser.add_argument("file", type=str, help="The Python file to process.")
-    args = parser.parse_args()
-    file_path = Path(args.file)
-    if not file_path.exists():
-        print(f"Error: The file {file_path} does not exist.")
-    else:
-        source_code = file_path.read_text(encoding="utf-8")
-        modified_code = add_ocl(source_code)
-        print(modified_code)
+    test_add_ocl()
+    # parser = argparse.ArgumentParser(
+    #     description="Process a Python file with add_ocl."
+    # )
+    # parser.add_argument("file", type=str, help="The Python file to process.")
+    # args = parser.parse_args()
+    # file_path = Path(args.file)
+    # if not file_path.exists():
+    #     print(f"Error: The file {file_path} does not exist.")
+    # else:
+    #     source_code = file_path.read_text(encoding="utf-8")
+    #     modified_code = add_ocl(source_code)
+    #     print(modified_code)
 
 
 if __name__ == "__main__":

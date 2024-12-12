@@ -43,7 +43,8 @@ outfile.write_text(f"""\
     run_script(write_with_ext(ocl_generator, "generator"))
     # print(outfile.read_text(encoding="utf-8"))
     shutil.copy(outfile, example_path)
-    shutil.rmtree(check_dir)
+    if not args.verbose:
+        shutil.rmtree(check_dir)
     if args.verbose:
         print(example_path.read_text(encoding="utf-8"))
 

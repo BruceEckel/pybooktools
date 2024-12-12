@@ -4,16 +4,19 @@ name = "pybooktools"
 version = "0.1.0"
 description = "Tools I use for writing Python books."
 readme = "README.md"
-requires-python = ">=3.12.0"
+requires-python = ">=3.13.0"
 dependencies = [
     "astor>=0.8.1",
+    "autopep8>=2.3.1",
     "black>=24.10.0",
     "icecream>=2.1.3",
+    "libcst>=1.5.1",
     "pytest>=8.3.4",
     "rich>=13.9.4",
 ]
 
 [project.scripts]
+testocl = "pybooktools.ocl.add_ocl:main"
 c = "pybooktools.reminder:main"
 ocl = "pybooktools.ocl.produce_ocled_example:main"
 bookup = "pybooktools.update_markdown_code_listings:main"

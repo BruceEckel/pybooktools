@@ -16,7 +16,7 @@ def main() -> None:
         "[deep_sky_blue1]slug    [/deep_sky_blue1]"
         "    [yellow]Add or update sluglines in Python files[/yellow]\n"
         "[deep_sky_blue1]chapnum  [/deep_sky_blue1]"
-        "   [yellow]Renumber Markdown chapters & align chapter names[/yellow]\n"
+        "   [yellow]Renumber Markdown chapters & align chapter names[/yellow]"
     )
     console.print(
         Panel(
