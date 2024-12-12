@@ -11,14 +11,15 @@ Where the `n` in `_on` is an `int` that is incremented for each subsequent `prin
 If a top-level `print()` has more than one argument, `add_ocl` issues a warning and ignores that `print()`.
 Returns the modified `python_source_code` string.
 """
-
+import argparse
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
 import libcst as cst
 import libcst.matchers as m
 
-warn = print
+from pybooktools.error_reporting import warn
 
 
 @dataclass
@@ -26,15 +27,15 @@ class PrintTransformer(cst.CSTTransformer):
     counter: int = 0
 
     def leave_SimpleStatementLine(
-            self,
-            node: cst.SimpleStatementLine,
-            updated_node: cst.SimpleStatementLine,
+        self,
+        node: cst.SimpleStatementLine,
+        updated_node: cst.SimpleStatementLine,
     ) -> cst.FlattenSentinel[cst.BaseStatement]:
         if m.matches(
-                node,
-                m.SimpleStatementLine(
-                    body=[m.Expr(value=m.Call(func=m.Name("print")))]
-                ),
+            node,
+            m.SimpleStatementLine(
+                body=[m.Expr(value=m.Call(func=m.Name("print")))]
+            ),
         ):
             call = node.body[0].value  # type: ignore
             if isinstance(call, cst.Call) and len(call.args) == 1:
@@ -108,9 +109,6 @@ print(withdraw(balance, 30.0))
 
 
 def main():
-    import argparse
-    from pathlib import Path
-
     parser = argparse.ArgumentParser(
         description="Process a Python file with add_ocl."
     )
