@@ -18,6 +18,7 @@ from pathlib import Path
 
 import libcst as cst
 import libcst.matchers as m
+from icecream import ic
 
 from pybooktools.error_reporting import warn
 
@@ -27,15 +28,15 @@ class PrintTransformer(cst.CSTTransformer):
     counter: int = 0
 
     def leave_SimpleStatementLine(
-        self,
-        node: cst.SimpleStatementLine,
-        updated_node: cst.SimpleStatementLine,
+            self,
+            node: cst.SimpleStatementLine,
+            updated_node: cst.SimpleStatementLine,
     ) -> cst.FlattenSentinel[cst.BaseStatement]:
         if m.matches(
-            node,
-            m.SimpleStatementLine(
-                body=[m.Expr(value=m.Call(func=m.Name("print")))]
-            ),
+                node,
+                m.SimpleStatementLine(
+                    body=[m.Expr(value=m.Call(func=m.Name("print")))]
+                ),
         ):
             call = node.body[0].value  # type: ignore
             if isinstance(call, cst.Call) and len(call.args) == 1:
@@ -103,9 +104,11 @@ def withdraw(x, y):
 print(balance := deposit(100.0, 50.0))
 print(withdraw(balance, 30.0))
 """
-    print("\n--- sample_code ---\n", sample_code)
+    print("\n--- sample_code ---\n", sample_code, "***")
     modified_code = add_ocl(sample_code)
-    print("\n--- modified_code ---\n", modified_code)
+    print("\n--- modified_code ---\n", modified_code, "***")
+    ic(sample_code)
+    ic(modified_code)
 
 
 def main():
@@ -116,13 +119,19 @@ def main():
         "file",
         type=str,
         nargs="?",
-        help="The Python file to process. Required unless using -t.",
+        help="The Python file to process. Required unless using -t",
     )
     parser.add_argument(
         "-t",
         "--test",
         action="store_true",
-        help="Run the test_add_ocl function.",
+        help="Run the test_add_ocl function",
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Display the updated file",
     )
     args = parser.parse_args()
 
@@ -141,7 +150,8 @@ def main():
     else:
         source_code = file_path.read_text(encoding="utf-8")
         modified_code = add_ocl(source_code)
-        print(modified_code)
+        if args.verbose:
+            print(modified_code)
 
 
 if __name__ == "__main__":

@@ -24,9 +24,10 @@ def main() -> None:
 
     original_source = valid_python(example_path)
     with_ocls = add_ocl(original_source)
-    write_with_ext(with_ocls, "ocls")
+    write_with_ext(with_ocls, "1_ocls")
     embedded_ocl_results = embed_ocl_results(with_ocls)
-    outfile = check_dir / f"{example_path.stem}_ocled.py"
+    write_with_ext(embedded_ocl_results, "1a_embedded")
+    outfile = check_dir / f"{example_path.stem}_3_ocled.py"
 
     ocl_generator = f'''
 from pybooktools.ocl import ocl_format
@@ -40,7 +41,7 @@ outfile.write_text(f"""\
 """, encoding="utf-8")
     '''
 
-    run_script(write_with_ext(ocl_generator, "generator"))
+    run_script(write_with_ext(ocl_generator, "2_generator"))
     # print(outfile.read_text(encoding="utf-8"))
     shutil.copy(outfile, example_path)
     if not args.verbose:
