@@ -3,11 +3,11 @@ import textwrap
 from typing import Any
 
 
-def output_format(arg: Any) -> str:
+def output_format(arg: Any) -> list[str]:
     arg = str(arg)
     wrapped_lines: list[str] = textwrap.wrap(arg, width=47)
     # Prepend '## ' to each line
-    result = "\n".join(f"## {line}".strip() for line in wrapped_lines)
+    result = [f"## {line}".strip() for line in wrapped_lines]
     return result
 
 

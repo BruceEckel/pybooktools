@@ -23,7 +23,7 @@ def ptags_to_dict(input_str: str) -> Dict[str, List[str]]:
             result[line.strip()] = buffer
             buffer = []
         else:
-            buffer.append(output_format(line))
+            buffer.extend(output_format(line))
 
     return result
 
