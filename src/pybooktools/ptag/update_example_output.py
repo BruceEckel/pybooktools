@@ -1,9 +1,10 @@
 # update_example_output.py
 import re
+import shutil
 from argparse import ArgumentParser
 from pathlib import Path
 
-from pybooktools.ptag import add_ptags
+from pybooktools.ptag import add_ptags, ensure_slug_line
 from pybooktools.util import run_script, valid_python, cleaned_dir
 
 
@@ -23,18 +24,21 @@ def main() -> None:
         outpath.write_text(python_script, encoding="utf-8")
         return outpath
 
-    original_source = valid_python(example_path)
-    # Remove comments starting with `#| `
-    cleaned_code = re.sub(r"^## .*$", "", original_source, flags=re.MULTILINE)
+    original_source = ensure_slug_line(valid_python(example_path), example_path)
+    # Remove comments starting with `## `
+    cleaned_code = re.sub(
+        r"^\s*## .*(\n|$)", "", original_source, flags=re.MULTILINE
+    )
+    example_path.write_text(cleaned_code, encoding="utf-8")
     with_ptags = add_ptags(cleaned_code)
     ptagged = write_with_ext(with_ptags, "1_ptags")
     output = run_script(ptagged)
     print(output)
     # shutil.copy(outfile, example_path)
-    # if not args.verbose:
-    #     shutil.rmtree(check_dir)
-    # if args.verbose:
-    #     print(example_path.read_text(encoding="utf-8"))
+    if not args.verbose:
+        shutil.rmtree(check_dir)
+    if args.verbose:
+        print(example_path.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":
