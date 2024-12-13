@@ -1,3 +1,3 @@
-#: simple.py
+# simple.py
 print("foo")
 print("bar")

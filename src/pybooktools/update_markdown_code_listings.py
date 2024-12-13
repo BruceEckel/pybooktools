@@ -1,4 +1,4 @@
-#: update_markdown_code_listings.py
+# update_markdown_code_listings.py
 """
 Looks in Markdown files for listings with sluglines,
 and updates those listings from the source code repository.

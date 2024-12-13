@@ -1,4 +1,4 @@
-#: produce_ocled_example.py
+# produce_ocled_example.py
 import shutil
 from argparse import ArgumentParser
 from pathlib import Path

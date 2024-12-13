@@ -1,4 +1,4 @@
-#: check_python_file.py
+# check_python_file.py
 from pathlib import Path
 
 from pybooktools.error_reporting import error

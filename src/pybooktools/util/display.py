@@ -1,4 +1,4 @@
-#: display.py
+# display.py
 from pathlib import Path
 from typing import Any
 

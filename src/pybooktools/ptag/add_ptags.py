@@ -1,4 +1,4 @@
-#: add_ptags.py
+# add_ptags.py
 """
 The argument to add_ptags is a string containing a valid Python script that may include print() statements.
 Using libcst, find all `print()` statements and add a print() statement right after it, at the same indent level.

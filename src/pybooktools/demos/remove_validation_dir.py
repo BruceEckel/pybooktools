@@ -1,4 +1,4 @@
-#: remove_validation_dir.py
+# remove_validation_dir.py
 import argparse
 from pathlib import Path
 from shutil import rmtree

@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from pybooktools.slug_line import ensure_slug_line, FileChanged, main
+from pybooktools.ptag.slug_line import ensure_slug_line, FileChanged, main
 
 
 # -- Test --
@@ -115,7 +115,7 @@ def temp_python_files(tmp_path: Path) -> Path:
 def test_main_recursive(mock_console, mock_args, temp_python_files):
     mock_args.return_value = argparse.Namespace(files=None, recursive=True)
     with patch.object(
-        Path, "rglob", return_value=temp_python_files.rglob("*.py")
+            Path, "rglob", return_value=temp_python_files.rglob("*.py")
     ):
         main()
 

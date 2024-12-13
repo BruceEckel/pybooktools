@@ -1,4 +1,4 @@
-#: ocl_format.py
+# ocl_format.py
 import textwrap
 from typing import Any
 

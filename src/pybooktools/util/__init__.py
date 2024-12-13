@@ -1,4 +1,4 @@
-#: __init__.py
+# __init__.py
 
 from .artifacts import artifact_path, get_artifact
 from .check_python_file import valid_python

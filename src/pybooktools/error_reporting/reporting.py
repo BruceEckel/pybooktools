@@ -1,4 +1,4 @@
-#: reporting.py
+# reporting.py
 import sys
 
 from rich.console import Console

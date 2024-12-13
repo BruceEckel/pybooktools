@@ -1,4 +1,4 @@
-#: add_output.py
+# update_example_output.py
 import re
 from argparse import ArgumentParser
 from pathlib import Path
@@ -8,7 +8,7 @@ from pybooktools.util import run_script, valid_python, cleaned_dir
 
 
 def main() -> None:
-    print("append_output.py")
+    print("update_example_output.py")
     parser = ArgumentParser(description="Add outputs to a Python example")
     parser.add_argument("pyfile", type=str, help="The Python example file")
     parser.add_argument(

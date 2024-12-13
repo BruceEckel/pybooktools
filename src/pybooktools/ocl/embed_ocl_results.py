@@ -1,4 +1,4 @@
-#: embed_ocl_results.py
+# embed_ocl_results.py
 import re
 
 

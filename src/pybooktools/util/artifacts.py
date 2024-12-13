@@ -1,4 +1,4 @@
-#: artifacts.py
+# artifacts.py
 from pathlib import Path
 
 from pybooktools.error_reporting import error

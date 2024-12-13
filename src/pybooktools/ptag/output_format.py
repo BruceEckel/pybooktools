@@ -1,4 +1,4 @@
-#: output_format.py
+# output_format.py
 import textwrap
 from typing import Any
 
@@ -30,7 +30,6 @@ def test_output_format():
     print(output_format(a_6))
     print(output_format(a_7))
 
-    # Additional tests
     # Empty string
     print(output_format(""))
 
