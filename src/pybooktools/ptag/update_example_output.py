@@ -35,12 +35,10 @@ def main() -> None:
         assert check_dir.is_dir()
         print(check_dir)
 
-    def write_with_ext(
-            python_script: str, ext: str, check_dir=check_dir
-    ) -> Path:
+    def write_with_ext(python_script: str, ext: str, ftype="py") -> Path:
         assert check_dir.exists()
         assert check_dir.is_dir()
-        outpath = check_dir / f"{example_path.stem}_{ext}.py"
+        outpath = check_dir / f"{example_path.stem}_{ext}.{ftype}"
         outpath.write_text(python_script, encoding="utf-8")
         return outpath
 
@@ -59,7 +57,7 @@ def main() -> None:
     ptag_dict = ptags_to_dict(output)
     if args.verbose:
         ic(ptag_dict)
-    write_with_ext(str(ptag_dict), "2_ptag_dict")
+    write_with_ext(ic.format(ptag_dict), "2_ptag_dict", ftype="txt")
     if args.verbose:
         print(example_path.read_text(encoding="utf-8"))
         print("with_ptags:\n", with_ptags)
@@ -76,7 +74,6 @@ def main() -> None:
     if args.verbose:
         ic(with_outputs)
     result = "\n".join(with_outputs)
-    write_with_ext(result, "4_result")
     if args.verbose:
         print(result)
     if not args.no_overwrite:

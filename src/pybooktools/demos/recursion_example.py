@@ -1,4 +1,4 @@
-# remove_validation_dir.py
+# recursion_example.py
 import argparse
 from pathlib import Path
 from shutil import rmtree
