@@ -1,5 +1,6 @@
 # update_example_output.py
 import re
+import shutil
 from argparse import ArgumentParser
 from pathlib import Path
 
@@ -70,6 +71,7 @@ def main() -> None:
                 break
         else:
             with_outputs.append(line)
+    with_outputs.append("")
     write_with_ext("\n".join(with_outputs), "3_with_outputs")
     if args.verbose:
         ic(with_outputs)
@@ -82,6 +84,9 @@ def main() -> None:
         print(f"Updated {example_path.name}")
     else:
         print(f"Original {example_path.name} NOT overwritten")
+
+    if not args.verbose:
+        shutil.rmtree(check_dir)
 
 
 if __name__ == "__main__":
