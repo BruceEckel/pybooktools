@@ -4,7 +4,10 @@ import shutil
 from argparse import ArgumentParser
 from pathlib import Path
 
+from icecream import ic
+
 from pybooktools.ptag import add_ptags, ensure_slug_line
+from pybooktools.ptag.ptag_results_to_dict import ptags_to_dict
 from pybooktools.util import run_script, valid_python, cleaned_dir
 
 
@@ -33,7 +36,7 @@ def main() -> None:
     with_ptags = add_ptags(cleaned_code)
     ptagged = write_with_ext(with_ptags, "1_ptags")
     output = run_script(ptagged)
-    print(output)
+    ic(ptags_to_dict(output))
     # shutil.copy(outfile, example_path)
     if not args.verbose:
         shutil.rmtree(check_dir)

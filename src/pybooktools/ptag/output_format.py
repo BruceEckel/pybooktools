@@ -5,9 +5,9 @@ from typing import Any
 
 def output_format(arg: Any) -> str:
     arg = str(arg)
-    wrapped_lines = textwrap.wrap(arg, width=47)
+    wrapped_lines: list[str] = textwrap.wrap(arg, width=47)
     # Prepend '## ' to each line
-    result = "\n".join(f"## {line}" for line in wrapped_lines)
+    result = "\n".join(f"## {line}".strip() for line in wrapped_lines)
     return result
 
 
