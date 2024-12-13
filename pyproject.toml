@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [project.scripts]
-ptag = "pybooktools.ptag.update_example_output:main"
+px = "pybooktools.ptag.update_example_output:main"
 c = "pybooktools.reminder:main"
 ocl = "pybooktools.ocl.produce_ocled_example:main"
 bookup = "pybooktools.update_markdown_code_listings:main"

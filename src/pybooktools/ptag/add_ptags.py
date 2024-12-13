@@ -40,7 +40,7 @@ class AddPTagsTransformer(cst.CSTTransformer):
                             args=[
                                 cst.Arg(
                                     value=cst.SimpleString(
-                                        f'"_ptag_{self.ptag_counter}"'
+                                        f'"_$_ptag_{self.ptag_counter}"'
                                     )
                                 )
                             ],
@@ -75,7 +75,7 @@ def test_add_ptags() -> None:
     """Test the add_ptags function with various cases."""
     # Test case 1: Single print statement
     input_code = """print("Hello")"""
-    expected_output = """print("Hello")\nprint("_ptag_1")"""
+    expected_output = """print("Hello")\nprint("_$_ptag_1")"""
     assert add_ptags(input_code) == expected_output
 
     # Test case 2: Multiple print statements
@@ -86,10 +86,10 @@ print("World")
 """
     expected_output = """
 print("Hello")
-print("_ptag_1")
+print("_$_ptag_1")
 x = 42
 print("World")
-print("_ptag_2")
+print("_$_ptag_2")
 """
     assert add_ptags(input_code) == expected_output
 
@@ -101,7 +101,7 @@ if True:
     expected_output = """
 if True:
     print("Inside if")
-    print("_ptag_1")
+    print("_$_ptag_1")
 """
     assert add_ptags(input_code) == expected_output
 
@@ -123,12 +123,12 @@ print("End")
 """
     expected_output = """
 print("Start")
-print("_ptag_1")
+print("_$_ptag_1")
 for i in range(3):
     print(f"Loop {i}")
-    print("_ptag_2")
+    print("_$_ptag_2")
 print("End")
-print("_ptag_3")
+print("_$_ptag_3")
 """
     assert add_ptags(input_code) == expected_output
 
@@ -147,10 +147,10 @@ def example():
     expected_output = """
 def example():
     print("Indented")
-    print("_ptag_1")
+    print("_$_ptag_1")
     if True:
         print("Nested")
-        print("_ptag_2")
+        print("_$_ptag_2")
 """
     assert add_ptags(input_code) == expected_output
 
@@ -164,7 +164,7 @@ if True:
 if True:
     if True:
         print("Deeply nested")
-        print("_ptag_1")
+        print("_$_ptag_1")
 """
     assert add_ptags(input_code) == expected_output
 
