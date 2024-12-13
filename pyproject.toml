@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [project.scripts]
-testocl = "pybooktools.ocl.add_ocl:main"
+ptag = "pybooktools.ptag.append_output:main"
 c = "pybooktools.reminder:main"
 ocl = "pybooktools.ocl.produce_ocled_example:main"
 bookup = "pybooktools.update_markdown_code_listings:main"
@@ -35,3 +35,6 @@ line-length = 80
 
 [tool.pytest.ini_options]
 pythonpath = ["src/pybooktools"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pybooktools"]

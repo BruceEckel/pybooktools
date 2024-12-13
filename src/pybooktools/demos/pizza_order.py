@@ -42,14 +42,14 @@ class Order:
 
 pizza = Pizza(Size.LARGE, [Add.PEPPERONI, Add.OLIVES])
 print(pizza)
-# | Pizza(size=<Size.LARGE: 2>,
-# | toppings=[<Add.PEPPERONI: 1>, <Add.OLIVES: 3>])
+## Pizza(size=<Size.LARGE: 2>,
+## toppings=[<Add.PEPPERONI: 1>, <Add.OLIVES: 3>])
 order = Order(pizza)
 print(order)
-# | Ordered
+## Ordered
 order.update(Status.IN_OVEN)
 print(order)
-# | In Oven
+##  In Oven
 order.update(Status.READY)
 print(order)
-# | Ready
+## Ready

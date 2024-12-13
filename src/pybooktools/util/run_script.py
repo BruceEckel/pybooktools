@@ -7,7 +7,7 @@ from pathlib import Path
 from rich.console import Console
 from rich.syntax import Syntax
 
-from pybooktools.error_reporting import panic
+from pybooktools.error_reporting import error, warn
 
 console = Console()
 
@@ -27,9 +27,9 @@ def get_virtual_env_python() -> str:
     return sys.executable
 
 
-def run_script(script_path: Path) -> None:
+def run_script(script_path: Path) -> str:
     """
-    Runs the script in its virtual environment
+    Runs the script in its virtual environment and returns the output
     """
     result = subprocess.run(
         [get_virtual_env_python(), str(script_path)],
@@ -37,10 +37,7 @@ def run_script(script_path: Path) -> None:
         text=True,
     )
     if result.returncode != 0:
-        console = Console()
-        console.print(
-            f"[bold red]Error running script {script_path}:[/bold red]"
-        )
+        warn(f"Error running script {script_path}")
         syntax = Syntax(
             script_path.read_text(encoding="utf-8"),
             "python",
@@ -48,5 +45,8 @@ def run_script(script_path: Path) -> None:
             line_numbers=True,
         )
         console.print(syntax)
-        console.print(f"[bold red]Error Message:[/bold red] {result.stderr}")
-        panic("")
+        error(f"{result.stderr}")
+        return result.stderr
+    else:
+        # console.print(f"Success: {script_path.name}")
+        return result.stdout
