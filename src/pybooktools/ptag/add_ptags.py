@@ -5,7 +5,7 @@ Using libcst, find all `print()` statements.
 For each add a print() statement right after it, at the "correct" indent level.
 This added print() statement will be called a `ptag`.
 The argument to the ptag is a simple string of the form:
-"_ptag_{n}"
+"_$_ptag_{n}"
 Where n is an integer that is incremented for each ptag.
 The `add_ptags` function returns the modified Python script.
 
@@ -14,12 +14,12 @@ If that code involves indentation, the ptag will be added after all the indentat
 For example:
 if True:
     print("Hello")
-print("_$_ptag_1")
+    print("_$_ptag_1")
 
 This is particularly important for looping, so that the ptag indicates ALL the print results from the loop:
 for i in range(3):
     print(f"Loop {i}")
-print("_$_ptag_1")
+    print("_$_ptag_1")
 
 See the examples in test_add_ptags() for more details.
 """
@@ -35,14 +35,14 @@ class AddPTagsTransformer(cst.CSTTransformer):
         self.ptag_counter = 0
 
     def leave_SimpleStatementLine(
-            self,
-            original_node: cst.SimpleStatementLine,
-            updated_node: cst.SimpleStatementLine,
+        self,
+        original_node: cst.SimpleStatementLine,
+        updated_node: cst.SimpleStatementLine,
     ) -> Union[cst.BaseStatement, cst.RemovalSentinel]:
         # Check if the line contains a print() statement
         if any(
-                m.matches(child, m.Expr(m.Call(func=m.Name("print"))))
-                for child in original_node.body
+            m.matches(child, m.Expr(m.Call(func=m.Name("print"))))
+            for child in original_node.body
         ):
             # Increment ptag counter
             self.ptag_counter += 1
