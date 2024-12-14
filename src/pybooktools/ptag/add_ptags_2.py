@@ -78,11 +78,10 @@ def add_ptags(python_example: str) -> str:
 
         def visit_Expr(self, node: ast.Expr) -> ast.AST:
             """
-            Remove unnecessary parentheses by simplifying wrapped expressions.
+            Preserve the original structure of binary operations and other expressions.
             """
-            if isinstance(node.value, ast.BinOp):
-                return node.value  # Unwrap unnecessary parentheses
-            return self.generic_visit(node)
+            node.value = self.generic_visit(node.value)
+            return node
 
         @staticmethod
         def _is_print(node: ast.Expr) -> bool:
