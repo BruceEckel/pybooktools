@@ -14,7 +14,7 @@ class UseCase:
     script: str
     expected_output: str
 
-    def __str__(self):
+    def __post_init__(self):
         self.script = self.script.strip()
         self.expected_output = self.expected_output.strip()
 
@@ -33,26 +33,38 @@ passed = lambda case_id: report(True, case_id)
 failed = lambda case_id: report(False, case_id)
 
 
-def check_operation(operation: callable, use_cases: list[UseCase]) -> None:
+def check_string_transformer(
+        string_transformer: callable, use_cases: list[UseCase]
+) -> None:
     results = []
     for case_id, script, expected_output in use_cases:
-        actual_output = operation(script)
+        actual_output = string_transformer(script).strip()
         if actual_output == expected_output:
             results.append(passed(case_id))
         else:
-            diff = '\n'.join(difflib.unified_diff(
-                expected_output.splitlines(),
-                actual_output.splitlines(),
-                lineterm='',
-                fromfile='expected',
-                tofile='actual'
-            ))
+            diff = "\n".join(
+                difflib.unified_diff(
+                    actual_output.splitlines(),
+                    expected_output.splitlines(),
+                    lineterm="",
+                    fromfile="Actual",
+                    tofile="Expected",
+                )
+            )
             fail_message = f"""
 {failed(case_id)}
-{DIVIDER} Expected {DIVIDER}
-{expected_output}
+{DIVIDER} Script {DIVIDER}
+_______________________________
+{script}
+_______________________________
 {DIVIDER} Actual {DIVIDER}
+_______________________________
 {actual_output}
+_______________________________
+{DIVIDER} Expected {DIVIDER}
+_______________________________
+{expected_output}
+_______________________________
 {DIVIDER} Differences {DIVIDER}
 {diff}
 """
@@ -74,7 +86,8 @@ def check_operation(operation: callable, use_cases: list[UseCase]) -> None:
 
 
 if __name__ == "__main__":
-    check_operation(
+    print("start")
+    check_string_transformer(
         lambda script: script + " bar",
         [
             UseCase(1, "foo", "foo bar"),
@@ -82,19 +95,24 @@ if __name__ == "__main__":
             UseCase(3, "x", "x bar"),
         ],
     )
+    print("end")
 
 """ Output From check_operation:
 ================ Case 1 passed ================
 ================ Case 2 failed ================
-**** Expected ****
-foo x
 **** Actual ****
+_______________________________
 x bar
+_______________________________
+**** Expected ****
+_______________________________
+foo x
+_______________________________
 **** Differences ****
---- expected
-+++ actual
+--- Actual
++++ Expected
 @@ -1 +1 @@
--foo x
-+x bar
+-x bar
++foo x
 ================ Case 3 passed ================
 """

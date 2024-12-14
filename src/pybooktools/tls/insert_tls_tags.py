@@ -12,7 +12,7 @@ The function returns the resulting string.
 
 import ast
 
-from check_utils import UseCase, check_operation
+from check_utils import UseCase, check_string_transformer
 
 
 def insert_top_level_separators(script: str) -> str:
@@ -62,8 +62,8 @@ def insert_top_level_separators(script: str) -> str:
 
 use_cases = [
     UseCase(
-        1,
-        """
+        case_id=1,
+        script="""
 x = 42
 def greet():
     print("Hello, world!")
@@ -72,8 +72,12 @@ if x > 10:
     greet()
 else:
     print("Goodbye!")
+    
+while True:
+    print("Hello, world!")
+    break
         """,
-        """
+        expected_output="""
 x = 42
 print("__$1$_tls__")
 
@@ -92,13 +96,46 @@ print("__$3$_tls__")
 ]
 
 if __name__ == "__main__":
-    check_operation(insert_top_level_separators, use_cases)
+    check_string_transformer(insert_top_level_separators, use_cases)
 
 """ Output From check_operation:
 
 ================ Case 1 failed ================
---- Expected ---
+**** Script ****
+_______________________________
+x = 42
+def greet():
+    print("Hello, world!")
 
+if x > 10:
+    greet()
+else:
+    print("Goodbye!")
+    
+while True:
+    print("Hello, world!")
+    break
+_______________________________
+**** Actual ****
+_______________________________
+x = 42
+print("__$self.counter$_tls__")
+def greet():
+    print("Hello, world!")
+print("__$self.counter$_tls__")
+
+if x > 10:
+    greet()
+else:
+    print("Goodbye!")
+print("__$self.counter$_tls__")
+    
+while True:
+    print("Hello, world!")
+    breakprint("__$self.counter$_tls__")
+_______________________________
+**** Expected ****
+_______________________________
 x = 42
 print("__$1$_tls__")
 
@@ -111,21 +148,29 @@ if x > 10:
 else:
     print("Goodbye!")
 print("__$3$_tls__")
-
-        
---- Actual ---
-
-x = 42
-print("__$self.counter$_tls__")
-def greet():
-    print("Hello, world!")
-print("__$self.counter$_tls__")
-
-if x > 10:
-    greet()
-else:
-    print("Goodbye!")
-print("__$self.counter$_tls__")
-        
+_______________________________
+**** Differences ****
+--- Actual
++++ Expected
+@@ -1,15 +1,12 @@
+ x = 42
+-print("__$self.counter$_tls__")
++print("__$1$_tls__")
++
+ def greet():
+     print("Hello, world!")
+-print("__$self.counter$_tls__")
++print("__$2$_tls__")
+ 
+ if x > 10:
+     greet()
+ else:
+     print("Goodbye!")
+-print("__$self.counter$_tls__")
+-    
+-while True:
+-    print("Hello, world!")
+-    breakprint("__$self.counter$_tls__")
++print("__$3$_tls__")
 
 """
