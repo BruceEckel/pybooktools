@@ -3,7 +3,7 @@
 The argument to add_ptags is a string containing a valid Python script that may include print() statements.
 Using an appropriate syntax manipulation tool, find all `print()` statements.
 
-There may also be expressions involving indentation.
+There may also be top-level expressions involving indentation.
 
 After each print() at the top level, or expressions at the top level with indentations and
 containing a print() statement, add a "ptag".
@@ -53,6 +53,7 @@ def add_ptags(python_example: str) -> str:
 
     class PTagInserter(ast.NodeTransformer):
         def __init__(self):
+            super().__init__()
             self.ptag_counter = 1
 
         def visit_Module(self, node: ast.Module) -> ast.Module:
@@ -83,7 +84,8 @@ def add_ptags(python_example: str) -> str:
                 return node.value  # Unwrap unnecessary parentheses
             return self.generic_visit(node)
 
-        def _is_print(self, node: ast.Expr) -> bool:
+        @staticmethod
+        def _is_print(node: ast.Expr) -> bool:
             """Check if a node is a top-level print statement."""
             return (
                 isinstance(node.value, ast.Call)
@@ -121,9 +123,10 @@ def add_ptags(python_example: str) -> str:
     return modified_code.strip()
 
 
-def check(ptagged: str, expected_output: str) -> None:
+def check(input_code: str, expected_output: str) -> None:
+    ptagged = add_ptags(input_code)
     if ptagged == expected_output:
-        print("PASS".center(40, "*"))
+        print(" PASS ".center(40, "*"))
     else:
         print(" FAIL ".center(40, "*"))
         print(f"--- Expected ---\n{expected_output}")
@@ -137,27 +140,28 @@ def test_add_ptags() -> None:
 if True:
     print("Inside if")
 """.strip()
+
     expected_output = """
 if True:
     print("Inside if")
 print("_$_ptag_1")
 """.strip()
-    ptagged = add_ptags(input_code)
-    check(ptagged, expected_output)
+    check(input_code, expected_output)
 
     input_code = """
 if True:
     if True:
         print("Deeply nested")
 """.strip()
+
     expected_output = """
 if True:
     if True:
         print("Deeply nested")
 print("_$_ptag_1")
 """.strip()
-    ptagged = add_ptags(input_code)
-    check(ptagged, expected_output)
+    check(input_code, expected_output)
+
 
     input_code = """
 print("Start")
@@ -174,14 +178,15 @@ print("_$_ptag_2")
 print("End")
 print("_$_ptag_3")
 """.strip()
-    ptagged = add_ptags(input_code)
-    check(ptagged, expected_output)
+    check(input_code, expected_output)
+
 
     input_code = """
 print("Normal")
 if True:
     print("Nested")
 """.strip()
+
     expected_output = """
 print("Normal")
 print("_$_ptag_1")
@@ -189,15 +194,13 @@ if True:
     print("Nested")
 print("_$_ptag_2")
 """.strip()
-    ptagged = add_ptags(input_code)
-    check(ptagged, expected_output)
+    check(input_code, expected_output)
 
     # Basic Test Cases:
     # Single print statement
     input_code = """print("Hello")""".strip()
     expected_output = """print("Hello")\nprint("_$_ptag_1")""".strip()
-    ptagged = add_ptags(input_code)
-    check(ptagged, expected_output)
+    check(input_code, expected_output)
 
     # Multiple print statements
     input_code = """
@@ -205,6 +208,7 @@ print("Hello")
 x = 42
 print("World")
 """.strip()
+
     expected_output = """
 print("Hello")
 print("_$_ptag_1")
@@ -212,8 +216,7 @@ x = 42
 print("World")
 print("_$_ptag_2")
 """.strip()
-    ptagged = add_ptags(input_code)
-    check(ptagged, expected_output)
+    check(input_code, expected_output)
 
     # No print statements
     input_code = """
@@ -222,14 +225,12 @@ y = 20
 result = x + y
 """.strip()
     expected_output = input_code
-    ptagged = add_ptags(input_code)
-    check(ptagged, expected_output)
+    check(input_code, expected_output)
 
     # Empty script
     input_code = """""".strip()
     expected_output = """""".strip()
-    ptagged = add_ptags(input_code)
-    check(ptagged, expected_output)
+    check(input_code, expected_output)
 
     # print("All tests passed")
 
