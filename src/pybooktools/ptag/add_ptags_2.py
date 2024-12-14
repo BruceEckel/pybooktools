@@ -75,6 +75,14 @@ def add_ptags(python_example: str) -> str:
             node.body = new_body
             return node
 
+        def visit_Expr(self, node: ast.Expr) -> ast.AST:
+            """
+            Remove unnecessary parentheses by simplifying wrapped expressions.
+            """
+            if isinstance(node.value, ast.BinOp):
+                return node.value  # Unwrap unnecessary parentheses
+            return self.generic_visit(node)
+
         def _is_print(self, node: ast.Expr) -> bool:
             """Check if a node is a top-level print statement."""
             return (
@@ -94,13 +102,11 @@ def add_ptags(python_example: str) -> str:
             """Create a new print() node for the ptag."""
             ptag_value = f"_$_ptag_{self.ptag_counter}"
             self.ptag_counter += 1
-            return ast.Expr(
-                value=ast.Call(
-                    func=ast.Name(id="print", ctx=ast.Load()),
-                    args=[ast.Constant(value=ptag_value, kind=None)],
-                    keywords=[],
-                )
-            )
+
+            # Use ast.parse to create the ptag node, ensuring consistent formatting
+            ptag_code = f"print(\"{ptag_value}\")"
+            ptag_node = ast.parse(ptag_code).body[0]
+            return ptag_node
 
     tree = ast.parse(python_example)
     transformer = PTagInserter()
