@@ -1,9 +1,11 @@
 # check_utils.py
+import difflib
 import inspect
 from dataclasses import dataclass
 from pathlib import Path
 
 OUTPUT_TAG = '\n""" Output From check_operation:'
+DIVIDER = "****"
 
 
 @dataclass
@@ -38,12 +40,21 @@ def check_operation(operation: callable, use_cases: list[UseCase]) -> None:
         if actual_output == expected_output:
             results.append(passed(case_id))
         else:
+            diff = '\n'.join(difflib.unified_diff(
+                expected_output.splitlines(),
+                actual_output.splitlines(),
+                lineterm='',
+                fromfile='expected',
+                tofile='actual'
+            ))
             fail_message = f"""
 {failed(case_id)}
---- Expected ---
+{DIVIDER} Expected {DIVIDER}
 {expected_output}
---- Actual ---
+{DIVIDER} Actual {DIVIDER}
 {actual_output}
+{DIVIDER} Differences {DIVIDER}
+{diff}
 """
             print(fail_message)
             results.append(fail_message)
@@ -75,9 +86,15 @@ if __name__ == "__main__":
 """ Output From check_operation:
 ================ Case 1 passed ================
 ================ Case 2 failed ================
---- Expected ---
+**** Expected ****
 foo x
---- Actual ---
+**** Actual ****
 x bar
+**** Differences ****
+--- expected
++++ actual
+@@ -1 +1 @@
+-foo x
++x bar
 ================ Case 3 passed ================
 """
