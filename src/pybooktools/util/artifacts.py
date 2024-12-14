@@ -13,7 +13,7 @@ def opt_msg(msg: str) -> str:
 
 
 def artifact_path(
-    example_path: Path, id_ext: str, function_name: str = "", file_ext="py"
+        example_path: Path, id_ext: str, function_name: str = "", file_ext="py"
 ) -> Path:
     if not example_path.exists():
         error(f"{opt_msg(function_name)}{example_path} does not exist")
@@ -22,14 +22,14 @@ def artifact_path(
             f"{opt_msg(function_name)}{validation_dir(example_path)} does not exist"
         )
     artifact_path = (
-        validation_dir(example_path)
-        / f"{example_path.stem}_{id_ext}.{file_ext}"
+            validation_dir(example_path)
+            / f"{example_path.stem}_{id_ext}.{file_ext}"
     )
     return artifact_path
 
 
 def get_artifact(
-    example_path: Path, id_ext: str, function_name: str = "", file_ext="py"
+        example_path: Path, id_ext: str, function_name: str = "", file_ext="py"
 ) -> Path:
     artifact = artifact_path(example_path, id_ext, function_name, file_ext)
     if not artifact.exists():

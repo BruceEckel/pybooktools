@@ -35,14 +35,14 @@ class AddPTagsTransformer(cst.CSTTransformer):
         self.ptag_counter = 0
 
     def leave_SimpleStatementLine(
-        self,
-        original_node: cst.SimpleStatementLine,
-        updated_node: cst.SimpleStatementLine,
+            self,
+            original_node: cst.SimpleStatementLine,
+            updated_node: cst.SimpleStatementLine,
     ) -> Union[cst.BaseStatement, cst.RemovalSentinel]:
         # Check if the line contains a print() statement
         if any(
-            m.matches(child, m.Expr(m.Call(func=m.Name("print"))))
-            for child in original_node.body
+                m.matches(child, m.Expr(m.Call(func=m.Name("print"))))
+                for child in original_node.body
         ):
             # Increment ptag counter
             self.ptag_counter += 1

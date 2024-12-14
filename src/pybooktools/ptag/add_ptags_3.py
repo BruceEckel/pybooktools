@@ -70,13 +70,13 @@ def add_ptags(python_example: str) -> str:
         def _is_top_level_print(self, stmt: cst.CSTNode) -> bool:
             """Check if the statement is a top-level print statement."""
             return (
-                isinstance(stmt, cst.SimpleStatementLine)
-                and any(
-                    isinstance(expr, cst.Call)
-                    and isinstance(expr.func, cst.Name)
-                    and expr.func.value == "print"
-                    for expr in stmt.body
-                )
+                    isinstance(stmt, cst.SimpleStatementLine)
+                    and any(
+                isinstance(expr, cst.Call)
+                and isinstance(expr.func, cst.Name)
+                and expr.func.value == "print"
+                for expr in stmt.body
+            )
             )
 
         def _contains_print(self, stmt: cst.CSTNode) -> bool:

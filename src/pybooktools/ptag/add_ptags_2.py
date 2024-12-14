@@ -37,6 +37,7 @@ DO NOT modify test_add_ptags(), but only modify add_ptags() so that the `expecte
 """
 
 import ast
+
 import astunparse
 
 
@@ -87,9 +88,9 @@ def add_ptags(python_example: str) -> str:
         def _is_print(node: ast.Expr) -> bool:
             """Check if a node is a top-level print statement."""
             return (
-                isinstance(node.value, ast.Call)
-                and isinstance(node.value.func, ast.Name)
-                and node.value.func.id == "print"
+                    isinstance(node.value, ast.Call)
+                    and isinstance(node.value.func, ast.Name)
+                    and node.value.func.id == "print"
             )
 
         def _contains_print(self, node: ast.stmt) -> bool:
