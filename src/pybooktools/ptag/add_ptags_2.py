@@ -32,6 +32,8 @@ print("_$_ptag_1")
 ```
 
 See the examples in test_add_ptags() for more details.
+
+DO NOT modify test_add_ptags(), but only modify add_ptags() so that the `expected_output`s are correctly produced.
 """
 
 import ast
@@ -104,7 +106,7 @@ def add_ptags(python_example: str) -> str:
 
 def check(ptagged: str, expected_output: str) -> None:
     if ptagged == expected_output:
-        print("PASS")
+        print("PASS".center(40, "*"))
     else:
         print(" FAIL ".center(40, "*"))
         print(f"--- Expected ---\n{expected_output}")
@@ -117,12 +119,12 @@ def test_add_ptags() -> None:
     input_code = """
 if True:
     print("Inside if")
-    """.strip()
+""".strip()
     expected_output = """
 if True:
     print("Inside if")
-    print("_$_ptag_1")
-    """.strip()
+print("_$_ptag_1")
+""".strip()
     ptagged = add_ptags(input_code)
     check(ptagged, expected_output)
 
@@ -130,13 +132,13 @@ if True:
 if True:
     if True:
         print("Deeply nested")
-    """.strip()
+""".strip()
     expected_output = """
 if True:
     if True:
         print("Deeply nested")
-        print("_$_ptag_1")
-    """.strip()
+print("_$_ptag_1")
+""".strip()
     ptagged = add_ptags(input_code)
     check(ptagged, expected_output)
 
@@ -145,16 +147,16 @@ print("Start")
 for i in range(3):
     print(f"Loop {i}")
 print("End")
-    """.strip()
+""".strip()
     expected_output = """
 print("Start")
 print("_$_ptag_1")
 for i in range(3):
     print(f"Loop {i}")
-    print("_$_ptag_2")
+print("_$_ptag_2")
 print("End")
 print("_$_ptag_3")
-    """.strip()
+""".strip()
     ptagged = add_ptags(input_code)
     check(ptagged, expected_output)
 
@@ -162,14 +164,14 @@ print("_$_ptag_3")
 print("Normal")
 if True:
     print("Nested")
-    """.strip()
+""".strip()
     expected_output = """
 print("Normal")
 print("_$_ptag_1")
 if True:
     print("Nested")
-    print("_$_ptag_2")
-    """.strip()
+print("_$_ptag_2")
+""".strip()
     ptagged = add_ptags(input_code)
     check(ptagged, expected_output)
 
