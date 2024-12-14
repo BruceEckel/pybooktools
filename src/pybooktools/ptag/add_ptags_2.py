@@ -3,35 +3,38 @@
 The argument to add_ptags is a string containing a valid Python script that may include print() statements.
 Using an appropriate syntax manipulation tool, find all `print()` statements.
 
-For each add a print() statement after it, at the correct indent level.
-This added print() statement will be called a `ptag`.
-The argument to the ptag is a simple string of the form:
-"_$_ptag_{n}"
+There may also be expressions involving indentation.
+
+After each print() at the top level, or expressions at the top level with indentations and
+containing a print() statement, add a "ptag".
+
+A ptag is a `print()` with an argument of the form:
+"_$_ptag_n"
 Where n is an integer that is incremented for each ptag.
 The `add_ptags` function returns the modified Python script.
 
 The function will only add ptags to code at the top level (not inside a function).
-If that code involves indentation, the ptag will be added after all the indentation, for example:
+So ptags are never indented.
+If the code being tagged involves indentation, the ptag will be added after all the indentation, for example:
 
 ```python
 if True:
     print("Hello")
-    print("_$_ptag_1")
+print("_$_ptag_1")
 ```
 
-This is particularly important for looping, so that the ptag indicates ALL the print results from the loop:
+and:
 
 ```python
 for i in range(3):
     print(f"Loop {i}")
-    print("_$_ptag_1")
+print("_$_ptag_1")
 ```
 
 See the examples in test_add_ptags() for more details.
 """
 
 import ast
-
 import astunparse
 
 
@@ -53,9 +56,9 @@ def add_ptags(python_example: str) -> str:
         def visit_Expr(self, node: ast.Expr) -> ast.AST:
             # Only process print() calls at the top level
             if (
-                    isinstance(node.value, ast.Call)
-                    and isinstance(node.value.func, ast.Name)
-                    and node.value.func.id == "print"
+                isinstance(node.value, ast.Call)
+                and isinstance(node.value.func, ast.Name)
+                and node.value.func.id == "print"
             ):
                 # Create a new print() node for the ptag
                 ptag_node = ast.Expr(
@@ -208,7 +211,6 @@ result = x + y
     expected_output = """""".strip()
     ptagged = add_ptags(input_code)
     check(ptagged, expected_output)
-
 
 if __name__ == "__main__":
     test_add_ptags()
