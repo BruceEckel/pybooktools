@@ -55,41 +55,52 @@ def add_ptags(python_example: str) -> str:
         def __init__(self):
             self.ptag_counter = 1
 
-        def visit_Expr(self, node: ast.Expr) -> ast.AST:
-            # Only process print() calls at the top level
-            if (
+        def visit_Module(self, node: ast.Module) -> ast.Module:
+            """
+            Process the top-level statements in the module, adding ptags after print statements
+            and indented blocks containing print statements.
+            """
+            new_body = []
+            for stmt in node.body:
+                new_body.append(stmt)
+
+                if isinstance(stmt, ast.Expr) and self._is_print(stmt):
+                    # Add a ptag after a top-level print statement
+                    new_body.append(self._create_ptag())
+
+                elif isinstance(stmt, (ast.If, ast.For, ast.While)) and self._contains_print(stmt):
+                    # Add a ptag after a top-level indented block containing print statements
+                    new_body.append(self._create_ptag())
+
+            node.body = new_body
+            return node
+
+        def _is_print(self, node: ast.Expr) -> bool:
+            """Check if a node is a top-level print statement."""
+            return (
                 isinstance(node.value, ast.Call)
                 and isinstance(node.value.func, ast.Name)
                 and node.value.func.id == "print"
-            ):
-                # Create a new print() node for the ptag
-                ptag_node = ast.Expr(
-                    value=ast.Call(
-                        func=ast.Name(id="print", ctx=ast.Load()),
-                        args=[
-                            ast.Constant(
-                                value=f"_$_ptag_{self.ptag_counter}",
-                                kind=None,
-                            )
-                        ],
-                        keywords=[],
-                    )
+            )
+
+        def _contains_print(self, node: ast.stmt) -> bool:
+            """Recursively check if a statement contains a print statement."""
+            for child in ast.walk(node):
+                if isinstance(child, ast.Expr) and self._is_print(child):
+                    return True
+            return False
+
+        def _create_ptag(self) -> ast.Expr:
+            """Create a new print() node for the ptag."""
+            ptag_value = f"_$_ptag_{self.ptag_counter}"
+            self.ptag_counter += 1
+            return ast.Expr(
+                value=ast.Call(
+                    func=ast.Name(id="print", ctx=ast.Load()),
+                    args=[ast.Constant(value=ptag_value, kind=None)],
+                    keywords=[],
                 )
-
-                self.ptag_counter += 1
-
-                # Attach the correct indentation to the new node
-                ptag_node.col_offset = node.col_offset
-                ptag_node.lineno = node.lineno + 1
-                return [node, ptag_node]
-
-            return node
-
-        def generic_visit(self, node: ast.AST) -> ast.AST:
-            # Avoid descending into function definitions
-            if isinstance(node, ast.FunctionDef):
-                return node
-            return super().generic_visit(node)
+            )
 
     tree = ast.parse(python_example)
     transformer = PTagInserter()
@@ -213,6 +224,9 @@ result = x + y
     expected_output = """""".strip()
     ptagged = add_ptags(input_code)
     check(ptagged, expected_output)
+
+    # print("All tests passed")
+
 
 if __name__ == "__main__":
     test_add_ptags()
