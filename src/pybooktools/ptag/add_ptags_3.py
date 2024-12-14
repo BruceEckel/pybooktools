@@ -55,7 +55,9 @@ def add_ptags(python_example: str) -> str:
             super().__init__()
             self.ptag_counter = 1
 
-        def leave_Module(self, original_node: cst.Module, updated_node: cst.Module) -> cst.Module:
+        def leave_Module(
+                self, original_node: cst.Module, updated_node: cst.Module
+        ) -> cst.Module:
             """
             Process the top-level statements in the module and append ptag statements
             after top-level prints or blocks containing prints.
@@ -69,14 +71,11 @@ def add_ptags(python_example: str) -> str:
 
         def _is_top_level_print(self, stmt: cst.CSTNode) -> bool:
             """Check if the statement is a top-level print statement."""
-            return (
-                    isinstance(stmt, cst.SimpleStatementLine)
-                    and any(
+            return isinstance(stmt, cst.SimpleStatementLine) and any(
                 isinstance(expr, cst.Call)
                 and isinstance(expr.func, cst.Name)
                 and expr.func.value == "print"
                 for expr in stmt.body
-            )
             )
 
         def _contains_print(self, stmt: cst.CSTNode) -> bool:
@@ -84,12 +83,16 @@ def add_ptags(python_example: str) -> str:
             if isinstance(stmt, (cst.If, cst.For, cst.While)):
                 # Check main body
                 for substmt in stmt.body.body:
-                    if self._is_top_level_print(substmt) or self._contains_print(substmt):
+                    if self._is_top_level_print(
+                            substmt
+                    ) or self._contains_print(substmt):
                         return True
                 # Check else/orelse body if applicable
                 if stmt.orelse:
                     for substmt in stmt.orelse.body:
-                        if self._is_top_level_print(substmt) or self._contains_print(substmt):
+                        if self._is_top_level_print(
+                                substmt
+                        ) or self._contains_print(substmt):
                             return True
             return False
 

@@ -70,7 +70,9 @@ def add_ptags(python_example: str) -> str:
                     # Add a ptag after a top-level print statement
                     new_body.append(self._create_ptag())
 
-                elif isinstance(stmt, (ast.If, ast.For, ast.While)) and self._contains_print(stmt):
+                elif isinstance(
+                        stmt, (ast.If, ast.For, ast.While)
+                ) and self._contains_print(stmt):
                     # Add a ptag after a top-level indented block containing print statements
                     new_body.append(self._create_ptag())
 
@@ -106,7 +108,7 @@ def add_ptags(python_example: str) -> str:
             self.ptag_counter += 1
 
             # Use ast.parse to create the ptag node, ensuring consistent formatting
-            ptag_code = f"print(\"{ptag_value}\")"
+            ptag_code = f'print("{ptag_value}")'
             ptag_node = ast.parse(ptag_code).body[0]
             return ptag_node
 
