@@ -36,6 +36,7 @@ See the examples in test_add_ptags() for more details.
 DO NOT modify test_add_ptags(), but only modify add_ptags() so that the `expected_output`s are correctly produced.
 """
 
+
 def add_ptags(python_example: str) -> str:
     """
     Given a Python script as a string, add ptag statements after each print() statement.
@@ -52,7 +53,7 @@ def add_ptags(python_example: str) -> str:
 
     def get_indent(line: str) -> str:
         """Get the leading whitespace of a line."""
-        return line[:len(line) - len(line.lstrip())]
+        return line[: len(line) - len(line.lstrip())]
 
     def is_print_statement(line: str) -> bool:
         """Check if a line is a print statement."""
@@ -68,7 +69,7 @@ def add_ptags(python_example: str) -> str:
         # Close blocks if indentation decreases
         while indent_stack and current_indent < indent_stack[-1]:
             indent_stack.pop()
-            result.append(f"{current_indent}print(\"_$_ptag_{ptag_counter}\")")
+            result.append(f'{current_indent}print("_$_ptag_{ptag_counter}")')
             ptag_counter += 1
 
         result.append(line)
@@ -76,7 +77,9 @@ def add_ptags(python_example: str) -> str:
         # If it's a print statement, add a ptag only after the block ends
         if is_print_statement(line):
             if not indent_stack:
-                result.append(f"{current_indent}print(\"_$_ptag_{ptag_counter}\")")
+                result.append(
+                    f'{current_indent}print("_$_ptag_{ptag_counter}")'
+                )
                 ptag_counter += 1
 
         # If it's a block opener, track its indentation
@@ -86,7 +89,7 @@ def add_ptags(python_example: str) -> str:
     # Close any remaining open blocks
     while indent_stack:
         indent_stack.pop()
-        result.append(f"print(\"_$_ptag_{ptag_counter}\")")
+        result.append(f'print("_$_ptag_{ptag_counter}")')
         ptag_counter += 1
 
     return "\n".join(result)
