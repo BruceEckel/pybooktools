@@ -15,7 +15,7 @@ class UseCase:
     expected_output: str
 
     def __post_init__(self):
-        self.script = self.script.strip() + "\n"
+        # self.script = self.script.strip() + "\n"
         self.expected_output = self.expected_output.strip() + "\n"
 
     def __iter__(self):
@@ -24,7 +24,7 @@ class UseCase:
 
 def report(test: bool, case_id: int) -> str:
     if test:
-        return f" Case {case_id} passed ".center(47, "=")
+        return "\n" + f" Case {case_id} passed ".center(47, "=")
     else:
         return f" Case {case_id} failed ".center(47, "=")
 
@@ -86,27 +86,33 @@ _______________________________
 
 
 if __name__ == "__main__":
-    print("start")
     check_string_transformer(
         lambda script: script + " bar",
         [
             UseCase(1, "foo", "foo bar"),
             UseCase(2, "x", "foo x"),
             UseCase(3, "x", "x bar"),
+            UseCase(4, "baz", "baz bar"),
         ],
     )
-    print("end")
 
 """ Output From check_operation:
+
 ================ Case 1 passed ================
 ================ Case 2 failed ================
+**** Script ****
+_______________________________
+x
+_______________________________
 **** Actual ****
 _______________________________
 x bar
+
 _______________________________
 **** Expected ****
 _______________________________
 foo x
+
 _______________________________
 **** Differences ****
 --- Actual
@@ -114,5 +120,7 @@ _______________________________
 @@ -1 +1 @@
 -x bar
 +foo x
+
 ================ Case 3 passed ================
+================ Case 4 passed ================
 """
