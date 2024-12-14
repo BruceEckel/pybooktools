@@ -162,7 +162,6 @@ print("_$_ptag_1")
 """.strip()
     check(input_code, expected_output)
 
-
     input_code = """
 print("Start")
 for i in range(3):
@@ -179,7 +178,6 @@ print("End")
 print("_$_ptag_3")
 """.strip()
     check(input_code, expected_output)
-
 
     input_code = """
 print("Normal")
