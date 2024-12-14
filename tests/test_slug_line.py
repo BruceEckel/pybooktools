@@ -1,7 +1,7 @@
 # test_slug_line.py
 from pathlib import Path
 
-from pybooktools.ptag.slug_line import ensure_slug_line
+from pybooktools.util.slug_line import ensure_slug_line
 
 # -- Test --
 # ensure_slug_line()

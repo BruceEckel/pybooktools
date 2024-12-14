@@ -17,11 +17,11 @@ dependencies = [
 ]
 
 [project.scripts]
-px = "pybooktools.ptag.update_example_output:main"
+px = "pybooktools.tls.update_example_output:main"
 c = "pybooktools.reminder:main"
 ocl = "pybooktools.ocl.produce_ocled_example:main"
 bookup = "pybooktools.update_markdown_code_listings:main"
-slug = "pybooktools.ptag.slug_line:main"
+slug = "pybooktools.util.slug_line:main"
 chapnum = "pybooktools.renumber_chapters:main"
 
 [tool.uv]

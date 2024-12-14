@@ -175,7 +175,7 @@ print("__$2$_tls__")
 if __name__ == "__main__":
     validate_transformer(insert_top_level_separators, use_cases)
 
-""" Output From: validate_string_transformer
+""" Output From: validate_transformer
 
 ================ Case 1 passed ================
 ================ Case 2 passed ================
