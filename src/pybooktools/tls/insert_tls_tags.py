@@ -13,7 +13,7 @@ The function returns the resulting string.
 
 import ast
 
-from check_utils import UseCase, check_string_transformer
+from pybooktools.validate import UseCase, validate_transformer
 
 
 def insert_top_level_separators(script: str) -> str:
@@ -173,9 +173,9 @@ print("__$2$_tls__")
 ]
 
 if __name__ == "__main__":
-    check_string_transformer(insert_top_level_separators, use_cases)
+    validate_transformer(insert_top_level_separators, use_cases)
 
-""" Output From check_operation:
+""" Output From: validate_string_transformer
 
 ================ Case 1 passed ================
 ================ Case 2 passed ================

@@ -1,44 +1,19 @@
-# check_utils.py
+# validate_transformer.py
 import difflib
 import inspect
-from dataclasses import dataclass
 from pathlib import Path
 
-OUTPUT_TAG = '\n""" Output From check_operation:'
-DIVIDER = "****"
+from .config import output_from_marker, DIVIDER, OUTPUT_MARKER
+from .presentation import passed, failed
+from .use_case import UseCase
 
 
-@dataclass
-class UseCase:
-    case_id: int
-    script: str
-    expected_output: str
-
-    def __post_init__(self):
-        # self.script = self.script.strip() + "\n"
-        self.expected_output = self.expected_output.strip() + "\n"
-
-    def __iter__(self):
-        return iter((self.case_id, self.script, self.expected_output))
-
-
-def report(test: bool, case_id: int) -> str:
-    if test:
-        return "\n" + f" Case {case_id} passed ".center(47, "=")
-    else:
-        return f" Case {case_id} failed ".center(47, "=")
-
-
-passed = lambda case_id: report(True, case_id)
-failed = lambda case_id: report(False, case_id)
-
-
-def check_string_transformer(
-        string_transformer: callable, use_cases: list[UseCase]
+def validate_transformer(
+        transformer: callable, use_cases: list[UseCase]
 ) -> None:
     results = []
     for case_id, script, expected_output in use_cases:
-        actual_output = string_transformer(script).strip() + "\n"
+        actual_output = str(transformer(script)).strip() + "\n"
         if actual_output == expected_output:
             results.append(passed(case_id))
         else:
@@ -77,16 +52,17 @@ _______________________________
     this_file_path = caller_file
     this_file = this_file_path.read_text(encoding="utf-8")
 
-    if OUTPUT_TAG in this_file:
-        this_file = this_file[: this_file.index(OUTPUT_TAG)]
+    if OUTPUT_MARKER in this_file:
+        this_file = this_file[: this_file.index(OUTPUT_MARKER)]
     this_file_path.write_text(
-        this_file + f'{OUTPUT_TAG}\n{"".join(results)}\n"""\n',
+        this_file
+        + f'{output_from_marker("validate_transformer")}\n{"".join(results)}\n"""\n',
         encoding="utf-8",
     )
 
 
 if __name__ == "__main__":
-    check_string_transformer(
+    validate_transformer(
         lambda script: script + " bar",
         [
             UseCase(1, "foo", "foo bar"),
@@ -96,7 +72,7 @@ if __name__ == "__main__":
         ],
     )
 
-""" Output From check_operation:
+""" Output From validate_string_transformer:
 
 ================ Case 1 passed ================
 ================ Case 2 failed ================

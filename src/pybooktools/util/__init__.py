@@ -1,7 +1,7 @@
 # __init__.py
 
+from pybooktools.validate.validate_python_file import valid_python
 from .artifacts import artifact_path, get_artifact
-from .check_python_file import valid_python
 from .display import display_function_name, icc
 from .file_changed import FileChanged
 from .path_utils import cleaned_dir
