@@ -11,6 +11,7 @@ The function returns the resulting string.
 """
 
 import ast
+from dataclasses import dataclass
 from pathlib import Path
 
 
@@ -59,8 +60,19 @@ def insert_top_level_separators(script: str) -> str:
     return inserter.apply_insertions()
 
 
-use_cases = {
-    1: [
+@dataclass
+class UseCase:
+    case_id: int
+    script: str
+    expected_output: str
+
+    def __iter__(self):
+        return iter((self.case_id, self.script, self.expected_output))
+
+
+use_cases = [
+    UseCase(
+        1,
         """
 x = 42
 def greet():
@@ -70,7 +82,7 @@ if x > 10:
     greet()
 else:
     print("Goodbye!")
-""",
+        """,
         """
 x = 42
 print("__$1$tls$__")
@@ -85,22 +97,36 @@ else:
     print("Goodbye!")
 print("__$3$tls$__")
 
-""",
-    ],
-}
+        """,
+    )
+]
 
 
-def test_insert_top_level_separators() -> None:
+def report(test: bool, case_id: int) -> str:
+    if test:
+        return f" Case {case_id} passed ".center(47, "=")
+    else:
+        return f" Case {case_id} failed ".center(47, "=")
+
+
+passed = lambda case_id: report(True, case_id)
+failed = lambda case_id: report(False, case_id)
+
+
+def check_insert_top_level_separators(use_cases: list[UseCase]) -> None:
     results = []
-    for case_id, (script, expected_output) in use_cases.items():
+    for case_id, script, expected_output in use_cases:
         actual_output = insert_top_level_separators(script)
         if actual_output == expected_output:
-            results.append(f"Case {case_id} passed")
+            results.append(passed(case_id))
         else:
             results.append(
-                f"""Case {case_id} failed
---- Expected ---\n{expected_output}
---- Actual ---\n{actual_output}
+                f"""
+{failed(case_id)}
+--- Expected ---
+{expected_output}
+--- Actual ---
+{actual_output}
 """
             )
     this_file_path = Path(__file__.replace("\\", "/"))
@@ -115,4 +141,40 @@ def test_insert_top_level_separators() -> None:
 
 
 if __name__ == "__main__":
-    test_insert_top_level_separators()
+    check_insert_top_level_separators(use_cases)
+
+"""Output:
+
+================ Case 1 failed ================
+--- Expected ---
+
+x = 42
+print("__$1$tls$__")
+
+def greet():
+    print("Hello, world!")
+print("__$2$tls$__")
+
+if x > 10:
+    greet()
+else:
+    print("Goodbye!")
+print("__$3$tls$__")
+
+        
+--- Actual ---
+
+x = 42
+print("__$1$tls$__")
+def greet():
+print("__$2$tls$__")
+    print("Hello, world!")
+
+if x > 10:
+print("__$3$tls$__")
+    greet()
+else:
+    print("Goodbye!")
+        
+
+"""
