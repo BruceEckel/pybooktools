@@ -13,7 +13,7 @@ A ptag is a `print()` with an argument of the form:
 Where n is an integer that is incremented for each ptag.
 The `add_ptags` function returns the modified Python script.
 
-The function will only add ptags to code at the top level (not inside a function).
+The function will only add ptags to code at the top level (not inside a function or within an indented top-level expression).
 So ptags are never indented.
 If the code being tagged involves indentation, the ptag will be added after all the indentation, for example:
 
