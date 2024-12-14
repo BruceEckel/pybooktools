@@ -15,8 +15,8 @@ class UseCase:
     expected_output: str
 
     def __post_init__(self):
-        self.script = self.script.strip()
-        self.expected_output = self.expected_output.strip()
+        self.script = self.script.strip() + "\n"
+        self.expected_output = self.expected_output.strip() + "\n"
 
     def __iter__(self):
         return iter((self.case_id, self.script, self.expected_output))
@@ -38,7 +38,7 @@ def check_string_transformer(
 ) -> None:
     results = []
     for case_id, script, expected_output in use_cases:
-        actual_output = string_transformer(script).strip()
+        actual_output = string_transformer(script).strip() + "\n"
         if actual_output == expected_output:
             results.append(passed(case_id))
         else:

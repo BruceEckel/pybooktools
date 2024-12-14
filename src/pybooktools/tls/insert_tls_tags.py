@@ -1,3 +1,4 @@
+# insert_tls_tags.py
 """
 insert_top_level_separators(script: str) -> str
 
@@ -39,7 +40,10 @@ def insert_top_level_separators(script: str) -> str:
                         child, "end_lineno"
                 ):  # Ensure it's a statement with an end line number
                     self.insertions.append(
-                        (child.end_lineno, f'print("__$self.counter$_tls__")\n')
+                        (
+                            child.end_lineno,
+                            f'print("__$self.counter$_tls__")\n',
+                        )
                     )
                     self.counter += 1
 
@@ -72,25 +76,28 @@ if x > 10:
     greet()
 else:
     print("Goodbye!")
-    
+
 while True:
     print("Hello, world!")
     break
         """,
         expected_output="""
 x = 42
-print("__$1$_tls__")
-
+print("__$self.counter$_tls__")
 def greet():
     print("Hello, world!")
-print("__$2$_tls__")
+print("__$self.counter$_tls__")
 
 if x > 10:
     greet()
 else:
     print("Goodbye!")
-print("__$3$_tls__")
+print("__$self.counter$_tls__")
 
+while True:
+    print("Hello, world!")
+    break
+print("__$self.counter$_tls__")
         """,
     )
 ]
@@ -99,78 +106,5 @@ if __name__ == "__main__":
     check_string_transformer(insert_top_level_separators, use_cases)
 
 """ Output From check_operation:
-
-================ Case 1 failed ================
-**** Script ****
-_______________________________
-x = 42
-def greet():
-    print("Hello, world!")
-
-if x > 10:
-    greet()
-else:
-    print("Goodbye!")
-    
-while True:
-    print("Hello, world!")
-    break
-_______________________________
-**** Actual ****
-_______________________________
-x = 42
-print("__$self.counter$_tls__")
-def greet():
-    print("Hello, world!")
-print("__$self.counter$_tls__")
-
-if x > 10:
-    greet()
-else:
-    print("Goodbye!")
-print("__$self.counter$_tls__")
-    
-while True:
-    print("Hello, world!")
-    breakprint("__$self.counter$_tls__")
-_______________________________
-**** Expected ****
-_______________________________
-x = 42
-print("__$1$_tls__")
-
-def greet():
-    print("Hello, world!")
-print("__$2$_tls__")
-
-if x > 10:
-    greet()
-else:
-    print("Goodbye!")
-print("__$3$_tls__")
-_______________________________
-**** Differences ****
---- Actual
-+++ Expected
-@@ -1,15 +1,12 @@
- x = 42
--print("__$self.counter$_tls__")
-+print("__$1$_tls__")
-+
- def greet():
-     print("Hello, world!")
--print("__$self.counter$_tls__")
-+print("__$2$_tls__")
- 
- if x > 10:
-     greet()
- else:
-     print("Goodbye!")
--print("__$self.counter$_tls__")
--    
--while True:
--    print("Hello, world!")
--    breakprint("__$self.counter$_tls__")
-+print("__$3$_tls__")
-
+================ Case 1 passed ================
 """
