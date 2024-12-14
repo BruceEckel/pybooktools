@@ -37,7 +37,6 @@ DO NOT modify test_add_ptags(), but only modify add_ptags() so that the `expecte
 """
 
 import libcst as cst
-import libcst.matchers as m
 
 
 def add_ptags(python_example: str) -> str:
@@ -58,39 +57,44 @@ def add_ptags(python_example: str) -> str:
 
         def leave_Module(self, original_node: cst.Module, updated_node: cst.Module) -> cst.Module:
             """
-            Append ptag statements to the top-level print statements and blocks containing print statements.
+            Process the top-level statements in the module and append ptag statements
+            after top-level prints or blocks containing prints.
             """
             new_body = []
             for stmt in original_node.body:
                 new_body.append(stmt)
-
-                if self._is_top_level_print(stmt):
-                    # Add a ptag for each top-level print statement
+                if self._is_top_level_print(stmt) or self._contains_print(stmt):
                     new_body.append(self._create_ptag())
-
-                elif self._contains_top_level_print(stmt):
-                    # Add a ptag after a top-level indented block containing print statements
-                    new_body.append(self._create_ptag())
-
             return updated_node.with_changes(body=new_body)
 
-        @staticmethod
-        def _is_top_level_print(stmt: cst.CSTNode) -> bool:
+        def _is_top_level_print(self, stmt: cst.CSTNode) -> bool:
             """Check if the statement is a top-level print statement."""
-            return m.matches(stmt, m.SimpleStatementLine(body=[m.Call(func=m.Name("print"))]))
-
-        @staticmethod
-        def _contains_top_level_print(stmt: cst.CSTNode) -> bool:
-            """Check if the statement contains a print statement at any level."""
-            if isinstance(stmt, cst.IndentedBlock):
-                return any(
-                    m.matches(line, m.SimpleStatementLine(body=[m.Call(func=m.Name("print"))]))
-                    for line in stmt.body
+            return (
+                isinstance(stmt, cst.SimpleStatementLine)
+                and any(
+                    isinstance(expr, cst.Call)
+                    and isinstance(expr.func, cst.Name)
+                    and expr.func.value == "print"
+                    for expr in stmt.body
                 )
+            )
+
+        def _contains_print(self, stmt: cst.CSTNode) -> bool:
+            """Recursively check if a block contains a print statement."""
+            if isinstance(stmt, (cst.If, cst.For, cst.While)):
+                # Check main body
+                for substmt in stmt.body.body:
+                    if self._is_top_level_print(substmt) or self._contains_print(substmt):
+                        return True
+                # Check else/orelse body if applicable
+                if stmt.orelse:
+                    for substmt in stmt.orelse.body:
+                        if self._is_top_level_print(substmt) or self._contains_print(substmt):
+                            return True
             return False
 
         def _create_ptag(self) -> cst.SimpleStatementLine:
-            """Create a ptag statement."""
+            """Create a print statement for the ptag."""
             ptag_code = f'print("_$_ptag_{self.ptag_counter}")'
             self.ptag_counter += 1
             return cst.parse_statement(ptag_code)
