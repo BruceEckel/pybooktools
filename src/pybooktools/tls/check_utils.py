@@ -12,6 +12,10 @@ class UseCase:
     script: str
     expected_output: str
 
+    def __str__(self):
+        self.script = self.script.strip()
+        self.expected_output = self.expected_output.strip()
+
     def __iter__(self):
         return iter((self.case_id, self.script, self.expected_output))
 
@@ -34,19 +38,20 @@ def check_operation(operation: callable, use_cases: list[UseCase]) -> None:
         if actual_output == expected_output:
             results.append(passed(case_id))
         else:
-            results.append(
-                f"""
+            fail_message = f"""
 {failed(case_id)}
 --- Expected ---
 {expected_output}
 --- Actual ---
 {actual_output}
 """
-            )
+            print(fail_message)
+            results.append(fail_message)
+
+    # Discover file from which check_operation is called:
     caller_frame = inspect.stack()[1]
     caller_file = Path(caller_frame.filename)
     this_file_path = caller_file
-    print(this_file_path)
     this_file = this_file_path.read_text(encoding="utf-8")
 
     if OUTPUT_TAG in this_file:

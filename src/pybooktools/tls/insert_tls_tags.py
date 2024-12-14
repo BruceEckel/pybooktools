@@ -36,10 +36,10 @@ def insert_top_level_separators(script: str) -> str:
             # Collect top-level statements
             for child in node.body:
                 if hasattr(
-                        child, "lineno"
-                ):  # Ensure it's a statement with a line number
+                        child, "end_lineno"
+                ):  # Ensure it's a statement with an end line number
                     self.insertions.append(
-                        (child.lineno, f'print("__${self.counter}$_tls__")\n')
+                        (child.end_lineno, f'print("__$self.counter$_tls__")\n')
                     )
                     self.counter += 1
 
@@ -116,16 +116,16 @@ print("__$3$_tls__")
 --- Actual ---
 
 x = 42
-print("__$1$_tls__")
+print("__$self.counter$_tls__")
 def greet():
-print("__$2$_tls__")
     print("Hello, world!")
+print("__$self.counter$_tls__")
 
 if x > 10:
-print("__$3$_tls__")
     greet()
 else:
     print("Goodbye!")
+print("__$self.counter$_tls__")
         
 
 """
