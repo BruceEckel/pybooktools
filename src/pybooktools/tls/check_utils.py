@@ -1,4 +1,5 @@
 # check_utils.py
+import inspect
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -42,7 +43,10 @@ def check_operation(operation: callable, use_cases: list[UseCase]) -> None:
 {actual_output}
 """
             )
-    this_file_path = Path(__file__.replace("\\", "/"))
+    caller_frame = inspect.stack()[1]
+    caller_file = Path(caller_frame.filename)
+    this_file_path = caller_file
+    print(this_file_path)
     this_file = this_file_path.read_text(encoding="utf-8")
 
     if OUTPUT_TAG in this_file:
