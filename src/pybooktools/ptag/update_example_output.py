@@ -1,4 +1,5 @@
 # update_example_output.py
+# TODO: add recursion
 import re
 import shutil
 from argparse import ArgumentParser

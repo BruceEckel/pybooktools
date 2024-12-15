@@ -1,4 +1,4 @@
-# output_format.py
+# output_formatter.py
 import textwrap
 from typing import Any
 

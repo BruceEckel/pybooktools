@@ -6,15 +6,15 @@ from pathlib import Path
 
 from icecream import ic
 
-from insert_tls_tags import insert_top_level_separators
 from pybooktools.error_reporting import error
+from pybooktools.tls import insert_top_level_separators
+from pybooktools.tls import tls_tags_to_dict
 from pybooktools.util import (
     run_script,
     valid_python,
     cleaned_dir,
     ensure_slug_line,
 )
-from tls_results_to_dict import tls_tags_to_dict
 
 
 def main() -> None:

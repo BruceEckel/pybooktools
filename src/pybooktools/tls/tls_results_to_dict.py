@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from output_format import output_format
+from pybooktools.tls import output_format
 from pybooktools.validate import UseCase, validate_transformer
 
 
