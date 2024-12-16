@@ -58,7 +58,7 @@ def main():
     elif args.recursive:
         code_files: list[Path] = [
             file
-            for file in Path(".").rglob("*.py")
+            for file in Path.cwd().rglob("*.py")
             # Exclude directories starting with '.' or '_':
             if not any(
                 (part.startswith(".") or part.startswith("_"))
@@ -66,7 +66,7 @@ def main():
             )
         ]
     else:  # No flags == find all files in the current directory:
-        code_files: list[Path] = list(Path(".").glob("*.py"))
+        code_files: list[Path] = list(Path.cwd().glob("*.py"))
 
     if not code_files:
         console.print("No Python files found")
