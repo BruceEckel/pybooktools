@@ -40,8 +40,7 @@ class Order:
         return self
 
 
-pizza = Pizza(Size.LARGE, [Add.PEPPERONI, Add.OLIVES])
-print(pizza)
+print(pizza := Pizza(Size.LARGE, [Add.PEPPERONI, Add.OLIVES]))
 print(order := Order(pizza))
 print(order.update(Status.IN_OVEN))
 print(order.update(Status.READY))
