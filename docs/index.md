@@ -26,7 +26,7 @@ Tools I use for writing Python books.
 
 ## Command Reminder
 
-> Shortcut: **c**
+> Shortcut: **cr**
 
 Displays a quick reminder of these commands.
 
@@ -34,17 +34,16 @@ Displays a quick reminder of these commands.
 
 ## Update Console Output
 
-> Shortcut: **ocl**
+> Shortcut: **px**
 
-**Note**: The `pybooktools` library must be a dependency in your project to enable `ocl`.
+Updates embedded console output in Python examples.
 
-For top-level `print()` statements (no indentation) in Python examples,
-clears and then updates `#|` output lines.
+For top-level statements (no indentation), including compound statements clears and then updates `##` output lines.
 
 When updating, produces the actual output from the example and inserts it, 
 so the output is correct and the example runs successfully.
 
-Run `ocl -h` for details on how to use it.
+Run `px -h` for details on how to use it.
 
 **Note**: This works only on the Python files, and not
 the examples embedded in Markdown documents. To update those after
@@ -89,7 +88,7 @@ Automatically adds the commented file name at the top of each Python file,
 in the form:
 
 ```text
-#: file_name.py
+# file_name.py
 ```
 
 1. If the slug line does not exist, it is added.

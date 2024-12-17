@@ -7,9 +7,9 @@ console = Console()
 
 def main() -> None:
     content = (
-        "[deep_sky_blue1]c       [/deep_sky_blue1]"
+        "[deep_sky_blue1]cr      [/deep_sky_blue1]"
         "    [yellow]Display these commands[/yellow]\n"
-        "[deep_sky_blue1]ocl   [/deep_sky_blue1]"
+        "[deep_sky_blue1]px    [/deep_sky_blue1]"
         "      [yellow]Add/Update Output Comment Lines in Python examples[/yellow]\n"
         "[deep_sky_blue1]bookup[/deep_sky_blue1]"
         "      [yellow]Update book examples from source repository[/yellow]\n"
