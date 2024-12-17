@@ -107,7 +107,7 @@ def main() -> None:
         formatter_class=RichHelpFormatter,
     )
     parser.add_argument(
-        "pyfile", nargs="*", type=str, help="The Python example file(s)"
+        "pyfiles", nargs="*", type=str, help="The Python example file(s)"
     )
     parser.add_argument(
         "-v",
@@ -133,13 +133,13 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    if not args.pyfile and not args.all and not args.recurse:
+    if not args.pyfiles and not args.all and not args.recurse:
         parser.print_help()
         print("\nError: No files specified and no mode selected (-a or -r)\n")
         parser.exit(1)
 
-    if args.pyfile:
-        for file_name in args.pyfile:
+    if args.pyfiles:
+        for file_name in args.pyfiles:
             file_path = Path(file_name)
             if file_path.is_file():
                 process(file_path, args.verbose)
