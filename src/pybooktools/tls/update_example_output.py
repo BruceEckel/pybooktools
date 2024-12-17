@@ -141,7 +141,7 @@ def main() -> None:
     if args.pyfiles:
         for file_name in args.pyfiles:
             file_path = Path(file_name)
-            if file_path.is_file():
+            if file_path.is_file() and file_path.suffix == ".py":
                 process(file_path, args.verbose)
             else:
                 print(f"Error: File not found: {file_name}")
