@@ -6,6 +6,7 @@ You must provide the path to at least one source code repository,
 as a Markdown comment in the form:
 <!-- #[code_location] ./src/functional_error_handling -->
 These can appear anywhere in the file.
+The path can be relative or absolute.
 If you provide more than one source code repository, you must ensure
 there are no duplicate file names across those directories.
 """
@@ -26,7 +27,7 @@ from rich.console import Console
 from pybooktools.trace import trace
 from pybooktools.util import display_function_name
 
-width = 65
+centering_width = 65
 console = Console()
 python_files: list[Path] = []
 
@@ -73,13 +74,13 @@ class MarkdownListing:
         Filename from slugline: {self.slugname}
         Source File: {self.source_file_path.absolute() if self.source_file_path else ""}
         {self.changed = }
-        {"  Markdown Code Listing  ".center(width, "-")}[chartreuse4]
+        {"  Markdown Code Listing  ".center(centering_width, "-")}[chartreuse4]
         {self.markdown_listing}[/chartreuse4]
-        {"  Source File Code Listing  ".center(width, "-")}[chartreuse4]
+        {"  Source File Code Listing  ".center(centering_width, "-")}[chartreuse4]
         {self.source_file_contents}[/chartreuse4]
-        {"  diffs  ".center(width, "v")}[chartreuse4]
+        {"  diffs  ".center(centering_width, "v")}[chartreuse4]
         {self.diffs}[/chartreuse4]
-        {'=' * width}
+        {'=' * centering_width}
         """
         )
 
@@ -113,11 +114,11 @@ def find_python_files_and_listings(
                 list((Path.cwd() / code_location).resolve().glob("**/*.py"))
             )
     console.print(
-        f"""[orange3]{"  Available Python Files  ".center(width, "-")}[/orange3]"""
+        f"""[orange3]{"  Available Python Files  ".center(centering_width, "-")}[/orange3]"""
     )
     for pyfile in [pf.name for pf in python_files]:
         console.print(f"\t[sea_green2]{pyfile}[/sea_green2]")
-    console.print(f"""[orange3]{"-" * width}[/orange3]""")
+    console.print(f"""[orange3]{"-" * centering_width}[/orange3]""")
 
     # Check for duplicate file names in python_files.
     # (Should python_files be a custom class?)
@@ -134,15 +135,15 @@ def find_python_files_and_listings(
     }
     if duplicates:
         console.print(
-            f"""[red]{"  Duplicate Python File Names  ".center(width, "-")}[/red]"""
+            f"""[red]{"  Duplicate Python File Names  ".center(centering_width, "-")}[/red]"""
         )
         for name, pyfile in duplicates.items():
             console.print(f"\t[red]{name}: {pyfile}[/red]")
-        console.print(f"""[red]{"-" * width}[/red]""")
+        console.print(f"""[red]{"-" * centering_width}[/red]""")
         sys.exit(1)
 
     # If slug line doesn't exist group(1) returns None:
-    listing_pattern = re.compile(r"```python\n(#:(.*?)\n)?(.*?)```", re.DOTALL)
+    listing_pattern = re.compile(r"```python\n(# (.*?)\n)?(.*?)```", re.DOTALL)
     for match in re.finditer(listing_pattern, markdown_content):
         if match.group(1) is not None:
             listing_content = match.group(0)  # Include Markdown tags
@@ -201,7 +202,7 @@ def main():
         markdown_file.write_text(updated_markdown, encoding="utf-8")
     change_count = (
         f"  {changes.count(True)} changes made to {markdown_file}  ".center(
-            width, "-"
+            centering_width, "-"
         )
     )
     console.print(f"\n[orange3]{change_count}[/orange3]")
