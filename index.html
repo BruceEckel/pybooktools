@@ -110,21 +110,20 @@
 
 <h2 id="command-reminder">Command Reminder</h2>
 <blockquote>
-<p>Shortcut: <strong>c</strong></p>
+<p>Shortcut: <strong>cr</strong></p>
 </blockquote>
 <p>Displays a quick reminder of these commands.</p>
 <hr style="height:3px;border-width:0;color:gray;background-color:gray; margin-top:50px;">
 
 <h2 id="update-console-output">Update Console Output</h2>
 <blockquote>
-<p>Shortcut: <strong>ocl</strong></p>
+<p>Shortcut: <strong>px</strong></p>
 </blockquote>
-<p><strong>Note</strong>: The <code>pybooktools</code> library must be a dependency in your project to enable <code>ocl</code>.</p>
-<p>For top-level <code>print()</code> statements (no indentation) in Python examples,
-clears and then updates <code>#|</code> output lines.</p>
+<p>Updates embedded console output in Python examples.</p>
+<p>For top-level statements (no indentation), including compound statements clears and then updates <code>##</code> output lines.</p>
 <p>When updating, produces the actual output from the example and inserts it, 
 so the output is correct and the example runs successfully.</p>
-<p>Run <code>ocl -h</code> for details on how to use it.</p>
+<p>Run <code>px -h</code> for details on how to use it.</p>
 <p><strong>Note</strong>: This works only on the Python files, and not
 the examples embedded in Markdown documents. To update those after
 you've run this program, use <code>bookup</code>.</p>
@@ -160,7 +159,7 @@ this is, it also enables <code>bookup</code> (<code>update_markdown_code_listing
 to update the code listing in the book from the source file.</p>
 <p>Automatically adds the commented file name at the top of each Python file,
 in the form:</p>
-<pre><code class="language-text">#: file_name.py
+<pre><code class="language-text"># file_name.py
 </code></pre>
 <ol>
 <li>If the slug line does not exist, it is added.</li>
@@ -276,5 +275,5 @@ If you run the <code>chapnum</code> command inside the directory containing such
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2024-12-11 22:28:27.112319+00:00
+Build Date UTC : 2024-12-18 16:19:37.270353+00:00
 -->
