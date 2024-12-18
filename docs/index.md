@@ -81,11 +81,9 @@ Run `bookup -h` for details on how to use it.
 > Shortcut: **slug**
 
 The "Slug Line" (a term from journalism) not only tells the reader which file
-this is, it also enables `bookup` (`update_markdown_code_listings.py`) 
-to update the code listing in the book from the source file.
+this is, it also enables `bookup` to update the code listing in the book from the source file.
 
-Automatically adds the commented file name at the top of each Python file,
-in the form:
+It automatically adds the commented file name at the top of each Python file, in the form:
 
 ```text
 # file_name.py
