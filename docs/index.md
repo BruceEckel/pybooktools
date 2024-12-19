@@ -36,7 +36,7 @@ Displays a quick reminder of these commands.
 
 > Shortcut: **px**
 
-Updates embedded console output in Python examples.
+Updates embedded console output in **P**ython e**X**amples.
 
 For top-level statements (no indentation), including compound statements clears and then updates `##` output lines.
 
@@ -45,7 +45,7 @@ so the output is correct and the example runs successfully.
 
 Run `px -h` for details on how to use it.
 
-**Note**: This works only on the Python files, and not
+**Note**: This works only on the Python example files, and not
 the examples embedded in Markdown documents. To update those after
 you've run this program, use `bookup`.
 
