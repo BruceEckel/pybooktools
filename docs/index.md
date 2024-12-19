@@ -58,13 +58,15 @@ you've run this program, use `bookup`.
 Looks in Markdown files for listings with sluglines (listings without sluglines are ignored),
 and updates those listings from the source code repository.
 You must use the `#[code_location]` tag to provide the path to at least one source code repository,
-as a Markdown comment in the form:
+as a Markdown comment in this format:
 
 ```text
-<!-- #[code_location] ./src/functional_error_handling -->
+<!-- #[code_location] ./src/validate -->
 ```
-
-- The above is a relative path; You can also use absolute paths
+- The above is a relative path; You can also use absolute paths:
+```text
+<!-- #[code_location] /git/pybooktools/src -->
+```
 - These can appear anywhere in the file.
 - The program searches across all the specified directories for the file name
   in the slugline.
@@ -121,4 +123,4 @@ If you run the `chapnum` command inside the directory containing such markdown f
 
 3. To recursively run on all subdirectories, use the `-r` flag.
 
-Use the `-h` flag for command details.
+Run `chapnum -h` for details on how to use it.
