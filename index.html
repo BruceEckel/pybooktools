@@ -136,11 +136,15 @@ you've run this program, use <code>bookup</code>.</p>
 <p>Looks in Markdown files for listings with sluglines (listings without sluglines are ignored),
 and updates those listings from the source code repository.
 You must use the <code>#[code_location]</code> tag to provide the path to at least one source code repository,
-as a Markdown comment in the form:</p>
-<pre><code class="language-text">&lt;!-- #[code_location] ./src/functional_error_handling --&gt;
+as a Markdown comment in this format:</p>
+<pre><code class="language-text">&lt;!-- #[code_location] ./src/validate --&gt;
 </code></pre>
 <ul>
-<li>The above is a relative path; You can also use absolute paths</li>
+<li>The above is a relative path; You can also use absolute paths:</li>
+</ul>
+<pre><code class="language-text">&lt;!-- #[code_location] /git/pybooktools/src --&gt;
+</code></pre>
+<ul>
 <li>These can appear anywhere in the file.</li>
 <li>The program searches across all the specified directories for the file name
   in the slugline.</li>
@@ -191,7 +195,7 @@ If you run the <code>chapnum</code> command inside the directory containing such
 <p>To recursively run on all subdirectories, use the <code>-r</code> flag.</p>
 </li>
 </ol>
-<p>Use the <code>-h</code> flag for command details.</p></div>
+<p>Run <code>chapnum -h</code> for details on how to use it.</p></div>
             </div>
         </div>
 
@@ -273,5 +277,5 @@ If you run the <code>chapnum</code> command inside the directory containing such
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2024-12-19 20:29:24.029391+00:00
+Build Date UTC : 2024-12-19 20:37:26.365685+00:00
 -->
