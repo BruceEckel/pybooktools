@@ -8,6 +8,7 @@ Tools I use for writing Python books.
 
 TODO:
 - Consistent UI, consider other UI systems:
+  - Apply https://pypi.org/project/rich-argparse/
   - Fill in `display` library 
   - https://rich.readthedocs.io/en/stable/protocol.html: Define __rich__ for classes
   - Add slugline-style output formatting to `update_example_output.py`
