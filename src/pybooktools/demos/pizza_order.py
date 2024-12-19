@@ -1,4 +1,3 @@
-# pizza_order.py
 from dataclasses import dataclass
 from enum import Enum, auto
 
