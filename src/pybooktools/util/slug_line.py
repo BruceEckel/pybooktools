@@ -5,7 +5,7 @@ from pathlib import Path
 
 from rich.console import Console
 
-from pybooktools.trace import trace
+from pybooktools.diagnostics import trace
 from pybooktools.util import display_function_name
 
 console = Console()

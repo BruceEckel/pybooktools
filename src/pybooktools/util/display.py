@@ -6,7 +6,7 @@ from icecream import ic
 from rich.console import Console
 from rich.panel import Panel
 
-from pybooktools.trace import trace
+from pybooktools.diagnostics import trace
 
 console = Console()
 

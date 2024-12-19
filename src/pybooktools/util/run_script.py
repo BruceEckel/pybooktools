@@ -7,7 +7,7 @@ from pathlib import Path
 from rich.console import Console
 from rich.syntax import Syntax
 
-from pybooktools.error_reporting import error, warn
+from pybooktools.diagnostics import error, warn
 
 console = Console()
 

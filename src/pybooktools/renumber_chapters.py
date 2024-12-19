@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List
 
-from pybooktools.trace import trace
+from pybooktools.diagnostics import trace
 from pybooktools.util import display_function_name
 
 chapter_pattern = r"^(\d+[a-zA-Z]?)\s+(.+)\.md$"
