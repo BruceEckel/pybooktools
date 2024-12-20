@@ -1,12 +1,13 @@
 # pybooktools
 
-Tools I use for writing Python books.
+Command-line tools I use for writing Python books.
 
 - [Documentation](https://bruceeckel.github.io/pybooktools/)
 
 - To deploy updated documentation: `uvx mkdocs gh-deploy`
 
 TODO:
+- Overview in docs, or details or both.
 - Consistent UI, consider other UI systems:
   - Apply https://pypi.org/project/rich-argparse/
   - Fill in `display` library 

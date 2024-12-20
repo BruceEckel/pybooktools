@@ -35,7 +35,7 @@ def insert_top_level_separators(script: str) -> str:
             # Collect top-level statements
             for child in node.body:
                 if hasattr(
-                        child, "end_lineno"
+                    child, "end_lineno"
                 ):  # Ensure it's a statement with an end line number
                     self.insertions.append(
                         (
