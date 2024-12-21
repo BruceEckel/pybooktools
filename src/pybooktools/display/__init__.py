@@ -6,3 +6,7 @@ Use:
 - Panel.fit
 - Possibly tables: https://rich.readthedocs.io/en/stable/tables.html
 """
+
+from .report import report
+
+__all__ = ["report"]
