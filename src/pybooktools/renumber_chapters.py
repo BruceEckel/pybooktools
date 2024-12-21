@@ -1,10 +1,11 @@
 # renumber_chapters.py
 import os
 import re
-from argparse import ArgumentParser
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List
+
+import typer
 
 from pybooktools.diagnostics import trace
 from pybooktools.util import display_function_name
@@ -93,50 +94,45 @@ class Book:
             print(chapter.file_name)
 
 
-def main() -> None:
-    parser = ArgumentParser(description="Manage chapters in a Markdown book")
-    parser.add_argument(
-        "directory",
-        type=str,
-        nargs="?",
-        default=None,
-        help="Directory containing Markdown chapters (default: current directory)",
-    )
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument(
-        "-r",
-        "--renumber",
-        action="store_true",
-        help="Renumber the chapters in the directory",
-    )
-    group.add_argument(
-        "-d",
-        "--display",
-        action="store_true",
-        help="Display the chapters in the directory without renumbering",
-    )
-    parser.add_argument(
-        "-t", "--trace", action="store_true", help="Enable tracing output"
-    )
-    args = parser.parse_args()
-
-    if args.trace:
+def main(
+        directory: str = typer.Argument(
+            None,
+            help="Directory containing Markdown chapters (default: current directory)",
+        ),
+        renumber: bool = typer.Option(
+            False, "--renumber", "-r", help="Renumber the chapters in the directory"
+        ),
+        display: bool = typer.Option(
+            False,
+            "--display",
+            "-d",
+            help="Display the chapters in the directory without renumbering",
+        ),
+        trace_enabled: bool = typer.Option(
+            False, "--trace", "-t", help="Enable tracing output"
+        ),
+) -> None:
+    if trace_enabled:
         trace.enable()
         display_function_name()
 
-    if not (args.renumber or args.display):
-        parser.print_help()
-        return
+    if not (renumber or display):
+        typer.echo("Either --renumber or --display must be specified.")
+        raise typer.Exit(code=1)
 
-    directory = Path(args.directory) if args.directory else Path(os.getcwd())
-    book = Book(directory)
+    dir_path = Path(directory) if directory else Path(os.getcwd())
+    book = Book(dir_path)
 
-    if args.renumber:
+    if renumber:
         book.update_chapter_numbers()
         print(book)
-    elif args.display:
+    elif display:
         book.display_chapters()
 
 
 if __name__ == "__main__":
-    main()
+    typer.run(main)
+
+
+def run():
+    typer.run(main)
