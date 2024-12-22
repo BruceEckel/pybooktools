@@ -114,7 +114,11 @@ def main(
         display_function_name()
 
     if not (renumber or display):
-        typer.echo("Either --renumber or --display must be specified.")
+        with typer.Context(typer.main.get_command(app)) as ctx:
+            typer.echo(ctx.get_help())
+        typer.secho(
+            "Specify either --renumber or --display\n", fg="red"
+        )
         raise typer.Exit(code=1)
 
     dir_path = Path(directory) if directory else Path.cwd()
