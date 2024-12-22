@@ -12,6 +12,8 @@ from pybooktools.util import display_function_name
 
 chapter_pattern = r"^(\d+[a-zA-Z]?)\s+(.+)\.md$"
 
+app = typer.Typer()
+
 
 @dataclass(order=True)
 class MarkdownChapter:
@@ -36,20 +38,15 @@ class MarkdownChapter:
         self.sort_index = int(re.sub(r"\D", "", self.number))
         self.file_name_title = self.file_name_title.title()  # Title case
 
-        # Extract Markdown file's version of title if there is one:
         self.content = self.path.read_text(encoding="utf-8").splitlines()
         if self.content and self.content[0].startswith("# "):
             self.markdown_title = self.content[0][2:].strip().title()
 
-        # Title at the beginning of the Markdown file takes precedence
-        # No title at the beginning of the Markdown file, use file_name_title
         self.title = self.markdown_title or self.file_name_title
 
-        # If there's not an existing title, insert the generated title from the file name.
         if not self.content or not self.content[0].startswith("# "):
             self.content.insert(0, f"# {self.title}")
         else:
-            # If there's an existing title, replace it with the title-cased version.
             self.content[0] = f"# {self.title}"
 
     def update_chapter_number(self, new_number: str) -> None:
@@ -58,7 +55,6 @@ class MarkdownChapter:
         new_name = f"{self.number} {sanitized_title}.md"
         self.path.rename(self.path.parent / new_name)
         self.path = self.path.parent / new_name
-        # Ensure one and only one newline at the end of the file
         self.path.write_text("\n".join(self.content) + "\n", encoding="utf-8")
 
     def __str__(self) -> str:
@@ -94,6 +90,7 @@ class Book:
             print(chapter.file_name)
 
 
+@app.command()
 def main(
         directory: str = typer.Argument(
             None,
@@ -130,9 +127,15 @@ def main(
         book.display_chapters()
 
 
-if __name__ == "__main__":
-    typer.run(main)
-
-
 def run():
+    import sys
+
+    # Support -h as an alias for --help
+    if "-h" in sys.argv:
+        sys.argv[sys.argv.index("-h")] = "--help"
+
     typer.run(main)
+
+
+if __name__ == "__main__":
+    run()
