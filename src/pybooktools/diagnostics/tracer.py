@@ -49,7 +49,7 @@ class Trace:
                 case _:
                     # Fallback for strings and other objects
                     if hasattr(arg, "__dataclass_fields__") or hasattr(
-                        arg, "__dict__"
+                            arg, "__dict__"
                     ):
                         console.print(Pretty(arg))
                     else:

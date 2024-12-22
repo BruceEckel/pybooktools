@@ -1,6 +1,6 @@
 # renumber_chapters.py
-import os
 import re
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List
@@ -117,7 +117,10 @@ def main(
         typer.echo("Either --renumber or --display must be specified.")
         raise typer.Exit(code=1)
 
-    dir_path = Path(directory) if directory else Path(os.getcwd())
+    dir_path = Path(directory) if directory else Path.cwd()
+    if not dir_path.is_dir():
+        typer.echo(f"{dir_path} is not a valid directory path")
+        raise typer.Exit(code=1)
     book = Book(dir_path)
 
     if renumber:
@@ -128,8 +131,6 @@ def main(
 
 
 def run():
-    import sys
-
     # Support -h as an alias for --help
     if "-h" in sys.argv:
         sys.argv[sys.argv.index("-h")] = "--help"

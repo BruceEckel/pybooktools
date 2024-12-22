@@ -9,7 +9,7 @@ from .use_case import UseCase
 
 
 def validate_transformer(
-    transformer: callable, use_cases: list[UseCase]
+        transformer: callable, use_cases: list[UseCase]
 ) -> None:
     results = []
     for case_id, script, expected_output in use_cases:
