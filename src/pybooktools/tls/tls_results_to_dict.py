@@ -5,12 +5,13 @@ from pybooktools.tls import output_format
 from pybooktools.validate import UseCase, validate_transformer
 
 
-def tls_tags_to_dict(input_str: str) -> Dict[str, List[str]]:
+def tls_tags_to_dict(input_str: str, wrap: bool = True) -> Dict[str, List[str]]:
     """
     Converts a string with __$n$_tls__ markers into a dictionary.
 
     Args:
         input_str (str): The input string containing lines and __$n$_tls__ markers.
+        wrap (bool): Set to False to prevent wrapping
 
     Returns:
         Dict[str, List[str]]: A dictionary where keys are tls markers and values
@@ -26,7 +27,7 @@ def tls_tags_to_dict(input_str: str) -> Dict[str, List[str]]:
             result[line.strip()] = buffer
             buffer = []
         else:
-            buffer.extend(output_format(line))
+            buffer.extend(output_format(line, wrap=wrap))
     if buffer:
         result[f"__${n + 1}$_tls__"] = buffer
 

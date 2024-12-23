@@ -56,12 +56,15 @@ class ExampleUpdater:
     def remove_validate_dir(self):
         shutil.rmtree(self.validate_dir)
 
-    def update_output(self) -> None:
+    def update_output(self, wrap: bool = True) -> None:
         with_tls_tags = insert_top_level_separators(self.cleaned_code)
         tls_tagged = self.__write_with_ext(with_tls_tags, "1_tls_tags")
         output = run_script(tls_tagged)
         self.__write_with_ext(output, "2_output", "txt")
-        tls_tag_dict = tls_tags_to_dict(output)
+        tls_tag_dict = tls_tags_to_dict(output, wrap=wrap)
+        self.__write_with_ext(
+            "\n".join(tls_tag_dict.keys()), "3_tls_tag_keys", ftype="txt"
+        )
         if self.verbose:
             ic(tls_tag_dict)
         self.__write_with_ext(
@@ -90,8 +93,8 @@ class ExampleUpdater:
             self.remove_validate_dir()
 
 
-def process(file_path: Path, verbose=False) -> None:
-    ExampleUpdater(file_path, verbose=verbose).update_output()
+def process(file_path: Path, verbose=False, wrap: bool = True) -> None:
+    ExampleUpdater(file_path, verbose=verbose).update_output(wrap=wrap)
 
 
 def main() -> None:
@@ -114,6 +117,11 @@ def main() -> None:
         "--verbose",
         action="store_true",
         help="Trace info, save intermediate files, don't overwrite original file",
+    )
+    parser.add_argument(
+        "--nowrap",
+        action="store_true",
+        help="Do not wrap output lines",
     )
 
     # Add mutually exclusive group for -a and -r
@@ -138,19 +146,23 @@ def main() -> None:
         print("\nError: No files specified and no mode selected (-a or -r)\n")
         parser.exit(1)
 
+    wrap = False if args.nowrap else True
+
     if args.pyfiles:
         for file_name in args.pyfiles:
             file_path = Path(file_name)
             if file_path.is_file() and file_path.suffix == ".py":
-                process(file_path, args.verbose)
+                process(file_path, args.verbose, wrap=wrap)
             else:
                 print(f"Error: File not found: {file_name}")
     elif args.all:
         for file_path in Path.cwd().glob("*.py"):
-            process(file_path, args.verbose)
+            if file_path.name.startswith("_"):
+                continue
+            process(file_path, args.verbose, wrap=wrap)
     elif args.recurse:
         for file_path in Path.cwd().rglob("*.py"):
-            process(file_path, args.verbose)
+            process(file_path, args.verbose, wrap=wrap)
 
 
 if __name__ == "__main__":

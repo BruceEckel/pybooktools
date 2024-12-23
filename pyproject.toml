@@ -18,7 +18,7 @@ px = "pybooktools.tls.update_example_output:main"
 cr = "pybooktools.reminder:main"
 bookup = "pybooktools.update_markdown_code_listings:main"
 slug = "pybooktools.util.slug_line:main"
-chapnum = "pybooktools.renumber_chapters:run"
+chapnum = "pybooktools.renumber_chapters:app"
 
 [tool.uv]
 package = true

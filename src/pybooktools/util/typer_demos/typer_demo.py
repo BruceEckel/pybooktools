@@ -1,10 +1,13 @@
 # typer_demo.py
 import typer
 
-app = typer.Typer(context_settings={"help_option_names": ["--help", "-h"]})
+app = typer.Typer(
+    context_settings={"help_option_names": ["-h", "--help"]},
+    add_completion=False,
+)
 
 
-@app.command(context_settings={"help_option_names": ["--help", "-h"]})
+@app.command()
 def main(
         ctx: typer.Context,
         arg: str = typer.Argument(
@@ -24,30 +27,27 @@ def main(
     typer.secho(f"{ctx.help_option_names = }")
 
 
-typer.run(main)
-##  Usage: typer_demo_1_tls_tags.py [OPTIONS]
-## [ARG]
-## +- Arguments ----------------------------------
-## -------------------------------+
-## |   arg      [ARG]  Just some argument
-## [default: None]                        |
-## +----------------------------------------------
-## -------------------------------+
-## +- Options ------------------------------------
-## -------------------------------+
-## | --flag1  -1        Flag number one
-## |
-## | --flag2  -2        Flag number two
-## |
-## | --help             Show this message and
-## exit.                              |
-## +----------------------------------------------
-## -------------------------------+
+app()
+# typer.run(main)
+##
+##  Usage: typer_demo_1_tls_tags.py [OPTIONS] [ARG]
+##
+## +- Arguments -----------------------------------------------------------------+
+## |   arg      [ARG]  Just some argument [default: None]                        |
+## +-----------------------------------------------------------------------------+
+## +- Options -------------------------------------------------------------------+
+## | --flag1  -1        Flag number one                                          |
+## | --flag2  -2        Flag number two                                          |
+## | --help             Show this message and exit.                              |
+## +-----------------------------------------------------------------------------+
+##
 ## arg: None
 ## flag1: False
 ## flag2: False
 ## ctx.args = []
-## ctx.params = {'arg': None, 'flag1': False,
-## 'flag2': False}
+## ctx.params = {'arg': None, 'flag1': False, 'flag2': False}
 ## ctx.command = <TyperCommand main>
 ## ctx.help_option_names = ['--help']
+##
+##
+##

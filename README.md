@@ -7,7 +7,6 @@ Command-line tools I use for writing Python books.
 - To deploy updated documentation: `uvx mkdocs gh-deploy`
 
 TODO:
-- Need a new flag for `px` that doesn't wrap output, for non-book examples
 - Overview in docs, or details or both.
 - Consistent UI, consider other UI systems:
   - Apply https://pypi.org/project/rich-argparse/

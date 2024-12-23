@@ -1,6 +1,5 @@
 # renumber_chapters.py
 import re
-import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List
@@ -13,11 +12,8 @@ from pybooktools.util import display_function_name
 chapter_pattern = r"^(\d+[a-zA-Z]?)\s+(.+)\.md$"
 
 app = typer.Typer(
-    no_args_is_help=True,
+    context_settings={"help_option_names": ["-h", "--help"]},
     add_completion=False,
-    context_settings={"help_option_names": ["-h"]},
-    rich_markup_mode="rich",
-    epilog="Shows up after the help message",
 )
 
 
@@ -144,13 +140,5 @@ def main(
         book.display_chapters()
 
 
-def run():
-    # Support -h as an alias for --help
-    if "-h" in sys.argv:
-        sys.argv[sys.argv.index("-h")] = "--help"
-
-    typer.run(main)
-
-
 if __name__ == "__main__":
-    run()
+    app()
