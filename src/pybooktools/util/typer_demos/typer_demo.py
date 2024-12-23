@@ -25,3 +25,29 @@ def main(
 
 
 typer.run(main)
+##  Usage: typer_demo_1_tls_tags.py [OPTIONS]
+## [ARG]
+## +- Arguments ----------------------------------
+## -------------------------------+
+## |   arg      [ARG]  Just some argument
+## [default: None]                        |
+## +----------------------------------------------
+## -------------------------------+
+## +- Options ------------------------------------
+## -------------------------------+
+## | --flag1  -1        Flag number one
+## |
+## | --flag2  -2        Flag number two
+## |
+## | --help             Show this message and
+## exit.                              |
+## +----------------------------------------------
+## -------------------------------+
+## arg: None
+## flag1: False
+## flag2: False
+## ctx.args = []
+## ctx.params = {'arg': None, 'flag1': False,
+## 'flag2': False}
+## ctx.command = <TyperCommand main>
+## ctx.help_option_names = ['--help']

@@ -40,15 +40,15 @@ class ExampleUpdater:
         self.original_source = ensure_slug_line(
             valid_python(self.example_path), self.example_path
         )
-        old_ocls_removed = re.sub(
+        old_tls_removed = re.sub(
             r"^#\s*\|.*(\n|$)", "", self.original_source, flags=re.MULTILINE
         )
         # Remove comments starting with `## `
         self.cleaned_code = re.sub(
-            r"^\s*## .*(\n|$)", "", old_ocls_removed, flags=re.MULTILINE
+            r"^\s*## .*(\n|$)", "", old_tls_removed, flags=re.MULTILINE
         )
 
-    def write_with_ext(self, text: str, ext: str, ftype="py") -> Path:
+    def __write_with_ext(self, text: str, ext: str, ftype="py") -> Path:
         outpath = self.validate_dir / f"{self.example_path.stem}_{ext}.{ftype}"
         outpath.write_text(text, encoding="utf-8")
         return outpath
@@ -58,13 +58,13 @@ class ExampleUpdater:
 
     def update_output(self) -> None:
         with_tls_tags = insert_top_level_separators(self.cleaned_code)
-        tls_tagged = self.write_with_ext(with_tls_tags, "1_tls_tags")
+        tls_tagged = self.__write_with_ext(with_tls_tags, "1_tls_tags")
         output = run_script(tls_tagged)
-        self.write_with_ext(output, "2_output", "txt")
+        self.__write_with_ext(output, "2_output", "txt")
         tls_tag_dict = tls_tags_to_dict(output)
         if self.verbose:
             ic(tls_tag_dict)
-        self.write_with_ext(
+        self.__write_with_ext(
             ic.format(tls_tag_dict), "3_tls_tag_dict", ftype="txt"
         )
         if self.verbose:
@@ -80,7 +80,7 @@ class ExampleUpdater:
                 with_outputs.append(line)
         with_outputs.append("")
         self.updated_code = "\n".join(with_outputs)
-        self.write_with_ext(self.updated_code, "4_updated")
+        self.__write_with_ext(self.updated_code, "4_updated")
         if self.verbose:
             print(self.updated_code)
             print(f"Original {self.example_name} NOT overwritten")

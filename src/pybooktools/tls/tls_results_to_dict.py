@@ -19,13 +19,16 @@ def tls_tags_to_dict(input_str: str) -> Dict[str, List[str]]:
     result: Dict[str, List[str]] = {}
     lines = input_str.strip().split("\n")
     buffer: List[str] = []
-
+    n = 0
     for line in lines:
         if "$_tls__" in line:
+            n = int(line.split("$")[1])
             result[line.strip()] = buffer
             buffer = []
         else:
             buffer.extend(output_format(line))
+    if buffer:
+        result[f"__${n + 1}$_tls__"] = buffer
 
     return result
 
@@ -68,6 +71,7 @@ baz
         {
             "__$1$_tls__": [],
             "__$2$_tls__": ["## foo", "## bar"],
+            "__$3$_tls__": ["## baz"],
         },
     ),
     # Edge case: No tls_tags, just lines
@@ -78,7 +82,7 @@ foo
 bar
 baz
     """,
-        "{}",
+        "{'__$1$_tls__': ['## foo', '## bar', '## baz']}",
     ),
 ]
 if __name__ == "__main__":

@@ -12,3 +12,4 @@ def main(
 
 
 typer.run(main)
+## ctx.help_option_names = ['--help']

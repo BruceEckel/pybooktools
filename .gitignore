@@ -167,8 +167,6 @@ cython_debug/
 # Thus lockfiles are not stored in the Github repository.
 
 *.lock
-**/_validation/
-*/_validation/
 /src/pybooktools/output_validator/testing/_validation
-.check_*
+.validate_*
 /src/pybooktools/demos/.check_simple
