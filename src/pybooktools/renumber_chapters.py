@@ -12,7 +12,13 @@ from pybooktools.util import display_function_name
 
 chapter_pattern = r"^(\d+[a-zA-Z]?)\s+(.+)\.md$"
 
-app = typer.Typer()
+app = typer.Typer(
+    no_args_is_help=True,
+    add_completion=False,
+    context_settings={"help_option_names": ["-h"]},
+    rich_markup_mode="rich",
+    epilog="Shows up after the help message",
+)
 
 
 @dataclass(order=True)
@@ -113,19 +119,23 @@ def main(
         trace.enable()
         display_function_name()
 
-    if not (renumber or display):
+    def help_error(msg: str) -> None:
         with typer.Context(typer.main.get_command(app)) as ctx:
             typer.echo(ctx.get_help())
-        typer.secho(
-            "Specify either --renumber or --display\n", fg="red"
-        )
+        typer.secho(f"{msg}\n", fg="red")
         raise typer.Exit(code=1)
 
+    if not (renumber or display):
+        help_error("Specify either --renumber or --display")
+
     dir_path = Path(directory) if directory else Path.cwd()
+
     if not dir_path.is_dir():
-        typer.echo(f"{dir_path} is not a valid directory path")
-        raise typer.Exit(code=1)
+        help_error(f"{dir_path} is not a valid directory path")
+
     book = Book(dir_path)
+    if not book.chapters:
+        help_error(f"No chapters found in {dir_path}")
 
     if renumber:
         book.update_chapter_numbers()
