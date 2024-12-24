@@ -3,6 +3,7 @@ import typer
 app = typer.Typer(
     context_settings={"help_option_names": ["-h", "--help"]},
     add_completion=False,
+    no_args_is_help=True,
 )
 
 

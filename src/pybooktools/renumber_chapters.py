@@ -14,6 +14,7 @@ chapter_pattern = r"^(\d+[a-zA-Z]?)\s+(.+)\.md$"
 app = typer.Typer(
     context_settings={"help_option_names": ["-h", "--help"]},
     add_completion=False,
+    no_args_is_help=True,
 )
 
 
