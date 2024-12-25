@@ -123,7 +123,7 @@ def main(
             help="Without making changes, show the renumbered chapters",
         ),
 ) -> None:
-    """Renumbers Markdown chapters in a directory."""
+    """[deep_sky_blue1]Renumbers Markdown chapters in a directory[/deep_sky_blue1]"""
 
     def help_error(msg: str) -> None:
         typer.echo(ctx.get_help())
