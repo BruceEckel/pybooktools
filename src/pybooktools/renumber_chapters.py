@@ -6,9 +6,6 @@ from typing import List
 
 import typer
 
-from pybooktools.diagnostics import trace
-from pybooktools.util import display_function_name
-
 chapter_pattern = r"^(\d+[a-zA-Z]?)\s+(.+)\.md$"
 
 app = typer.Typer(
@@ -23,7 +20,7 @@ class MarkdownChapter:
     path: Path
     file_name: str = field(init=False)
     file_name_title: str = field(init=False)
-    markdown_title: str = field(init=False)
+    markdown_title: str | None = field(init=False)
     title: str = field(init=False)
     number: str = field(init=False)
     content: list[str] = field(init=False)
@@ -44,6 +41,8 @@ class MarkdownChapter:
         self.content = self.path.read_text(encoding="utf-8").splitlines()
         if self.content and self.content[0].startswith("# "):
             self.markdown_title = self.content[0][2:].strip().title()
+        else:
+            self.markdown_title = None
 
         self.title = self.markdown_title or self.file_name_title
 
@@ -52,16 +51,19 @@ class MarkdownChapter:
         else:
             self.content[0] = f"# {self.title}"
 
-    def update_chapter_number(self, new_number: str) -> None:
+    def new_name(self, new_number: str) -> str:
         self.number = new_number
         sanitized_title = re.sub(r"[^A-Za-z0-9 ]", "", self.title)
-        new_name = f"{self.number} {sanitized_title}.md"
+        return f"{self.number} {sanitized_title}.md"
+
+    def update_chapter_number(self, new_number: str) -> None:
+        new_name = self.new_name(new_number)
         self.path.rename(self.path.parent / new_name)
         self.path = self.path.parent / new_name
         self.path.write_text("\n".join(self.content) + "\n", encoding="utf-8")
 
     def __str__(self) -> str:
-        return f"{self.number} {self.file_name_title}"
+        return f"{self.number} {self.title}"
 
 
 @dataclass
@@ -79,6 +81,11 @@ class Book:
         self.chapters = sorted(
             chapters, key=lambda ch: (ch.sort_index, ch.number)
         )
+
+    def show_without_updating(self) -> None:
+        for i, chapter in enumerate(self.chapters, start=1):
+            updated_number = f"{i:0{len(str(len(self.chapters)))}}"
+            print(chapter.new_name(updated_number))
 
     def update_chapter_numbers(self) -> None:
         for i, chapter in enumerate(self.chapters, start=1):
@@ -100,30 +107,29 @@ def main(
             help="Directory containing Markdown chapters (default: current directory)",
         ),
         renumber: bool = typer.Option(
-            False, "--renumber", "-r", help="Renumber the chapters in the directory"
+            False, "--renumber", "-r", help="Renumber the chapters"
         ),
         display: bool = typer.Option(
             False,
             "--display",
             "-d",
-            help="Display the chapters in the directory without renumbering",
+            help="Display the existing chapters without renumbering",
         ),
-        trace_enabled: bool = typer.Option(
-            False, "--trace", "-t", help="Enable tracing output"
+        test: bool = typer.Option(
+            False,
+            "--test",
+            "-t",
+            help="Without making changes, show the renumbered chapters",
         ),
 ) -> None:
-    if trace_enabled:
-        trace.enable()
-        display_function_name()
-
     def help_error(msg: str) -> None:
         with typer.Context(typer.main.get_command(app)) as ctx:
             typer.echo(ctx.get_help())
         typer.secho(f"{msg}\n", fg="red")
         raise typer.Exit(code=1)
 
-    if not (renumber or display):
-        help_error("Specify either --renumber or --display")
+    if not (renumber or display or test):
+        help_error("Specify either --renumber, --display, or --test")
 
     dir_path = Path(directory) if directory else Path.cwd()
 
@@ -139,6 +145,8 @@ def main(
         print(book)
     elif display:
         book.display_chapters()
+    elif test:
+        book.show_without_updating()
 
 
 if __name__ == "__main__":

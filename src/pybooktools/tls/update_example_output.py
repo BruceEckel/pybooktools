@@ -40,13 +40,11 @@ class ExampleUpdater:
         self.original_source = ensure_slug_line(
             valid_python(self.example_path), self.example_path
         )
-        old_tls_removed = re.sub(
-            r"^#\s*\|.*(\n|$)", "", self.original_source, flags=re.MULTILINE
-        )
         # Remove comments starting with `## `
         self.cleaned_code = re.sub(
-            r"^\s*## .*(\n|$)", "", old_tls_removed, flags=re.MULTILINE
+            r"^\s*##.*(\n|$)", "", self.original_source, flags=re.MULTILINE
         )
+        self.__write_with_ext(self.cleaned_code, "0_cleaned")
 
     def __write_with_ext(self, text: str, ext: str, ftype="py") -> Path:
         outpath = self.validate_dir / f"{self.example_path.stem}_{ext}.{ftype}"
