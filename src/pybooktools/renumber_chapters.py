@@ -102,6 +102,7 @@ class Book:
 
 @app.command()
 def main(
+        ctx: typer.Context,
         directory: str = typer.Argument(
             None,
             help="Directory containing Markdown chapters (default: current directory)",
@@ -125,8 +126,7 @@ def main(
     """Renumbers Markdown chapters in a directory."""
 
     def help_error(msg: str) -> None:
-        with typer.Context(typer.main.get_command(app)) as ctx:
-            typer.echo(ctx.get_help())
+        typer.echo(ctx.get_help())
         typer.secho(f"{msg}\n", fg="bright_red")
         raise typer.Exit(code=1)
 
