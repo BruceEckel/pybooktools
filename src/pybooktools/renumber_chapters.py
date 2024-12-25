@@ -9,9 +9,9 @@ import typer
 chapter_pattern = r"^(\d+[a-zA-Z]?)\s+(.+)\.md$"
 
 app = typer.Typer(
-    context_settings={"help_option_names": ["-h", "--help"]},
+    context_settings={"help_option_names": ["--help", "-h"]},
     add_completion=False,
-    no_args_is_help=True,
+    rich_markup_mode="rich",
 )
 
 
@@ -122,10 +122,12 @@ def main(
             help="Without making changes, show the renumbered chapters",
         ),
 ) -> None:
+    """Renumbers Markdown chapters in a directory."""
+
     def help_error(msg: str) -> None:
         with typer.Context(typer.main.get_command(app)) as ctx:
             typer.echo(ctx.get_help())
-        typer.secho(f"{msg}\n", fg="red")
+        typer.secho(f"{msg}\n", fg="bright_red")
         raise typer.Exit(code=1)
 
     if not (renumber or display or test):

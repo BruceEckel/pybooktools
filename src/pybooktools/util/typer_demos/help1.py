@@ -9,5 +9,5 @@ def main(ctx: typer.Context) -> None:
     typer.echo(f"{ctx.help_option_names = }")
 
 
-typer.run(main)
+typer.run(main)  # Doesn't work -- have to run app() instead
 ## ctx.help_option_names = ['--help']
