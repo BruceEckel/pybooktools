@@ -2,7 +2,7 @@
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List
+from typing import List, Annotated
 
 import typer
 
@@ -103,25 +103,22 @@ class Book:
 @app.command()
 def main(
         ctx: typer.Context,
-        directory: str = typer.Argument(
-            None,
-            help="Directory containing Markdown chapters (default: current directory)",
-        ),
-        renumber: bool = typer.Option(
-            False, "--renumber", "-r", help="Renumber the chapters"
-        ),
-        display: bool = typer.Option(
-            False,
+        directory: Annotated[str, typer.Argument(
+            help="Directory containing Markdown chapters (default: current directory)"
+        )] = None,
+        renumber: Annotated[bool, typer.Option(
+            "--renumber", "-r", help="Renumber the chapters"
+        )] = False,
+        display: Annotated[bool, typer.Option(
             "--display",
             "-d",
             help="Display the existing chapters without renumbering",
-        ),
-        test: bool = typer.Option(
-            False,
+        )] = False,
+        test: Annotated[bool, typer.Option(
             "--test",
             "-t",
             help="Without making changes, show the renumbered chapters",
-        ),
+        )] = False,
 ) -> None:
     """[deep_sky_blue1]Renumbers Markdown chapters in a directory[/deep_sky_blue1]"""
 

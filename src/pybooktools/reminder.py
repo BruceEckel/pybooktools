@@ -4,23 +4,22 @@ from rich.panel import Panel
 
 console = Console()
 
+cc = "deep_sky_blue1"
+dc = "yellow"
+
+reminders = f"""
+[{cc}]cr        [/{cc}][{dc}]Display these commands[/{dc}]
+[{cc}]px        [/{cc}][{dc}]Add/Update Output Comment Lines in Python examples[/{dc}]
+[{cc}]bookup    [/{cc}][{dc}]Update book examples from source repository[/{dc}]
+[{cc}]slug      [/{cc}][{dc}]Add or update sluglines in Python files[/{dc}]
+[{cc}]chapnum   [/{cc}][{dc}]Renumber Markdown chapters & align chapter names[/{dc}]
+""".strip()
+
 
 def main() -> None:
-    content = (
-        "[deep_sky_blue1]cr      [/deep_sky_blue1]"
-        "    [yellow]Display these commands[/yellow]\n"
-        "[deep_sky_blue1]px    [/deep_sky_blue1]"
-        "      [yellow]Add/Update Output Comment Lines in Python examples[/yellow]\n"
-        "[deep_sky_blue1]bookup[/deep_sky_blue1]"
-        "      [yellow]Update book examples from source repository[/yellow]\n"
-        "[deep_sky_blue1]slug    [/deep_sky_blue1]"
-        "    [yellow]Add or update sluglines in Python files[/yellow]\n"
-        "[deep_sky_blue1]chapnum  [/deep_sky_blue1]"
-        "   [yellow]Renumber Markdown chapters & align chapter names[/yellow]"
-    )
     console.print(
         Panel(
-            content,
+            reminders,
             border_style="green1",
             title="Commands",
             title_align="left",
