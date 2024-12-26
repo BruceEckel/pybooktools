@@ -95,20 +95,12 @@ def find_python_files_and_listings(
     global python_files
     listings: list[MarkdownListing] = []
     code_location_pattern = re.compile(r"#\[code_location]\s*(.*)\s*-->")
-    # console.print(f"{markdown_content =}")
 
     for match in re.finditer(code_location_pattern, markdown_content):
-        # console.print(f"[orange3]{match}, {match.group(1)}[/orange3]")
         code_location = Path(match.group(1).strip())
-        # console.print(
-        #     f"[orange3]{code_location}, {code_location.is_absolute()}[/orange3]"
-        # )
         if code_location.is_absolute():
-            # console.print(f"[blue]{code_location = }[/blue]")
             pyfiles = list(code_location.glob("*.py"))
-            # console.print(f"[blue]{pyfiles = }[/blue]")
             python_files.extend(pyfiles)
-            # console.print(f"[blue]{python_files = }[/blue]")
         else:  # Relative path:
             python_files.extend(
                 list((Path.cwd() / code_location).resolve().glob("**/*.py"))

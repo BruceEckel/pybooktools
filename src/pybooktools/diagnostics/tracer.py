@@ -1,4 +1,7 @@
 # tracer.py
+"""
+Use Icecream instead?
+"""
 import json
 import traceback
 from dataclasses import dataclass
