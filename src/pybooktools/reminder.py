@@ -4,8 +4,8 @@ from rich.panel import Panel
 
 console = Console()
 
-cc = "deep_sky_blue1"
-dc = "yellow"
+cc = "deep_sky_blue1"  # Command Color
+dc = "yellow"  # Description Color
 
 reminders = f"""
 [{cc}]cr        [/{cc}][{dc}]Display these commands[/{dc}]
