@@ -117,7 +117,7 @@ def main(
         test: Annotated[bool, typer.Option(
             "--test",
             "-t",
-            help="Without making changes, show the renumbered chapters",
+            help="Without making differences, show the renumbered chapters",
         )] = False,
 ) -> None:
     """[deep_sky_blue1]Renumbers Markdown chapters in a directory[/deep_sky_blue1]"""

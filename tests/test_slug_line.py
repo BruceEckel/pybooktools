@@ -60,7 +60,7 @@ def test_ensure_slug_line_empty_file():
 #     """Finds the local files in the test directory, which already have sluglines"""
 #     mock_args.return_value = argparse.Namespace(files=None, recursive=False)
 #     main()
-#     mock_console.assert_any_call("[bold blue]Number of changes[/bold blue]: 0")
+#     mock_console.assert_any_call("[bold blue]Number of differences[/bold blue]: 0")
 #
 #
 # @pytest.fixture
@@ -78,7 +78,7 @@ def test_ensure_slug_line_empty_file():
 #         files=[str(temp_file)], recursive=False
 #     )
 #     main()
-#     mock_console.assert_any_call(f"[bold blue]Number of changes[/bold blue]: 1")
+#     mock_console.assert_any_call(f"[bold blue]Number of differences[/bold blue]: 1")
 #
 #
 # @pytest.fixture
@@ -108,6 +108,6 @@ def test_ensure_slug_line_empty_file():
 #         "[bold red]file1.py[/bold red]",
 #         "[bold red]file2.py[/bold red]",
 #         "[bold red]file3.py[/bold red]",
-#         "[bold blue]Number of changes[/bold blue]: 3",
+#         "[bold blue]Number of differences[/bold blue]: 3",
 #     ]:
 #         assert any(result in pf for pf in processed_files)
