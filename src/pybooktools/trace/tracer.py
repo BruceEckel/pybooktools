@@ -64,3 +64,6 @@ class Trace:
     def disable(self) -> None:
         console.print(f"[red]trace disabled[/red]")
         self.__tracing = False
+
+
+trace = Trace()

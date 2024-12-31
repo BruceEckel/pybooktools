@@ -1,11 +1,11 @@
 # display.py
+import sys
 from pathlib import Path
 from typing import Any
 
 from icecream import ic
 from rich.panel import Panel
 
-from pybooktools.diagnostics import trace
 from pybooktools.util.console import console
 
 
@@ -29,15 +29,11 @@ def dbg(msg: str) -> None:
 
 
 def display_function_name(title="", only_while_tracing=False) -> None:
-    dbg(f"In display_function_name, {bool(trace) = } {only_while_tracing = }")
     if only_while_tracing:
-        if not trace:
-            dbg("Early return from display_function_name")
-            return
+        return
 
     import inspect
 
-    dbg("Continuing display_function_name")
     caller_frame = inspect.stack()[1]
     fname = f"{Path(caller_frame.filename).name}"
     panel_title = f"[green]{title}[/green]" if title else None
@@ -51,8 +47,55 @@ def display_function_name(title="", only_while_tracing=False) -> None:
 
 
 def test_display_function_name():
-    print(f"{trace = }")
     display_function_name("Foo")
-    trace.enable()
-    print(f"{trace = }")
     display_function_name("Bar")
+
+
+def report(
+        title: str,
+        msg: str,
+        msg_color: str = "orange3",
+        title_color: str = "bold red",
+        style="bold red",
+) -> None:
+    panel = Panel(
+        f"[{msg_color}]{msg}[/{msg_color}]",
+        title=f"[{title_color}]{title}[/{title_color}]",
+        title_align="left",
+        style=style,
+    )
+    console.print(panel)
+
+
+def display_dict(title: str, data: dict[Any, Any]) -> None:
+    console.rule(f"[red]{title}")
+    for k, v in data.items():
+        console.print(f"\t[red]{k}: {v}[/red]")
+    console.rule("[red]")
+
+
+def display_path_list(title: str, paths: list[Path]) -> None:
+    console.rule(f"[orange3]{title}")
+    for item in [it.name for it in paths]:
+        console.print(f"\t[sea_green2]{item}[/sea_green2]")
+    console.rule("[orange3]")
+
+
+def panic(msg: str) -> None:
+    report("Panic", msg)
+    sys.exit()
+
+
+def error(msg: str) -> None:
+    report("Error", msg)
+    sys.exit()
+
+
+def warn(msg: str) -> None:
+    report(
+        "Warning",
+        msg,
+        msg_color="dark_goldenrod",
+        title_color="cornflower_blue",
+        style="light_slate_blue",
+    )

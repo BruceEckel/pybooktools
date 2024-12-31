@@ -13,8 +13,8 @@ there are no duplicate file names across those directories.
 
 import argparse
 
-from pybooktools.diagnostics import trace
 from pybooktools.python_chapter.python_chapter import PythonChapter
+from pybooktools.trace.tracer import trace
 from pybooktools.util import display_function_name
 
 

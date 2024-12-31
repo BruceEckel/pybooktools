@@ -1,3 +1,4 @@
+# rule.py
 from rich.jupyter import JupyterMixin
 from rich.rule import Rule
 from rich.text import Text

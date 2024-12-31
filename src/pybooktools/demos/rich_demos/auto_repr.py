@@ -1,3 +1,4 @@
+# auto_repr.py
 from dataclasses import dataclass
 
 from pybooktools.util import console

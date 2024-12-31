@@ -1,7 +1,7 @@
 # validate_python_file.py
 from pathlib import Path
 
-from pybooktools.diagnostics import error
+from pybooktools.util.display import error
 
 
 def optional_message(msg: str) -> str:

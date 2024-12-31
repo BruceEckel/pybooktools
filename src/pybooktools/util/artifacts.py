@@ -1,7 +1,7 @@
 # artifacts.py
 from pathlib import Path
 
-from pybooktools.diagnostics import error
+from pybooktools.util.display import error
 
 
 def validation_dir(example_path: Path) -> Path:

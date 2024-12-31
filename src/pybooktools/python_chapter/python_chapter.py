@@ -1,3 +1,4 @@
+# python_chapter.py
 import collections
 import re
 import sys
@@ -6,10 +7,9 @@ from pathlib import Path
 from re import Pattern
 from typing import Final
 
-from pybooktools.diagnostics import panic
-from pybooktools.display import display_path_list, display_dict, display
 from pybooktools.python_chapter import PythonExample
 from pybooktools.util import console
+from pybooktools.util.display import display_dict, display_path_list, panic
 
 
 @dataclass
@@ -92,7 +92,7 @@ class PythonChapter:
     def update_markdown_examples(self) -> None:
         self.updated_markdown = self.markdown_text
         for example in self.python_examples:
-            display(example.status())
+            console.print(example.status())
             if example.differs:
                 self.updated_markdown = self.updated_markdown.replace(example.markdown_example, example.repo_example)
 

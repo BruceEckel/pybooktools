@@ -1,11 +1,12 @@
+# python_example.py
 import difflib
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import LiteralString
 
-from pybooktools.diagnostics import panic
 from pybooktools.python_chapter import PythonChapter
 from pybooktools.util import console
+from pybooktools.util.display import panic
 
 
 @dataclass

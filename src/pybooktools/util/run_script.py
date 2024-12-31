@@ -6,8 +6,8 @@ from pathlib import Path
 
 from rich.syntax import Syntax
 
-from pybooktools.diagnostics import error, warn
 from pybooktools.util import console
+from pybooktools.util.display import error, warn
 
 
 def get_virtual_env_python() -> str:
