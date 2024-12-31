@@ -40,7 +40,7 @@ def main():
 
     if python_chapter.differences:
         python_chapter.update_markdown_listings()
-        python_chapter.write_updated_markdown()
+        python_chapter.write_updated_chapter()
     python_chapter_change_report(python_chapter)
 
 

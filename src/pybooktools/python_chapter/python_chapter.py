@@ -52,7 +52,7 @@ class PythonChapter:
     markdown_text: str = field(init=False)
     repo_paths: list[Path] = field(default_factory=list, init=False)
     python_repo_examples: list[Path] = field(default_factory=list, init=False)
-    markdown_examples: list[PythonExample] = field(default_factory=list, init=False)
+    python_examples: list[PythonExample] = field(default_factory=list, init=False)
     updated_markdown: str = field(init=False)
     differences: int = 0
     code_location_pattern: Final[Pattern[str]] = re.compile(r"#\[code_location]\s*(.*)\s*-->")
@@ -65,7 +65,7 @@ class PythonChapter:
         self.extract_repo_paths()
         self.find_python_examples_in_repo()
         self.find_python_examples_in_markdown()
-        self.differences = len([True for listing in self.markdown_examples if listing.differs])
+        self.differences = len([True for example in self.python_examples if example.differs])
 
     def extract_repo_paths(self) -> None:
         """
@@ -104,16 +104,16 @@ class PythonChapter:
                     (file for file in self.python_repo_examples if file.name == slugname),
                     None,
                 )
-                self.markdown_examples.append(
+                self.python_examples.append(
                     PythonExample(self, markdown_python_example, repo_example_path, slugname)
                 )
 
     def update_markdown_listings(self) -> None:
         self.updated_markdown = self.markdown_text
-        for listing in self.markdown_examples:
+        for listing in self.python_examples:
             display_listing_status(listing)
             if listing.differs:
                 self.updated_markdown = self.updated_markdown.replace(listing.markdown_example, listing.repo_example)
 
-    def write_updated_markdown(self) -> None:
+    def write_updated_chapter(self) -> None:
         self.markdown_path.write_text(self.updated_markdown, encoding="utf-8")

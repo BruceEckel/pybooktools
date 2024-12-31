@@ -5,12 +5,9 @@ from pathlib import Path
 from rich.console import Console
 from rich.panel import Panel
 
-from pybooktools.python_chapter.python_chapter import PythonExample
+from pybooktools.python_chapter.python_chapter import PythonExample, PythonChapter
 
 console = Console(width=65)
-
-
-# centering_width = 65
 
 
 def report(
@@ -66,7 +63,7 @@ def find_duplicate_python_files(python_files: list[Path]) -> None:
         sys.exit(1)
 
 
-def display_listing_status(listing: "PythonExample") -> None:
+def display_listing_status(listing: PythonExample) -> None:
     if listing.differs:
         console.print(f"[bold red]{listing.slugname}[/bold red]")
         console.print(f"[bright_cyan]{listing}[/bright_cyan]")
@@ -74,7 +71,7 @@ def display_listing_status(listing: "PythonExample") -> None:
         console.print(f"[bold green]{listing.slugname}[/bold green]")
 
 
-def display_python_example(pyexample: "PythonExample") -> None:
+def display_python_example(pyexample: PythonExample) -> None:
     console.print(f"Filename from slugline: {pyexample.slugname}")
     console.print(f"Source File: {pyexample.repo_example_path.absolute() if pyexample.repo_example_path else ""}")
     console.print(f"{pyexample.differs = }")
@@ -87,7 +84,7 @@ def display_python_example(pyexample: "PythonExample") -> None:
     console.rule("[cyan]")
 
 
-def python_chapter_change_report(pychapter: "PythonChapter") -> None:
-    console.rule(f"[orange3]{pychapter.changes} Python Chapter Changes")
-    for python_example in [python_example for python_example in pychapter.markdown_examples if python_example.differs]:
+def python_chapter_change_report(pychapter: PythonChapter) -> None:
+    console.rule(f"[orange3]{pychapter.differences} Python Chapter Differences")
+    for python_example in [python_example for python_example in pychapter.python_examples if python_example.differs]:
         console.print(f"[bright_cyan]{python_example.slugname}[/bright_cyan]")
