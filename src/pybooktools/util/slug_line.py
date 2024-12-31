@@ -3,12 +3,9 @@ import argparse
 import re
 from pathlib import Path
 
-from rich.console import Console
-
 from pybooktools.diagnostics import trace
+from pybooktools.util import console
 from pybooktools.util import display_function_name
-
-console = Console()
 
 
 def ensure_slug_line(pycode: str, file_path: Path) -> str:

@@ -2,6 +2,7 @@
 
 from pybooktools.validate.validate_python_file import valid_python
 from .artifacts import artifact_path, get_artifact
+from .console import console
 from .display import display_function_name, icc
 from .file_changed import FileChanged
 from .path_utils import cleaned_dir
@@ -9,6 +10,7 @@ from .run_script import get_virtual_env_python, run_script
 from .slug_line import ensure_slug_line
 
 __all__ = [
+    "console",
     "artifact_path",
     "get_artifact",
     "valid_python",

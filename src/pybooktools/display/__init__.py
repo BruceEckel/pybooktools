@@ -7,6 +7,11 @@ Use:
 - Possibly tables: https://rich.readthedocs.io/en/stable/tables.html
 """
 
-from .report import report
+from .report import report, display_dict, display_path_list, display
 
-__all__ = ["report"]
+__all__ = [
+    "report",
+    "display_path_list",
+    "display_dict",
+    "display",
+]

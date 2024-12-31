@@ -14,7 +14,6 @@ there are no duplicate file names across those directories.
 import argparse
 
 from pybooktools.diagnostics import trace
-from pybooktools.display.report import python_chapter_change_report
 from pybooktools.python_chapter.python_chapter import PythonChapter
 from pybooktools.util import display_function_name
 
@@ -39,9 +38,10 @@ def main():
     python_chapter = PythonChapter(args.python_markdown_chapter)
 
     if python_chapter.differences:
-        python_chapter.update_markdown_listings()
+        python_chapter.update_markdown_examples()
         python_chapter.write_updated_chapter()
-    python_chapter_change_report(python_chapter)
+
+    python_chapter.change_report()
 
 
 if __name__ == "__main__":

@@ -3,12 +3,10 @@ from pathlib import Path
 from typing import Any
 
 from icecream import ic
-from rich.console import Console
 from rich.panel import Panel
 
 from pybooktools.diagnostics import trace
-
-console = Console()
+from pybooktools.util.console import console
 
 
 def icc(*_: Any) -> None:

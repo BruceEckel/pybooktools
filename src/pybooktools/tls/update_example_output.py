@@ -6,14 +6,12 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from icecream import ic
-from rich.console import Console
 from rich.text import Text
 
 from pybooktools.tls import insert_top_level_separators, tls_tags_to_dict
 from pybooktools.util import cleaned_dir, ensure_slug_line, run_script
+from pybooktools.util import console
 from pybooktools.validate.validate_python_file import valid_python
-
-console = Console()
 
 
 class RichHelpFormatter(RawDescriptionHelpFormatter):

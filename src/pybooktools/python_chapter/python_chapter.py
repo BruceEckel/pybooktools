@@ -1,49 +1,15 @@
-import difflib
+import collections
 import re
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from re import Pattern
-from typing import LiteralString, Final
+from typing import Final
 
 from pybooktools.diagnostics import panic
-from pybooktools.display.report import display_available_python_files, find_duplicate_python_files, \
-    display_listing_status
-
-
-@dataclass
-class PythonExample:
-    from_python_chapter: "PythonChapter"
-    markdown_example: str
-    repo_example_path: Path | None
-    slugname: LiteralString | None
-    # Exclude field from constructor arguments:
-    repo_example: str = field(init=False)
-    differs: bool = field(init=False)
-    diffs: str = field(init=False)
-
-    def __post_init__(self):
-        if self.repo_example_path is None:
-            panic(f"repo_example_path cannot be None: {self.from_python_chapter}, {self.slugname}")
-        if not self.repo_example_path.is_file():
-            panic(f"repo_example_path is not a file: {self.repo_example_path}")
-        if not self.repo_example_path.suffix == ".py":
-            panic(f"repo_example_path is not a Python file: {self.repo_example_path}")
-        self.repo_example = (
-                "```python\n"
-                + self.repo_example_path.read_text(encoding="utf-8")
-                + "```"
-        )
-        self.differs = self.markdown_example != self.repo_example
-        if self.differs:
-            differ = difflib.Differ()
-            diff_lines = list(
-                differ.compare(
-                    self.markdown_example.splitlines(keepends=True),
-                    self.repo_example.splitlines(keepends=True),
-                )
-            )
-            # Format the differences for display
-            self.diffs = "".join(diff_lines)
+from pybooktools.display import display_path_list, display_dict, display
+from pybooktools.python_chapter import PythonExample
+from pybooktools.util import console
 
 
 @dataclass
@@ -89,8 +55,23 @@ class PythonChapter:
 
         for code_location in self.repo_paths:
             self.python_repo_examples.extend(list(code_location.glob("*.py")))
-        display_available_python_files(self.python_repo_examples)
-        find_duplicate_python_files(self.python_repo_examples)
+        display_path_list("Available Repo Examples", self.python_repo_examples)
+        self.find_duplicate_python_repo_examples()
+
+    def find_duplicate_python_repo_examples(self) -> None:
+        # Check for duplicate file names in `paths`.
+        # Map file names to their full paths:
+        file_paths = collections.defaultdict(list)  # Values are lists
+        for fpath in self.python_repo_examples:
+            file_paths[fpath.name].append(fpath)
+        duplicates = {
+            file_name: paths
+            for file_name, paths in file_paths.items()
+            if len(paths) > 1
+        }
+        if duplicates:
+            display_dict("Duplicate Python File Names", duplicates)
+            sys.exit(1)
 
     def find_python_examples_in_markdown(self):
         # Find python examples in Markdown chapter:
@@ -108,12 +89,19 @@ class PythonChapter:
                     PythonExample(self, markdown_python_example, repo_example_path, slugname)
                 )
 
-    def update_markdown_listings(self) -> None:
+    def update_markdown_examples(self) -> None:
         self.updated_markdown = self.markdown_text
-        for listing in self.python_examples:
-            display_listing_status(listing)
-            if listing.differs:
-                self.updated_markdown = self.updated_markdown.replace(listing.markdown_example, listing.repo_example)
+        for example in self.python_examples:
+            display(example.status())
+            if example.differs:
+                self.updated_markdown = self.updated_markdown.replace(example.markdown_example, example.repo_example)
 
     def write_updated_chapter(self) -> None:
         self.markdown_path.write_text(self.updated_markdown, encoding="utf-8")
+
+    def change_report(self) -> None:
+        console.rule(f"[orange3]{self.markdown_path.name} differences: {self.differences}")
+        for python_example in [python_example for python_example in self.python_examples if
+                               python_example.differs]:
+            console.print(f"[bright_cyan]{python_example.slugname}[/bright_cyan]")
+        console.rule()

@@ -7,10 +7,9 @@ import traceback
 from dataclasses import dataclass
 from typing import Any
 
-from rich.console import Console
 from rich.pretty import Pretty
 
-console = Console()
+from pybooktools.util import console
 
 
 @dataclass

@@ -4,12 +4,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-from rich.console import Console
 from rich.syntax import Syntax
 
 from pybooktools.diagnostics import error, warn
-
-console = Console()
+from pybooktools.util import console
 
 
 def get_virtual_env_python() -> str:
