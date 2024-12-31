@@ -10,32 +10,33 @@ The path can be relative or absolute.
 If you provide more than one source code repository, the program ensures
 there are no duplicate file names across those directories.
 """
+from pathlib import Path
+from typing import Annotated
 
-import argparse
+import typer
 
 from pybooktools.python_chapter.python_chapter import PythonChapter
-from pybooktools.trace.tracer import trace
-from pybooktools.util import display_function_name
+
+app = typer.Typer(
+    context_settings={"help_option_names": ["--help", "-h"]},
+    add_completion=False,
+    rich_markup_mode="rich",
+)
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Update Python slugline-marked source-code listings within a Python chapter."
-    )
-    parser.add_argument(
-        "python_markdown_chapter",
-        help="Path to the Python chapter to be updated.",
-    )
-    parser.add_argument(
-        "-t", "--trace", action="store_true", help="Enable tracing output"
-    )
-    args = parser.parse_args()
-
-    if args.trace:
-        trace.enable()
-        display_function_name()
-
-    python_chapter = PythonChapter(args.python_markdown_chapter)
+@app.command(no_args_is_help=True)
+def main(
+        ctx: typer.Context,
+        python_markdown_chapter: Annotated[str, typer.Argument(
+            ..., help="Path to the Python chapter to be updated."
+        )]
+):
+    """Update Python slugline-marked source-code listings within a Python chapter."""
+    if not python_markdown_chapter:
+        typer.echo(ctx.get_help())
+        typer.echo(f"Missing argument: python_markdown_chapter")
+        raise typer.Exit(code=1)
+    python_chapter = PythonChapter(Path(python_markdown_chapter))
 
     if python_chapter.differences:
         python_chapter.update_markdown_examples()
@@ -45,4 +46,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    app()

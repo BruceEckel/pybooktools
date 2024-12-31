@@ -4,13 +4,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import LiteralString
 
-from pybooktools.python_chapter import PythonChapter
 from pybooktools.util import console
-from pybooktools.util.display import panic
+from pybooktools.util import panic
 
 
 @dataclass
 class PythonExample:
+    # noinspection PyUnresolvedReferences
     in_python_chapter: "PythonChapter"
     markdown_example: str
     repo_example_path: Path | None
@@ -51,6 +51,8 @@ class PythonExample:
             return f"[bold green]{self.slugname}[/bold green]\n"
 
     def display(self) -> None:
+        # The built-in formatting for console.print might be enough;
+        # i.e., this may be unneccessary
         console.print(f"Filename from slugline: {self.slugname}")
         console.print(f"Source File: {self.repo_example_path.absolute() if self.repo_example_path else ""}")
         console.print(f"{self.differs = }")

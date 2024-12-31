@@ -169,4 +169,4 @@ cython_debug/
 *.lock
 /src/pybooktools/output_validator/testing/_validation
 .validate_*
-/src/pybooktools/demos/.check_simple
+/src/pybooktools/xperiments/.check_simple

@@ -7,9 +7,8 @@ from pathlib import Path
 from re import Pattern
 from typing import Final
 
-from pybooktools.python_chapter import PythonExample
-from pybooktools.util import console
-from pybooktools.util.display import display_dict, display_path_list, panic
+from pybooktools.util import display_dict, display_path_list, console, error
+from .python_example import PythonExample
 
 
 @dataclass
@@ -26,7 +25,7 @@ class PythonChapter:
 
     def __post_init__(self) -> None:
         if not (self.markdown_path.is_file() and self.markdown_path.suffix == ".md"):
-            panic(f"{self.markdown_path} is not a Markdown file")
+            error(f"{self.markdown_path} is not a Markdown file")
         self.markdown_text = self.markdown_path.read_text(encoding="utf-8")
         self.extract_repo_paths()
         self.find_python_examples_in_repo()

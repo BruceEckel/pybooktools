@@ -15,7 +15,7 @@ dependencies = [
 [project.scripts]
 px = "pybooktools.tls.update_example_output:main"
 cr = "pybooktools.reminder:main"
-bookup = "pybooktools.update_markdown_code_listings:main"
+bookup = "pybooktools.update_markdown_python_examples:app"
 slug = "pybooktools.slug_line:app"
 chapnum = "pybooktools.renumber_chapters:app"
 
