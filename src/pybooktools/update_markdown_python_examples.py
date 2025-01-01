@@ -16,6 +16,7 @@ from typing import Annotated
 import typer
 
 from pybooktools.python_chapter.python_chapter import PythonChapter
+from pybooktools.util.typer_help_error import HelpError
 
 app = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]},
@@ -32,17 +33,19 @@ def main(
         )]
 ):
     """Update Python slugline-marked source-code listings within a Python chapter."""
-    if not python_markdown_chapter:
-        typer.echo(ctx.get_help())
-        typer.echo(f"Missing argument: python_markdown_chapter")
-        raise typer.Exit(code=1)
-    python_chapter = PythonChapter(Path(python_markdown_chapter))
 
-    if python_chapter.differences:
-        python_chapter.update_markdown_examples()
-        python_chapter.write_updated_chapter()
+    help_error = HelpError(ctx)
 
-    python_chapter.change_report()
+    try:
+        python_chapter = PythonChapter(Path(python_markdown_chapter))
+
+        if python_chapter.differences:
+            python_chapter.update_markdown_examples()
+            python_chapter.write_updated_chapter()
+
+        python_chapter.change_report()
+    except ValueError as e:
+        help_error(e.args[0])
 
 
 if __name__ == "__main__":

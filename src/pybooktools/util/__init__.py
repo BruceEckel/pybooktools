@@ -7,6 +7,7 @@ from .display import display_function_name, icc, display_dict, display_path_list
 from .ensure_slug_line import ensure_slug_line
 from .path_utils import cleaned_dir
 from .run_script import get_virtual_env_python, run_script
+from .typer_help_error import HelpError
 
 __all__ = [
     "console",
@@ -25,4 +26,5 @@ __all__ = [
     "panic",
     "error",
     "warn",
+    "HelpError",
 ]

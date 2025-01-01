@@ -5,7 +5,7 @@ from typing import Annotated
 import typer
 
 from pybooktools.trace import trace
-from pybooktools.util import display_function_name, console, ensure_slug_line
+from pybooktools.util import display_function_name, console, ensure_slug_line, HelpError
 
 app = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]},
@@ -29,11 +29,7 @@ def main(
         )] = False,
 ) -> None:
     """Create or update slug lines (commented file name at top) in Python files"""
-
-    def help_error(msg: str) -> None:
-        typer.echo(ctx.get_help())
-        typer.secho(f"{msg}\n", fg="bright_red")
-        raise typer.Exit(code=1)
+    help_error = HelpError(ctx)
 
     if trace_flag:
         trace.enable()

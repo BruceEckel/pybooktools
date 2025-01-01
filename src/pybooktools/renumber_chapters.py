@@ -6,6 +6,8 @@ from typing import List, Annotated
 
 import typer
 
+from pybooktools.util import HelpError
+
 chapter_pattern = r"^(\d+[a-zA-Z]?)\s+(.+)\.md$"
 
 app = typer.Typer(
@@ -122,10 +124,7 @@ def main(
 ) -> None:
     """[deep_sky_blue1]Renumbers Markdown chapters in a directory[/deep_sky_blue1]"""
 
-    def help_error(msg: str) -> None:
-        typer.echo(ctx.get_help())
-        typer.secho(f"{msg}\n", fg="bright_red")
-        raise typer.Exit(code=1)
+    help_error = HelpError(ctx)
 
     if not (renumber or display or test):
         help_error("Specify either --renumber, --display, or --test")
