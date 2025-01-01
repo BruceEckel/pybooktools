@@ -6,7 +6,7 @@ from typing import Any
 from icecream import ic
 from rich.panel import Panel
 
-from pybooktools.util.console import console
+from .console import console
 
 
 def icc(*_: Any) -> None:

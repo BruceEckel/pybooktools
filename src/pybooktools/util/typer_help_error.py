@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import typer
 from rich.panel import Panel
 
-from pybooktools.util import console
+from .console import console
 
 
 @dataclass
