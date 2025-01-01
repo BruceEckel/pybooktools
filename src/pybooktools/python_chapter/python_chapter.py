@@ -4,11 +4,10 @@ import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from re import Pattern
-from typing import Final
 
 from pybooktools.util import display_dict, display_path_list, console
 from .python_example import PythonExample
+from ..util.config import code_location_pattern, listing_pattern
 
 
 @dataclass
@@ -20,8 +19,6 @@ class PythonChapter:
     python_examples: list[PythonExample] = field(default_factory=list, init=False)
     updated_markdown: str = field(init=False)
     differences: int = 0
-    code_location_pattern: Final[Pattern[str]] = re.compile(r"#\[code_location]\s*(.*)\s*-->")
-    listing_pattern: Final[Pattern[str]] = re.compile(r"```python\n(# (.*?)\n)?(.*?)```", re.DOTALL)
 
     def __post_init__(self) -> None:
         if not (self.markdown_path.is_file() and self.markdown_path.suffix == ".md"):
@@ -38,7 +35,7 @@ class PythonChapter:
         """
         location_list = [
             Path(match.group(1).strip())
-            for match in re.finditer(self.code_location_pattern, self.markdown_text)
+            for match in re.finditer(code_location_pattern, self.markdown_text)
         ]
         for location in location_list:
             if location.is_absolute():
@@ -74,7 +71,7 @@ class PythonChapter:
 
     def find_python_examples_in_markdown(self):
         # Find python examples in Markdown chapter:
-        for match in re.finditer(self.listing_pattern, self.markdown_text):
+        for match in re.finditer(listing_pattern, self.markdown_text):
             # If slug line doesn't exist group(1) returns None:
             if match.group(1) is not None:
                 markdown_python_example = match.group(0)  # Include Markdown tags

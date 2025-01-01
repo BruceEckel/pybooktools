@@ -7,8 +7,7 @@ from typing import List, Annotated
 import typer
 
 from pybooktools.util import HelpError
-
-chapter_pattern = r"^(\d+[a-zA-Z]?)\s+(.+)\.md$"
+from pybooktools.util.config import chapter_pattern
 
 app = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]},

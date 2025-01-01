@@ -2,6 +2,12 @@
 import re
 from pathlib import Path
 
+from .config import slug_pattern
+
+
+def is_slug(line: str) -> bool:
+    return re.match(slug_pattern, line) is not None
+
 
 def ensure_slug_line(pycode: str, file_path: Path) -> str:
     """
@@ -11,7 +17,7 @@ def ensure_slug_line(pycode: str, file_path: Path) -> str:
     slug_line = f"# {file_path.name}\n"
 
     # Check if the first line is a slug line
-    if lines and re.match(r"^#\s*(?::\s+)?\w+\.py$", lines[0]):
+    if lines and is_slug(lines[0]):
         # Slug line exists, replace it:
         lines[0] = slug_line
     else:
