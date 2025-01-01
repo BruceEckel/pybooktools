@@ -22,15 +22,15 @@ chapnum = "pybooktools.renumber_chapters:app"
 [tool.uv]
 package = true
 
+[tool.uv.pip]
+generate-hashes = true
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-#[tool.black]
-#line-length = 80
+[tool.hatch.build.targets.wheel]
+packages = ["src/pybooktools"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src/pybooktools"]
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/pybooktools"]
