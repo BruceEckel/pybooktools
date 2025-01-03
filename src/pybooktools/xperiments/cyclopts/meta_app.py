@@ -1,26 +1,30 @@
 # meta_app.py
+"""
+Create or Update the embedded output in Python examples. The embedded output is
+everything output to the console after each Top-Level Statement (TLS). For example:
+```python
+print("foo")
+## foo
+for i in range(3):  # Entire `for` is a TLS
+    print(i)
+## 0
+## 1
+## 2
+```
+"""
 from typing import Annotated
 
 from cyclopts import App, Parameter
-from rich.syntax import Syntax
 
 from pybooktools.util import error
 
-doc = f"""[cyan1]\
-Create or Update the embedded output in Python examples. The embedded output is 
-everything output to the console after each Top-Level Statement. For example:
-
-{Syntax(
-    '''print("foo")
-    ## foo
-    for i in range(3):
-        print(i)
-    ## 0
-    ## 1
-    ## 2''', "python", theme="monokai", line_numbers=True)}
-[/cyan1]"""
-
-app = App(name="px", help_format="rich", version_flags=[], help=doc)
+app = App(
+    name="px",
+    help_format="markdown",
+    version_flags=[],
+    help=__doc__,
+    usage="\nUsage: [green]px [-f FILES] [-a] [-r][/green]"
+)
 
 
 @app.command(name=("-f", "--files"), sort_key=1)
@@ -32,10 +36,7 @@ def foo(pyfiles: tuple[str, ...]):
 
 @app.command(name=("-a", "--all"), sort_key=2)
 def current_dir():
-    """
-from rich.syntax import Syntax
-
-Find and process each file in the current directory"""
+    """Find and process each file in the current directory"""
     for f in ["a.py", "b.py", "c.py"]:
         print(f"Processing {f}")
 
@@ -49,14 +50,15 @@ def recurse_dirs():
 
 @app.meta.default
 def launcher(
-    *pyfiles: Annotated[
+    *args: Annotated[
         str, Parameter(show=True, allow_leading_hyphen=True, help="After -f, Python file(s) to process")]
 ):
-    if pyfiles[0] not in ("-f", "-a", "-r"):
+    print(f"{args!r}\n{type(args)=}")
+    if not args or args[0] not in ("-f", "--files", "-a", "--all", "-r", "--recurse"):
         app.help_print()
         h = "green"
         error(f"First element on command line must be [{h}]-f[/{h}], [{h}]-a[/{h}], or [{h}]-r[/{h}]")
-    app(pyfiles)
+    app(args)
 
 
 def main():
