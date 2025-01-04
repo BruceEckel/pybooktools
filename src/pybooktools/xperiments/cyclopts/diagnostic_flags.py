@@ -8,9 +8,9 @@ app = App(version_flags=[])
 
 @dataclass(frozen=True)
 class Diagnostics:
-    verbose: Annotated[bool, Parameter(name="-v", help="Verbose mode")] = False
-    trace: Annotated[bool, Parameter(name="-t", help="Trace mode")] = False
-    debug: Annotated[bool, Parameter(name="-d", help="Debug mode")] = False
+    verbose: Annotated[bool, Parameter(name="-v", help="Verbose mode", group="diagnostic flags")] = False
+    trace: Annotated[bool, Parameter(name="-t", help="Trace mode", group="diagnostic flags")] = False
+    debug: Annotated[bool, Parameter(name="-d", help="Debug mode", group="diagnostic flags")] = False
 
     # Default instance
     DEFAULT = None
@@ -21,21 +21,21 @@ Diagnostics.DEFAULT = Diagnostics()
 
 
 @app.command(name="-f", help="It's foo")
-def foo(val: int, diagnostics: Diagnostics = Diagnostics.DEFAULT):
+def foo(val: int, diagnostics=Diagnostics.DEFAULT):
     print(f"FOO {val=}")
     print(f"{diagnostics=}")
     print()
 
 
 @app.command(name="-b", help="It's bar")
-def bar(flag: bool = False, diagnostics: Diagnostics = Diagnostics.DEFAULT):
+def bar(flag: bool = False, diagnostics=Diagnostics.DEFAULT):
     print(f"BAR {flag=}")
     print(f"{diagnostics=}")
     print()
 
 
 @app.command(name="-z", help="It's baz")
-def baz(files: list[str], diagnostics: Diagnostics = Diagnostics.DEFAULT):
+def baz(files: list[str], diagnostics=Diagnostics.DEFAULT):
     print(f"BAZ {files=}")
     print(f"{diagnostics=}")
     print()
