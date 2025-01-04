@@ -3,7 +3,7 @@ from typing import Annotated
 
 from cyclopts import App, Parameter
 
-app = App(version_flags=[])
+app = App(version_flags=[], help="Usage: diagnostic_flags.py [CMD] [ARGS] [DIAGNOSTIC FLAGS]", help_flags=["-h"])
 
 
 @dataclass(frozen=True)
@@ -12,12 +12,17 @@ class Diagnostics:
     trace: Annotated[bool, Parameter(name="-t", help="Trace mode", group="diagnostic flags")] = False
     debug: Annotated[bool, Parameter(name="-d", help="Debug mode", group="diagnostic flags")] = False
 
-    # Default instance
     DEFAULT = None
 
 
-# Define DEFAULT after the class is fully initialized
 Diagnostics.DEFAULT = Diagnostics()
+
+
+@app.command(name="--help", help="Show this help message")
+def helper(diagnostics=Diagnostics.DEFAULT):
+    """helper doc string"""
+    print(diagnostics)
+    app.help_print()
 
 
 @app.command(name="-f", help="It's foo")
@@ -42,20 +47,22 @@ def baz(files: list[str], diagnostics=Diagnostics.DEFAULT):
 
 
 if __name__ == "__main__":
-    app(["-f", "42", "-v", "-t"])
-    app(["-b", "0", "-v", "-d"])
-    app(["-z", "one", "two", "three", "-v", "-d"])
-    app(["-f", "42", "-d", "-v"])
-    app(["-b", "0", "-v", "-t"])
-    app(["-z", "one", "two", "three", "-t", "-d"])
-    app(["-f", "42"])
-    app(["-b", "0"])
-    app(["-z", "one", "two", "three"])
-    # Flag order doesn't matter(!):
-    app(["-b", "0", "-v", "-d", "-t"])
-    app(["-b", "0", "-d", "-v", "-t"])
-    app(["-b", "0", "-d", "-t", "-v"])
-    app(["-b", "0", "-t", "-v", "-d"])
-
-    app(["-h"])
-    app(["-f", "-h"])
+    app.help_print("--help")
+    # app(["-f", "42", "-v", "-t"])
+    # app(["-b", "0", "-v", "-d"])
+    # app(["-z", "one", "two", "three", "-v", "-d"])
+    # app(["-f", "42", "-d", "-v"])
+    # app(["-b", "0", "-v", "-t"])
+    # app(["-z", "one", "two", "three", "-t", "-d"])
+    # app(["-f", "42"])
+    # app(["-b", "0"])
+    # app(["-z", "one", "two", "three"])
+    # # Flag order doesn't matter(!):
+    # app(["-b", "0", "-v", "-d", "-t"])
+    # app(["-b", "0", "-d", "-v", "-t"])
+    # app(["-b", "0", "-d", "-t", "-v"])
+    # app(["-b", "0", "-t", "-v", "-d"])
+    # 
+    # app(["-h"])
+    # app(["-f", "-h"])
+    # app.help_print("--help")
