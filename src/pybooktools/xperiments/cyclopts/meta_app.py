@@ -27,21 +27,21 @@ app = App(
 )
 
 
-@app.command(name=("-f", "--files"), sort_key=1)
+@app.command(name="-f", sort_key=1)
 def foo(pyfiles: tuple[str, ...]):
     """Process each file provided after -f"""
     for f in pyfiles:
         print(f"Processing {f}")
 
 
-@app.command(name=("-a", "--all"), sort_key=2)
+@app.command(name="-a", sort_key=2)
 def current_dir():
     """Find and process each file in the current directory"""
     for f in ["a.py", "b.py", "c.py"]:
         print(f"Processing {f}")
 
 
-@app.command(name=("-r", "--recurse"), sort_key=3)
+@app.command(name="-r", sort_key=3)
 def recurse_dirs():
     """Recursively find and process all files in the current directory and subdirectories"""
     for f in ["foo/a.py", "bar/b.py", "baz/c.py"]:
@@ -54,7 +54,7 @@ def launcher(
         str, Parameter(show=True, allow_leading_hyphen=True, help="After -f, Python file(s) to process")]
 ):
     print(f"{args!r}\n{type(args)=}")
-    if not args or args[0] not in ("-f", "--files", "-a", "--all", "-r", "--recurse"):
+    if not args or args[0] not in ("-f", "-a", "-r"):
         app.help_print()
         h = "green"
         error(f"First element on command line must be [{h}]-f[/{h}], [{h}]-a[/{h}], or [{h}]-r[/{h}]")
