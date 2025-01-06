@@ -1,4 +1,4 @@
-# update_example_output.py
+# update_example_output_cyclops.py
 """
     pyfiles: The Python example file(s) (optional)
 

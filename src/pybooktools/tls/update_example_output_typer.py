@@ -1,4 +1,4 @@
-# update_example_output.py
+# update_example_output_typer.py
 from pathlib import Path
 
 import typer

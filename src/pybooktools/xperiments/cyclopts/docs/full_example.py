@@ -1,3 +1,4 @@
+# full_example.py
 from dataclasses import dataclass
 from typing import Annotated
 

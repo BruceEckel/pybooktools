@@ -1,3 +1,4 @@
+# config.py
 import re
 from re import Pattern
 from typing import Final

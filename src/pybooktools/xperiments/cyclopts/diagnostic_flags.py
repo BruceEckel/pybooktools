@@ -1,3 +1,4 @@
+# diagnostic_flags.py
 import sys
 from dataclasses import dataclass
 from typing import Annotated
