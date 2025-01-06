@@ -1,10 +1,8 @@
 # paths.py
-from itertools import product
 
 from cyclopts import App
 from cyclopts.types import File, ExistingFile, ResolvedFile, ResolvedExistingFile
 from rich.console import Console
-from rich.panel import Panel
 
 console = Console()
 app = App(
@@ -19,25 +17,29 @@ result = ""
 @app.command(name="-f1")
 def process_files(files: list[File]):
     global result
-    result += f"-f1: process_files\n{files}"
+    result += f"process_files: {files}"
+    print(result)
 
 
 @app.command(name="-f2")
 def process_existing_files(files: list[ExistingFile]):
     global result
-    result += f"-f2: process_existing_files\n{files}"
+    result += f"process_existing_files: {files}"
+    print(result)
 
 
 @app.command(name="-f3")
 def process_resolved_files(files: list[ResolvedFile]):
     global result
-    result += f"-f3: process_resolved_files\n{files}"
+    result += f"process_resolved_files: {files}"
+    print(result)
 
 
 @app.command(name="-f4")
 def process_resolved_existing_files(files: list[ResolvedExistingFile]):
     global result
-    result += f"-f4: process_resolved_existing_files\n{files}"
+    result += f"process_resolved_existing_files: {files}"
+    print(result)
 
 
 @app.command(name="-x")
