@@ -38,6 +38,8 @@ def python_example_validator(type_, pyfile: Path, main_allowed=False) -> None:
     def fail(err_msg: str) -> str:
         raise ValueError(f"{pyfile} {err_msg}")
 
+    print(f"python_example_validator: {pyfile=}")
+
     if not pyfile.exists():
         fail("doesn't exist")
     if not pyfile.is_file():
