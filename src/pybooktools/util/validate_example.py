@@ -35,17 +35,15 @@ def invalid_example(pyfile: Path, msg: str = "", main_allowed=False) -> str | No
 
 
 def python_example_validator(type_, pyfile: Path, main_allowed=False) -> None:
-    def fail(err_msg: str) -> str:
-        raise ValueError(f"{pyfile} {err_msg}")
+    def fail(assertion: bool, err_msg: str) -> None:
+        if not assertion:
+            raise ValueError(f"{pyfile} {err_msg}")
 
     print(f"python_example_validator: {pyfile=}")
 
-    if not pyfile.exists():
-        fail("doesn't exist")
-    if not pyfile.is_file():
-        fail("is not a file")
-    if pyfile.suffix != ".py":
-        fail("is not a Python file")
+    fail(pyfile.exists(), "doesn't exist")
+    fail(pyfile.is_file(), "is not a file")
+    fail(pyfile.suffix == ".py", "is not a Python file")
     example = pyfile.read_text(encoding="utf-8")
     example_lines = example.splitlines()
     if not example:
