@@ -3,9 +3,6 @@
 Contains everything that determines a valid book example
 """
 from pathlib import Path
-from typing import Annotated
-
-from cyclopts import Parameter
 
 from pybooktools.util import is_slug
 
@@ -32,28 +29,3 @@ def invalid_example(pyfile: Path, msg: str = "", main_allowed=False) -> str | No
     if "__main__" in example and not main_allowed:
         return descr("contains __main__")
     return None
-
-
-def python_example_validator(type_, pyfile: Path, main_allowed=False) -> None:
-    def fail(assertion: bool, err_msg: str) -> None:
-        if not assertion:
-            raise ValueError(f"{pyfile} {err_msg}")
-
-    print(f"python_example_validator: {pyfile=}")
-
-    fail(pyfile.exists(), "doesn't exist")
-    fail(pyfile.is_file(), "is not a file")
-    fail(pyfile.suffix == ".py", "is not a Python file")
-    example = pyfile.read_text(encoding="utf-8")
-    example_lines = example.splitlines()
-    if not example:
-        fail("is empty")
-    if not is_slug(example_lines[0]):
-        fail("has no slug line")
-    if len(example_lines) < 3:
-        fail("is too short")
-    if "__main__" in example and not main_allowed:
-        fail("contains __main__")
-
-
-PyExample = Annotated[Path, Parameter(validator=python_example_validator)]

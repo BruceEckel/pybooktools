@@ -67,9 +67,13 @@ def examples():
     global display
     display = False
     for cmdlist in [[command] + args for command, args in all_combinations]:
+        try:
+            app_result = app(cmdlist, exit_on_error=False)
+        except Exception as e:
+            app_result = f"{e.__class__.__name__}: {e}"
         console.print(
             Panel(
-                f"[dark_goldenrod]{app(cmdlist)}",
+                f"[dark_goldenrod]{app_result}",
                 title=f"[sea_green1]{str(cmdlist)}",
                 style="blue",
                 title_align="left"
