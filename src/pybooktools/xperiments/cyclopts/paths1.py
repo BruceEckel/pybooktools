@@ -13,43 +13,36 @@ app = App(
     help_flags="-h",
 )
 
-result = ""
+
+@app.command
+def f1(files: list[File]):
+    print(f"f1: {files}")
+    return f"f1: {files}"
 
 
-@app.command(name="-f1")
-def process_files(files: list[File]):
-    global result
-    result += f"process_files: {files}"
-    print(result)
+@app.command
+def f2(files: list[ExistingFile]):
+    print(f"f2: {files}")
+    return f"f2: {files}"
 
 
-@app.command(name="-f2")
-def process_existing_files(files: list[ExistingFile]):
-    global result
-    result += f"process_existing_files: {files}"
-    print(result)
+@app.command
+def f3(files: list[ResolvedFile]):
+    print(f"f3: {files}")
+    return f"f3: {files}"
 
 
-@app.command(name="-f3")
-def process_resolved_files(files: list[ResolvedFile]):
-    global result
-    result += f"process_resolved_files: {files}"
-    print(result)
-
-
-@app.command(name="-f4")
-def process_resolved_existing_files(files: list[ResolvedExistingFile]):
-    global result
-    result += f"process_resolved_existing_files: {files}"
-    print(result)
+@app.command
+def f4(files: ResolvedExistingFile):
+    print(f"f4: {files}")
+    return f"f4: {files}"
 
 
 @app.command(name="-x")
 def examples():
     """Run examples"""
-    global result
     all_combinations = product(
-        ["-f1", "-f2", "-f3", "-f4"],
+        ["f1", "f2", "f3", "f4"],
         [
             ["paths.py"],
             ["paths.py", "paths.py"],
@@ -62,9 +55,7 @@ def examples():
     )
 
     for cmdlist in [[command] + args for command, args in all_combinations]:
-        result = ""
-        app(cmdlist)
-        console.print(Panel(result, title=str(cmdlist), style="bold"))
+        console.print(Panel(app(cmdlist), title=str(cmdlist), style="bold"))
 
 
 if __name__ == "__main__":
