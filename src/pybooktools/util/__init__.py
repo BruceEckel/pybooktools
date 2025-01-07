@@ -5,6 +5,7 @@ from .path_utils import cleaned_dir
 from .run_script import run_script
 from .typer_help_error import HelpError
 from .valid_python_file import valid_python
+from .validate_example import PyExample
 
 __all__ = [
     "console",
@@ -22,4 +23,5 @@ __all__ = [
     "run_script",
     "HelpError",
     "valid_python",
+    'PyExample',
 ]
