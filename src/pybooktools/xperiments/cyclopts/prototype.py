@@ -79,6 +79,12 @@ def recursive(opt_flags=OptFlags.DEFAULT):
 @app.command(name="-x")
 def examples():
     """Run examples"""
+    flags = [
+        ["-nowrap", "-v", "-t", "-d"],
+        ["-nowrap", "-v", "-t"],
+        ["-nowrap", "-v"],
+        ["-nowrap"],
+    ]
     combinations_f = product(
         ["-f"],
         [
@@ -90,38 +96,13 @@ def examples():
             ["prototype.py", "nonexistent1.py", "nonexistent2.py"],
             ["prototype.py", "prototype.py", "nonexistent3.py", "nonexistent4.py"],
         ],
-        [
-            ["-nowrap", "-v", "-t", "-d"],
-            ["-nowrap", "-v", "-t"],
-            ["-nowrap", "-v"],
-            ["-nowrap"],
-        ],
-    )
-    combinations_a = product(
-        ["-a"],
-        [
-            ["-nowrap", "-v", "-t", "-d"],
-            ["-nowrap", "-v", "-t"],
-            ["-nowrap", "-v"],
-            ["-nowrap"],
-        ],
-    )
-    combinations_r = product(
-        ["-r"],
-        [
-            ["-nowrap", "-v", "-t", "-d"],
-            ["-nowrap", "-v", "-t"],
-            ["-nowrap", "-v"],
-            ["-nowrap"],
-        ],
+        flags,
     )
     # Flatten:
     all_combinations = \
         [list(chain([a], b, c)) for a, b, c in combinations_f] + \
-        [list(chain([a], b)) for a, b in combinations_a] + \
-        [list(chain([a], b)) for a, b in combinations_r]
-    # ic(list(all_combinations))
-    # return
+        [list(chain([a], b)) for a, b in product(["-a"], flags)] + \
+        [list(chain([a], b)) for a, b in product(["-r"], flags)]
     global display
     display = False
     for cmdlist in all_combinations:
