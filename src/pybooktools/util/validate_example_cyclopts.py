@@ -34,8 +34,8 @@ if __name__ == "__main__":
 
 
     @app.default
-    def main(pyfile: PyExample):
-        return f"{pyfile = }"
+    def main(_: PyExample):
+        pass
 
 
     def demos() -> list[Path]:
@@ -58,8 +58,9 @@ if __name__ == "__main__":
 
 
     for demo in demos():
-        print(f"Running {demo}...")
+        print(f"arg: {demo}")
         try:
-            app_result = app([str(demo)], exit_on_error=False)
-        except Exception as e:
-            app_result = f"{e.__class__.__name__}: {e}"
+            # Note brackets around argument:
+            app([str(demo)], exit_on_error=False)
+        except Exception:
+            pass
