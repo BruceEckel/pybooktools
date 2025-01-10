@@ -10,7 +10,7 @@ from pybooktools.util import is_slug
 def python_example_validator(type_, pyfile: Path, main_allowed=False) -> None:
     def validate(assertion: bool, err_msg: str) -> None:
         if not assertion:
-            msg = f"\npython_example_validator: {pyfile} {err_msg}"
+            msg = f"\n{pyfile} {err_msg}"
             raise ValueError(msg)
 
     validate(pyfile.exists(), "doesn't exist")
