@@ -1,4 +1,5 @@
 from .console import console
+from .create_demo_files import create_demo_files
 from .display import display_function_name, icc, display_dict, display_path_list, report, panic, error, warn
 from .ensure_slug_line import ensure_slug_line, is_slug
 from .path_utils import cleaned_dir
@@ -23,4 +24,5 @@ __all__ = [
     "HelpError",
     "PyExample",
     "python_example_validator",
+    "create_demo_files",
 ]

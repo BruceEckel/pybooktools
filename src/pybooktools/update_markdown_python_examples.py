@@ -1,8 +1,8 @@
 # update_markdown_python_examples.py
 """
-Looks in Markdown files for listings with sluglines,
+Looks in Markdown chapters for listings with sluglines,
 and updates those listings from the source code repository.
-You must provide the path to at least one source code repository,
+For each chapter, you must provide a path to only one source code repository,
 as a Markdown comment in the form:
 <!-- #[code_location] ./src/functional_error_handling -->
 These can appear anywhere in the file.
@@ -27,10 +27,10 @@ app = typer.Typer(
 
 @app.command(no_args_is_help=True)
 def main(
-        ctx: typer.Context,
-        python_markdown_chapter: Annotated[str, typer.Argument(
-            ..., help="Path to the Python chapter to be updated."
-        )]
+    ctx: typer.Context,
+    python_markdown_chapter: Annotated[str, typer.Argument(
+        ..., help="Path to the Python chapter to be updated."
+    )]
 ):
     """Update Python slugline-marked source-code listings within a Python chapter."""
 

@@ -3,8 +3,8 @@ from pathlib import Path
 
 import typer
 
+from pybooktools.tls.example_updater import ExampleUpdater
 from pybooktools.util import console, HelpError
-from .example_updater import ExampleUpdater
 
 app = typer.Typer()
 
@@ -29,22 +29,22 @@ def collect_files(recurse: bool, all_files: bool) -> list[Path]:
 
 @app.command()
 def main(
-        ctx: typer.Context,
-        pyfiles: list[Path] = typer.Argument(
-            None, help="The Python example file(s)", show_default=False
-        ),
-        verbose: bool = typer.Option(
-            False, "-v", "--verbose", help="Trace info, save intermediate files, don't overwrite original file"
-        ),
-        nowrap: bool = typer.Option(
-            False, "--nowrap", help="Do not wrap output lines"
-        ),
-        recurse: bool = typer.Option(
-            False, "-r", "--recurse", help="Find Python examples in subdirectories"
-        ),
-        all_files: bool = typer.Option(
-            False, "-a", "--all", help="Process all Python examples in the current directory"
-        )
+    ctx: typer.Context,
+    pyfiles: list[Path] = typer.Argument(
+        None, help="The Python example file(s)", show_default=False
+    ),
+    verbose: bool = typer.Option(
+        False, "-v", "--verbose", help="Trace info, save intermediate files, don't overwrite original file"
+    ),
+    nowrap: bool = typer.Option(
+        False, "--nowrap", help="Do not wrap output lines"
+    ),
+    recurse: bool = typer.Option(
+        False, "-r", "--recurse", help="Find Python examples in subdirectories"
+    ),
+    all_files: bool = typer.Option(
+        False, "-a", "--all", help="Process all Python examples in the current directory"
+    )
 ):
     """Update embedded outputs in Python examples."""
     if not pyfiles and not all_files and not recurse:
