@@ -26,25 +26,25 @@ def result(files: list[Path]):
 
 
 @app.command
-def f1(files: list[File]):
+def file(files: list[File]):
     """cyclopts.types.File"""
     return result(files)
 
 
 @app.command
-def f2(files: list[ExistingFile]):
+def existing_file(files: list[ExistingFile]):
     """cyclopts.types.ExistingFile"""
     return result(files)
 
 
 @app.command
-def f3(files: list[ResolvedFile]):
+def resolved_file(files: list[ResolvedFile]):
     """cyclopts.types.ResolvedFile"""
     return result(files)
 
 
 @app.command
-def f4(files: list[ResolvedExistingFile]):
+def resolved_existing_file(files: list[ResolvedExistingFile]):
     """cyclopts.types.ResolvedExistingFile"""
     return result(files)
 
@@ -53,7 +53,7 @@ def f4(files: list[ResolvedExistingFile]):
 def examples():
     """Run examples"""
     all_combinations = product(
-        ["f1", "f2", "f3", "f4"],
+        ["file", "existing-file", "resolved-file", "resolved-existing-file"],
         [
             ["paths.py"],
             ["paths.py", "paths.py"],

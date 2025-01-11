@@ -1,4 +1,4 @@
-# validate_example.py
+# python_example_validator.py
 """
 Contains everything that determines a valid book example
 """

@@ -7,7 +7,7 @@ from pathlib import Path
 from icecream import ic
 
 from pybooktools.tls import insert_top_level_separators, tls_tags_to_dict
-from pybooktools.util import cleaned_dir, ensure_slug_line, valid_python, run_script
+from pybooktools.util import cleaned_dir, run_script, python_example_validator
 
 
 @dataclass
@@ -23,10 +23,8 @@ class ExampleUpdater:
     def __post_init__(self):
         self.example_name = self.example_path.name
         self.validate_dir = cleaned_dir(self.example_path, ".validate_")
-        # Also checks that file exists:
-        self.original_source = ensure_slug_line(
-            valid_python(self.example_path), self.example_path
-        )
+        python_example_validator(self.example_path)
+        self.original_source = self.example_path.read_text(encoding="utf-8")
         # Remove comments starting with `## `
         self.cleaned_code = re.sub(
             r"^\s*##.*(\n|$)", "", self.original_source, flags=re.MULTILINE

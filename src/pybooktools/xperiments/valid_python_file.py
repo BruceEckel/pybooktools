@@ -1,7 +1,7 @@
 # valid_python_file.py
 from pathlib import Path
 
-from .display import error
+from pybooktools.util.display import error
 
 
 def opt_msg(msg: str) -> str:

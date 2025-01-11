@@ -15,7 +15,7 @@ class User:
 
 
 @app.default
-def main(user: User):
+def main(_: User):
     pass
 
 

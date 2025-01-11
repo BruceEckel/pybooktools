@@ -1,4 +1,7 @@
-# validate_example_cyclopts.py
+# python_example_validator.py
+"""
+Single point of truth to determine a valid book example.
+"""
 from pathlib import Path
 from typing import Annotated
 
@@ -7,7 +10,7 @@ from cyclopts import Parameter
 from pybooktools.util import is_slug
 
 
-def python_example_validator(type_, pyfile: Path, main_allowed=False) -> None:
+def python_example_validator(pyfile: Path, main_allowed=False) -> None:
     def validate(assertion: bool, err_msg: str) -> None:
         if not assertion:
             msg = f"\n{pyfile} {err_msg}"
@@ -24,7 +27,11 @@ def python_example_validator(type_, pyfile: Path, main_allowed=False) -> None:
     validate("__main__" not in example and not main_allowed, "contains __main__")
 
 
-PyExample = Annotated[Path, Parameter(validator=python_example_validator)]
+def cyclopts_python_example_validator(type_, pyfile: Path, main_allowed=False) -> None:  # noqa
+    python_example_validator(pyfile, main_allowed=main_allowed)
+
+
+PyExample = Annotated[Path, Parameter(validator=cyclopts_python_example_validator)]
 
 ### Test
 if __name__ == "__main__":
@@ -62,5 +69,5 @@ if __name__ == "__main__":
         try:
             # Note brackets around argument:
             app([str(demo)], exit_on_error=False)
-        except Exception:
+        except Exception:  # noqa pylint: disable=broad-except
             pass
