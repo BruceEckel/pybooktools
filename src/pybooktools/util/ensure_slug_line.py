@@ -2,7 +2,7 @@
 import re
 from pathlib import Path
 
-from .config import slug_pattern
+from pybooktools.util.config import slug_pattern
 
 
 def is_slug(line: str) -> bool:
