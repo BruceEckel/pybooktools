@@ -52,11 +52,11 @@ def test_display_function_name():
 
 
 def report(
-        title: str,
-        msg: str,
-        msg_color: str = "orange3",
-        title_color: str = "bold red",
-        style="bold red",
+    title: str,
+    msg: str,
+    msg_color: str = "orange3",
+    title_color: str = "bold red",
+    style="bold red",
 ) -> None:
     panel = Panel(
         f"[{msg_color}]{msg}[/{msg_color}]",
