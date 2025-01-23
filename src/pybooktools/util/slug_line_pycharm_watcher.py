@@ -1,8 +1,11 @@
 # slug_line_pycharm_watcher.py
 # File Watcher Configuration for Pycharm:
+# 0. Install https://plugins.jetbrains.com/plugin/7177-file-watchers
+# Go to Settings | Tools | Actions on Save, Click on "Configure File Watcher", then '+'
 # 1. Program: `python.exe`
-# 2. Arguments: `slug_line_pycharm_watcher.py $FilePath$`
+# 2. Arguments: `C:\git\pybooktools\src\pybooktools\util\slug_line_pycharm_watcher.py $FilePath$`
 # 3. Working Directory: `$FileDir$`
+# 4. Uncheck all Advanced Options to prevent infinite looping
 import re
 import sys
 from pathlib import Path
