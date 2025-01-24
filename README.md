@@ -13,6 +13,8 @@ TODO:
     - In actual code, includes a book & chapter indicator:
     - `# file_name.py: From LazyProgrammerGuide.com chapter N`
     - Everything to the right of the `:` is stripped when the example is updated into the book.
+- Run `Black` with a separate command? Even if Pycharm has its own settings it could be useful to
+  occasionally apply `Black`.
 - Test `update_markdown_code_listings.py` to verify it works with new slugline format
 - Tool `extract_markdown_code_listings.py` that extracts one example or all examples from a chapter back to its source
   code repo.
