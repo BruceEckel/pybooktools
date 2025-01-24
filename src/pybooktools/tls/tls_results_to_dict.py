@@ -1,7 +1,7 @@
 # tls_results_to_dict.py
 from typing import Dict, List
 
-from pybooktools.tls import output_format
+from output_formatter import output_format
 from pybooktools.validate import UseCase, validate_transformer
 
 
@@ -11,7 +11,7 @@ def tls_tags_to_dict(input_str: str, wrap: bool = True) -> Dict[str, List[str]]:
 
     Args:
         input_str (str): The input string containing lines and __$n$_tls__ markers.
-        wrap (bool): Set to False to prevent wrapping
+        wrap (bool): Set to False prevents wrapping
 
     Returns:
         Dict[str, List[str]]: A dictionary where keys are tls markers and values

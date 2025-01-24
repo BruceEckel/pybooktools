@@ -15,8 +15,8 @@ slug_pattern: Final[str] = r"^#\s+\w+\.py$"
 
 if __name__ == "__main__":
     pyfile = Path(sys.argv[1])
-    lines = pyfile.read_text(encoding="utf-8").splitlines(True)
     slug_line = f"# {pyfile.name}\n"
+    lines = pyfile.read_text(encoding="utf-8").splitlines(True)
 
     if lines and re.match(slug_pattern, lines[0]):
         lines[0] = slug_line  # Replace existing slug line

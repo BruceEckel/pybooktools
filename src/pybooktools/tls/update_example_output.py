@@ -4,13 +4,12 @@ Update embedded outputs in Python examples
 """
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Optional
 
-from cyclopts import App, Parameter, Group
+from cyclopts import App, Parameter, Group, ValidationError
 from rich.console import Console
 from rich.panel import Panel
 
-from pybooktools.tls import ExampleUpdater
 from pybooktools.util import PyExample, create_demo_files
 
 console = Console()
@@ -22,25 +21,19 @@ app = App(
     help=__doc__,
     default_parameter=Parameter(negative=()),
 )
-opts = Group(
+optg = Group(
     "Option Flags (any combination)",
     default_parameter=Parameter(negative=""),  # Disable "--no-" flags
 )
 display = True
 
 
-@dataclass(frozen=True)
+@dataclass
 class OptFlags:
-    no_wrap: Annotated[bool, Parameter(name="-nowrap", help="Do not wrap output", group=opts)] = False
-    verbose: Annotated[bool, Parameter(name="-v", help="Verbose", group=opts)] = False
-    trace: Annotated[bool, Parameter(name="-t", help="Trace", group=opts)] = False
-    debug: Annotated[bool, Parameter(name="-d", help="Debug", group=opts)] = False
-    DEFAULT = None
-    NoParse = None
-
-
-OptFlags.DEFAULT = OptFlags()
-NoParse = Annotated[OptFlags, Parameter(parse=False)]
+    no_wrap: Annotated[bool, Parameter(name="-nowrap", help="Do not wrap output", group=optg)] = False
+    verbose: Annotated[bool, Parameter(name="-v", help="Verbose", group=optg)] = False
+    trace: Annotated[bool, Parameter(name="-t", help="Trace", group=optg)] = False
+    debug: Annotated[bool, Parameter(name="-d", help="Debug", group=optg)] = False
 
 
 def report(fname: str, files: list[Path], opt_flags: OptFlags):
@@ -52,61 +45,74 @@ def report(fname: str, files: list[Path], opt_flags: OptFlags):
 
 
 def process(file_path: Path, verbose=False, wrap: bool = True) -> None:
-    ExampleUpdater(file_path, verbose=verbose).update_output(wrap=wrap)
+    print(f"process({file_path}, verbose={verbose}, wrap={wrap})...")
+    # ExampleUpdater(file_path, verbose=verbose).update_output(wrap=wrap)
 
 
 @app.command(name="-f", sort_key=1)
-def process_files(files: list[PyExample], *, opt_flags=OptFlags.DEFAULT):
+def process_files(files: list[PyExample], *, opts: Optional[OptFlags] = None):
     """Files: Process one or more Python files provided as arguments"""
+    if opts is None:
+        opts = OptFlags()
     for file in files:
-        process(file, opt_flags.verbose, not opt_flags.no_wrap)
-    result = report("process_files", files, opt_flags=opt_flags)
-    return result
+        process(file, opts.verbose, not opts.no_wrap)
+    return report("process_files", files, opt_flags=opts)
 
 
 @app.command(name="-a", sort_key=2)
-def all_files_in_current_dir(opt_flags=OptFlags.DEFAULT):
+def all_files_in_current_dir(opts: Optional[OptFlags] = None):
     """All: Process all Python examples in the current directory"""
+    if opts is None:
+        opts = OptFlags()
     paths = list(Path(".").glob("*.py"))
-    result = report("all_files_in_current_dir", paths, opt_flags=opt_flags)
-    process_files(paths, opt_flags=opt_flags)
+    result = report("all_files_in_current_dir", paths, opt_flags=opts)
+    process_files(paths, opts=opts)
     return result
 
 
 @app.command(name="-r", sort_key=3)
-def recursive(opt_flags=OptFlags.DEFAULT):
+def recursive(opts: Optional[OptFlags] = None):
     """Recursive: Process all Python examples in current directory AND subdirectories"""
+    if opts is None:
+        opts = OptFlags()
     paths = list(Path(".").rglob("*.py"))
-    result = report("recursive", paths, opt_flags=opt_flags)
-    process_files(paths, opt_flags=opt_flags)
+    result = report("recursive", paths, opt_flags=opts)
+    process_files(paths, opts=opts)
     return result
 
 
 @app.command(name="-x")
 def examples():
     """Run examples"""
+    import shutil
     demo_dir = "updater_demos"
     tests: dict[str, str] = {
-        "valid_example.py": "# valid_example.py\nprint('Valid')\nprint('Example')",
+        "valid_example.py": "# valid_example.py\nprint('Valid')\nprint('Example')\n",
         "empty_file.py": "",
         "short_example.py": "# short_example.py\nprint('Too short')",
         "missing_slug.py": "print('No slug line')\nprint('Example')\nprint('long enough')",
         "main_included.py": "# main_included.py\nif __name__ == '__main__':\n    print('Main block included')",
         "non_python.txt": "This is not a Python file.",
     }
-    create_demo_files(demo_dir, tests)
+    demo_files = create_demo_files(demo_dir, tests)
     global display
     display = False
-    for cmdlist in all_combinations:
-        console.print(
-            Panel(
-                f"[dark_goldenrod]{app(cmdlist, exit_on_error=False)}",
-                title=f"[sea_green1]{str(cmdlist)}",
-                style="blue",
-                title_align="left"
+    for demo_file in demo_files:
+        cmdlist = ["-f", str(demo_file), "-v", "-t", "-d"]
+        print(f"cmdlist = {cmdlist}")
+        try:
+            console.print(
+                Panel(
+                    f"[dark_goldenrod]{app(cmdlist, exit_on_error=False)}",
+                    title=f"[sea_green1]{str(cmdlist)}",
+                    style="blue",
+                    title_align="left"
+                )
             )
-        )
-    Path(demo_dir).rmdir()
+        except (ValidationError, OSError) as e:
+            pass
+            # print(f"{e = }")
+    shutil.rmtree(demo_dir, ignore_errors=True)
 
 
 if __name__ == "__main__":
