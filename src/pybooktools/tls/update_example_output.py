@@ -86,7 +86,7 @@ def recursive(opt_flags=OptFlags.DEFAULT):
 def examples():
     """Run examples"""
     demo_dir = "updater_demos"
-    examples: dict[str, str] = {
+    tests: dict[str, str] = {
         "valid_example.py": "# valid_example.py\nprint('Valid')\nprint('Example')",
         "empty_file.py": "",
         "short_example.py": "# short_example.py\nprint('Too short')",
@@ -94,7 +94,7 @@ def examples():
         "main_included.py": "# main_included.py\nif __name__ == '__main__':\n    print('Main block included')",
         "non_python.txt": "This is not a Python file.",
     }
-    create_demo_files(demo_dir, examples)
+    create_demo_files(demo_dir, tests)
     global display
     display = False
     for cmdlist in all_combinations:

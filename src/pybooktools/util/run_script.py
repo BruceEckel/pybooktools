@@ -46,5 +46,4 @@ def run_script(script_path: Path) -> str:
         error(f"{result.stderr}")
         return result.stderr
     else:
-        # console.print(f"Success: {script_path.name}")
         return result.stdout
