@@ -19,7 +19,7 @@ class Example:
         Example.id_counter += 1
 
         self.content = self.content.strip()
-        self.lines = self.content.strip().splitlines()
+        self.lines = self.content.strip().splitlines() + ["\n"]
         if not self.lines:
             return  # Empty content: create Example later
         if self._filename is None:
