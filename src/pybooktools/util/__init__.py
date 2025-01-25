@@ -1,8 +1,8 @@
 from .console import console
-from .create_demo_examples import DemoExamples
 from .create_demo_files import create_demo_files
 from .display import display_function_name, icc, display_dict, display_path_list, report, panic, error, warn
 from .ensure_slug_line import ensure_slug_line, is_slug
+from .example_creator import CreateExamples
 from .path_utils import cleaned_dir
 from .python_example_validator import PyExample, python_example_validator
 from .run_script import run_script
@@ -26,5 +26,5 @@ __all__ = [
     "PyExample",
     "python_example_validator",
     "create_demo_files",
-    "DemoExamples",
+    "CreateExamples",
 ]

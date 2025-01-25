@@ -10,7 +10,7 @@ from cyclopts import App, Parameter, Group, ValidationError
 from rich.console import Console
 from rich.panel import Panel
 
-from pybooktools.util import PyExample, DemoExamples
+from pybooktools.util import PyExample, CreateExamples
 
 console = Console()
 app = App(
@@ -90,16 +90,16 @@ def examples():
         try:
             console.print(
                 Panel(
-                    f"[dark_goldenrod]{app(cmdlist, exit_on_error=False)}",
-                    title=f"[sea_green1]{str(cmdlist)}",
+                    f"[dark_goldenrod]{app(arglist, exit_on_error=False)}",
+                    title=f"[sea_green1]{str(arglist)}",
                     style="blue",
                     title_align="left"
                 )
             )
-        except (ValidationError, OSError) as e:
+        except (ValidationError, OSError):
             pass
 
-    demo_files = DemoExamples.from_file("updater_demos", "demo_examples.txt")
+    demo_files = CreateExamples.from_file("updater_demos", "demo_examples.txt")
     global display
     display = False
     for demo in demo_files:
