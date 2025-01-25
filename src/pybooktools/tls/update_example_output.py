@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Annotated, Optional
 
 from cyclopts import App, Parameter, Group, ValidationError
+from cyclopts.types import ExistingDirectory
 from rich.console import Console
 from rich.panel import Panel
 
@@ -58,31 +59,23 @@ def process_files(files: list[PyExample], *, opts: Optional[OptFlags] = None):
     return report("process_files", files, opt_flags=opts)
 
 
-# Cyclopts has a built-in way to do this:
-def valid_dir_path(directory: str) -> Path:
-    dir_path = Path(directory)
-    if not dir_path.exists():
-        raise FileNotFoundError(f"Directory '{dir_path}' does not exist")
-    if not dir_path.is_dir():
-        raise NotADirectoryError(f"'{dir_path}' is not a directory")
-    return dir_path
-
-
 @app.command(name="-a", sort_key=2)
-def all_files_in_dir(target_dir: str = ".", opts: Optional[OptFlags] = None):
+def all_files_in_dir(target_dir: ExistingDirectory = Path("."), opts: Optional[OptFlags] = None):
     """All: Process all Python examples in specified directory [.]"""
     opts = opts or OptFlags()
-    paths = list(valid_dir_path(target_dir).glob("*.py"))
+    # paths = list(valid_dir_path(target_dir).glob("*.py"))
+    paths = list(target_dir.glob("*.py"))
     result = report("all_files_in_dir", paths, opt_flags=opts)
     process_files(paths, opts=opts)
     return result
 
 
 @app.command(name="-r", sort_key=3)
-def recursive(target_dir: str = ".", opts: Optional[OptFlags] = None):
+def recursive(target_dir: ExistingDirectory = Path("."), opts: Optional[OptFlags] = None):
     """Recursive: Process all Python examples in specified directory [.] AND subdirectories"""
     opts = opts or OptFlags()
-    paths = list(valid_dir_path(target_dir).rglob("*.py"))
+    # paths = list(valid_dir_path(target_dir).rglob("*.py"))
+    paths = list(target_dir.rglob("*.py"))
     result = report("recursive", paths, opt_flags=opts)
     process_files(paths, opts=opts)
     return result
@@ -91,7 +84,7 @@ def recursive(target_dir: str = ".", opts: Optional[OptFlags] = None):
 # Demo tests:
 
 def run(arglist: list[str]):
-    console.rule()
+    console.rule(str(arglist))
     try:
         console.print(
             Panel(
@@ -113,13 +106,13 @@ def examples():
     global display
     display = False
     for demo in demo_files:
-        cmdlist = ["-f", str(demo.file_path), "-v", "-t", "-d"]
-        print(f"cmdlist = {cmdlist}")
-        run(cmdlist)
+        run(["-f", str(demo.file_path), "-v", "-t", "-d"])
     run(["-a", "-v", "-t", "-d"])
     run(["-a", "updater_examples", "-v", "-t", "-d"])
     run(["-r", "-v", "-t", "-d"])
     run(["-r", "updater_examples", "-v", "-t", "-d"])
+    run(["-a", "nonexistent_dir"])
+    run(["-r", "nonexistent_dir"])
     demo_files.delete()
 
 
