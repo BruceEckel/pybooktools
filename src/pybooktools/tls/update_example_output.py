@@ -59,11 +59,16 @@ def process_files(files: list[PyExample], *, opts: Optional[OptFlags] = None):
 
 
 @app.command(name="-a", sort_key=2)
-def all_files_in_current_dir(opts: Optional[OptFlags] = None):
-    """All: Process all Python examples in the current directory"""
+def all_files_in_dir(target_dir: str = ".", opts: Optional[OptFlags] = None):
+    """All: Process all Python examples in the specified directory"""
     opts = opts or OptFlags()
-    paths = list(Path(".").glob("*.py"))
-    result = report("all_files_in_current_dir", paths, opt_flags=opts)
+    target_path = Path(target_dir)
+    if not target_path.exists():
+        raise FileNotFoundError(f"Directory '{target_path}' does not exist")
+    if not target_path.is_dir():
+        raise NotADirectoryError(f"'{target_path}' is not a directory")
+    paths = list(target_path.glob("*.py"))
+    result = report("all_files_in_dir", paths, opt_flags=opts)
     process_files(paths, opts=opts)
     return result
 
