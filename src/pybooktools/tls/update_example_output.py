@@ -58,48 +58,56 @@ def process_files(files: list[PyExample], *, opts: Optional[OptFlags] = None):
     return report("process_files", files, opt_flags=opts)
 
 
+# Cyclopts has a built-in way to do this:
+def valid_dir_path(directory: str) -> Path:
+    dir_path = Path(directory)
+    if not dir_path.exists():
+        raise FileNotFoundError(f"Directory '{dir_path}' does not exist")
+    if not dir_path.is_dir():
+        raise NotADirectoryError(f"'{dir_path}' is not a directory")
+    return dir_path
+
+
 @app.command(name="-a", sort_key=2)
 def all_files_in_dir(target_dir: str = ".", opts: Optional[OptFlags] = None):
-    """All: Process all Python examples in the specified directory"""
+    """All: Process all Python examples in specified directory [.]"""
     opts = opts or OptFlags()
-    target_path = Path(target_dir)
-    if not target_path.exists():
-        raise FileNotFoundError(f"Directory '{target_path}' does not exist")
-    if not target_path.is_dir():
-        raise NotADirectoryError(f"'{target_path}' is not a directory")
-    paths = list(target_path.glob("*.py"))
+    paths = list(valid_dir_path(target_dir).glob("*.py"))
     result = report("all_files_in_dir", paths, opt_flags=opts)
     process_files(paths, opts=opts)
     return result
 
 
 @app.command(name="-r", sort_key=3)
-def recursive(opts: Optional[OptFlags] = None):
-    """Recursive: Process all Python examples in current directory AND subdirectories"""
+def recursive(target_dir: str = ".", opts: Optional[OptFlags] = None):
+    """Recursive: Process all Python examples in specified directory [.] AND subdirectories"""
     opts = opts or OptFlags()
-    paths = list(Path(".").rglob("*.py"))
+    paths = list(valid_dir_path(target_dir).rglob("*.py"))
     result = report("recursive", paths, opt_flags=opts)
     process_files(paths, opts=opts)
     return result
 
 
-@app.command(name="-x")
-def examples():
-    """Run examples"""
+# Demo tests:
 
-    def run(arglist: list[str]):
-        console.rule()
-        try:
-            console.print(
-                Panel(
-                    f"[dark_goldenrod]{app(arglist, exit_on_error=False)}",
-                    title=f"[sea_green1]{str(arglist)}",
-                    style="blue",
-                    title_align="left"
-                )
+def run(arglist: list[str]):
+    console.rule()
+    try:
+        console.print(
+            Panel(
+                f"[dark_goldenrod]{app(arglist, exit_on_error=False)}",
+                title=f"[sea_green1]{str(arglist)}",
+                style="blue",
+                title_align="left"
             )
-        except (ValidationError, OSError):
-            pass
+        )
+    except (ValidationError, OSError):
+        pass
+
+
+@app.command(name="-x1")
+def examples():
+    """Run examples (1)"""
 
     demo_files = CreateExamples.from_file("updater_examples", "bad_examples.txt")
     global display
@@ -109,7 +117,9 @@ def examples():
         print(f"cmdlist = {cmdlist}")
         run(cmdlist)
     run(["-a", "-v", "-t", "-d"])
+    run(["-a", "updater_examples", "-v", "-t", "-d"])
     run(["-r", "-v", "-t", "-d"])
+    run(["-r", "updater_examples", "-v", "-t", "-d"])
     demo_files.delete()
 
 
