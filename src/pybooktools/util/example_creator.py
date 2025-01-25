@@ -88,10 +88,9 @@ class CreateExamples:
                    ])
 
     @classmethod
-    def from_file(cls, example_dir: str, file_path: str) -> "CreateExamples":
+    def from_file(cls, example_dir: str, file_path: Path) -> "CreateExamples":
         """Create an instance by reading a text file."""
-        file_content = Path(file_path).read_text(encoding="utf-8")
-        return cls.from_text(example_dir, file_content)
+        return cls.from_text(example_dir, file_path.read_text(encoding="utf-8"))
 
     def delete(self) -> None:
         """Delete the example directory."""
@@ -106,7 +105,7 @@ class CreateExamples:
 
 
 if __name__ == "__main__":
-    examples = CreateExamples.from_file("example_dir", "examples.txt")
+    examples = CreateExamples.from_file("example_dir", Path("examples.txt"))
     print(repr(examples))
     print("-" * 40)
     for example in examples:

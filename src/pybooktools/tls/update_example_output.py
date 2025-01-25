@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Annotated, Optional
 
 from cyclopts import App, Parameter, Group, ValidationError
-from cyclopts.types import ExistingDirectory
+from cyclopts.types import ExistingDirectory, ExistingFile
 from rich.console import Console
 from rich.panel import Panel
 
@@ -98,22 +98,18 @@ def run(arglist: list[str]):
         pass
 
 
-@app.command(name="-x1")
-def examples():
-    """Run examples (1)"""
-
-    demo_files = CreateExamples.from_file("updater_examples", "bad_examples.txt")
+@app.command(name="-x")
+def examples(example_text_path: ExistingFile = Path("bad_examples.txt"), retain: bool = False):
+    """Run examples"""
+    demo_files = CreateExamples.from_file("updater_examples", example_text_path)
     global display
     display = False
     for demo in demo_files:
         run(["-f", str(demo.file_path), "-v", "-t", "-d"])
-    run(["-a", "-v", "-t", "-d"])
     run(["-a", "updater_examples", "-v", "-t", "-d"])
-    run(["-r", "-v", "-t", "-d"])
     run(["-r", "updater_examples", "-v", "-t", "-d"])
-    run(["-a", "nonexistent_dir"])
-    run(["-r", "nonexistent_dir"])
-    demo_files.delete()
+    if not retain:
+        demo_files.delete()
 
 
 if __name__ == "__main__":
