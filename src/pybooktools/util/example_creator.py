@@ -57,20 +57,20 @@ class Example:
 
 @dataclass
 class CreateExamples:
-    example_dir: str
-    example_path: Path = field(init=False)
+    examples_dir: str
+    examples_path: Path = field(init=False)
     examples: list[Example] = field(default_factory=list)
 
     def __post_init__(self) -> None:
-        self.example_path = Path(self.example_dir)
+        self.examples_path = Path(self.examples_dir)
         self._reset_example_dir()
         self._write_examples_to_disk()
 
     def _reset_example_dir(self) -> None:
         """Reset the example directory, creating a fresh structure."""
-        if self.example_path.exists():
-            shutil.rmtree(self.example_path)
-        self.example_path.mkdir(exist_ok=True)
+        if self.examples_path.exists():
+            shutil.rmtree(self.examples_path)
+        self.examples_path.mkdir()
 
     def _write_examples_to_disk(self) -> None:
         """Write all examples to the example directory."""
@@ -81,7 +81,7 @@ class CreateExamples:
     def from_text(cls, example_dir: str, text: str) -> "CreateExamples":
         """Create an instance from a block of text."""
         blocks = re.split(r"^---\s*$", text.strip(), flags=re.MULTILINE)
-        return cls(example_dir=example_dir,
+        return cls(examples_dir=example_dir,
                    examples=[
                        Example(Path(example_dir), input_text=block.strip())
                        for block in blocks if block.strip()
@@ -95,8 +95,8 @@ class CreateExamples:
 
     def delete(self) -> None:
         """Delete the example directory."""
-        if self.example_path.exists():
-            shutil.rmtree(self.example_path)
+        if self.examples_path.exists():
+            shutil.rmtree(self.examples_path)
 
     def __repr__(self) -> str:
         return "\n---\n".join(repr(e) for e in self.examples)
