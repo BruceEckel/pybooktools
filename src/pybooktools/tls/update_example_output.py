@@ -45,15 +45,14 @@ def report(fname: str, files: list[Path], opt_flags: OptFlags):
 
 
 def process(file_path: Path, verbose=False, wrap: bool = True) -> None:
-    print(f"process({file_path}, verbose={verbose}, wrap={wrap})...")
+    print(f"process({file_path}, verbose={verbose}, wrap={wrap}) ...")
     # ExampleUpdater(file_path, verbose=verbose).update_output(wrap=wrap)
 
 
 @app.command(name="-f", sort_key=1)
 def process_files(files: list[PyExample], *, opts: Optional[OptFlags] = None):
     """Files: Process one or more Python files provided as arguments"""
-    if opts is None:
-        opts = OptFlags()
+    opts = opts or OptFlags()
     for file in files:
         process(file, opts.verbose, not opts.no_wrap)
     return report("process_files", files, opt_flags=opts)
@@ -62,8 +61,7 @@ def process_files(files: list[PyExample], *, opts: Optional[OptFlags] = None):
 @app.command(name="-a", sort_key=2)
 def all_files_in_current_dir(opts: Optional[OptFlags] = None):
     """All: Process all Python examples in the current directory"""
-    if opts is None:
-        opts = OptFlags()
+    opts = opts or OptFlags()
     paths = list(Path(".").glob("*.py"))
     result = report("all_files_in_current_dir", paths, opt_flags=opts)
     process_files(paths, opts=opts)
@@ -73,8 +71,7 @@ def all_files_in_current_dir(opts: Optional[OptFlags] = None):
 @app.command(name="-r", sort_key=3)
 def recursive(opts: Optional[OptFlags] = None):
     """Recursive: Process all Python examples in current directory AND subdirectories"""
-    if opts is None:
-        opts = OptFlags()
+    opts = opts or OptFlags()
     paths = list(Path(".").rglob("*.py"))
     result = report("recursive", paths, opt_flags=opts)
     process_files(paths, opts=opts)
@@ -99,13 +96,15 @@ def examples():
         except (ValidationError, OSError):
             pass
 
-    demo_files = CreateExamples.from_file("updater_demos", "demo_examples.txt")
+    demo_files = CreateExamples.from_file("updater_examples", "bad_examples.txt")
     global display
     display = False
     for demo in demo_files:
         cmdlist = ["-f", str(demo.file_path), "-v", "-t", "-d"]
         print(f"cmdlist = {cmdlist}")
         run(cmdlist)
+    run(["-a", "-v", "-t", "-d"])
+    run(["-r", "-v", "-t", "-d"])
     demo_files.delete()
 
 
