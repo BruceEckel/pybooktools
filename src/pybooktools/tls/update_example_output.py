@@ -84,15 +84,9 @@ def recursive(opts: Optional[OptFlags] = None):
 @app.command(name="-x")
 def examples():
     """Run examples"""
-    import shutil
-    demo_dir = "updater_demos"
 
-    demo_files = DemoExamples.from_file(demo_dir, "demo_examples.txt")
-    global display
-    display = False
-    for demo in demo_files:
-        cmdlist = ["-f", demo.filename, "-v", "-t", "-d"]
-        print(f"cmdlist = {cmdlist}")
+    def run(arglist: list[str]):
+        console.rule()
         try:
             console.print(
                 Panel(
@@ -104,8 +98,15 @@ def examples():
             )
         except (ValidationError, OSError) as e:
             pass
-            # print(f"{e = }")
-    shutil.rmtree(demo_dir, ignore_errors=True)
+
+    demo_files = DemoExamples.from_file("updater_demos", "demo_examples.txt")
+    global display
+    display = False
+    for demo in demo_files:
+        cmdlist = ["-f", str(demo.file_path), "-v", "-t", "-d"]
+        print(f"cmdlist = {cmdlist}")
+        run(cmdlist)
+    demo_files.delete()
 
 
 if __name__ == "__main__":

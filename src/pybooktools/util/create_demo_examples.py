@@ -9,7 +9,8 @@ from typing import List, ClassVar
 @dataclass
 class Example:
     id_counter: ClassVar[int] = 0  # Class-level counter for IDs
-    input_text: str = ""
+    dir_path: Path
+    input_text: str
     example_text: str = ""
     lines: list[str] = field(init=False)
     _filename: str | None = None
@@ -47,6 +48,10 @@ class Example:
         file_path = directory / self.filename
         file_path.write_text(self.example_text + "\n", encoding="utf-8")
 
+    @property
+    def file_path(self):
+        return self.dir_path / self.filename
+
     def __repr__(self) -> str:
         return self.example_text
 
@@ -69,8 +74,9 @@ class DemoExamples:
     @classmethod
     def from_text(cls, demo_dir: str, text: str) -> "DemoExamples":
         """Create a DemoExamples instance from a block of text."""
+        demo_path = Path(demo_dir)
         blocks = re.split(r"^---\s*$", text.strip(), flags=re.MULTILINE)
-        examples = [Example(input_text=block.strip()) for block in blocks if block.strip()]
+        examples = [Example(demo_path, input_text=block.strip()) for block in blocks if block.strip()]
         instance = cls(demo_dir=demo_dir, examples=examples)
         return instance
 
@@ -96,5 +102,5 @@ if __name__ == "__main__":
     print(repr(demos))
     print("-" * 40)
     for demo in demos:
-        print(demo.filename)
+        print(demo.file_path)
     demos.delete()
