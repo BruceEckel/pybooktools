@@ -1,0 +1,10 @@
+# example_x.py
+print("Hello, world")
+---
+print("More content")
+print("More data")
+print("More fun")
+---
+# example_y.py
+---
+print("Another example")
