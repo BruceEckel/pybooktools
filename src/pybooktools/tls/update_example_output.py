@@ -10,7 +10,7 @@ from cyclopts import App, Parameter, Group, ValidationError
 from rich.console import Console
 from rich.panel import Panel
 
-from pybooktools.util import PyExample, create_demo_files
+from pybooktools.util import PyExample, DemoExamples
 
 console = Console()
 app = App(
@@ -86,19 +86,12 @@ def examples():
     """Run examples"""
     import shutil
     demo_dir = "updater_demos"
-    tests: dict[str, str] = {
-        "valid_example.py": "# valid_example.py\nprint('Valid')\nprint('Example')\n",
-        "empty_file.py": "",
-        "short_example.py": "# short_example.py\nprint('Too short')",
-        "missing_slug.py": "print('No slug line')\nprint('Example')\nprint('long enough')",
-        "main_included.py": "# main_included.py\nif __name__ == '__main__':\n    print('Main block included')",
-        "non_python.txt": "This is not a Python file.",
-    }
-    demo_files = create_demo_files(demo_dir, tests)
+
+    demo_files = DemoExamples.from_file(demo_dir, "demo_examples.txt")
     global display
     display = False
-    for demo_file in demo_files:
-        cmdlist = ["-f", str(demo_file), "-v", "-t", "-d"]
+    for demo in demo_files:
+        cmdlist = ["-f", demo.filename, "-v", "-t", "-d"]
         print(f"cmdlist = {cmdlist}")
         try:
             console.print(

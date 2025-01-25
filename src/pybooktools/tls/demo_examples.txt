@@ -1,0 +1,12 @@
+print('Valid')
+print('Example')
+---
+print('Too short')
+---
+print('No slug line')
+print('Example')
+print('long enough')
+---
+if __name__ == '__main__':
+    print('Main block included')
+---
