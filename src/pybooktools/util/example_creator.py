@@ -1,4 +1,24 @@
 # example_creator.py
+"""
+[demo_dir_name]
+---                # Create in demo_dir_name with auto-generated name
+print('Valid')
+print('Example')
+--- foo            # Create in demo_dir_name as foo.py
+print('Valid')
+print('Example')
+--- bar.py         # Create in demo_dir_name as bar.py
+print('Valid')
+print('Example')
+---/baz1           # Create in subdirectory baz1
+print('No slug line')
+print('Example')
+print('long enough')
+---
+for i in range(5):
+    print(f"{i = }")
+---
+"""
 import re
 import shutil
 from dataclasses import dataclass, field
