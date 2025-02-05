@@ -120,14 +120,14 @@ def examples():
 # def meta(
 #     *tokens: Annotated[str, Parameter(show=False, allow_leading_hyphen=True)],
 #     run_examples: Annotated[bool, Parameter(name="-x")] = False,
-#     opt_flags: OptFlags = OptFlags.DEFAULT,
+#     opts: OptFlags = OptFlags.DEFAULT,
 # ):
 #     """
 #     Parameters
 #     ----------
 #     run_examples: bool
 #         Run example commands
-#     opt_flags: OptFlags
+#     opts: OptFlags
 #         Optional flags for "verbose", "trace", "debug" and "no wrap";
 #         any combination of "-v", "-t", "-d", and "--nowrap"
 #     """
@@ -136,13 +136,13 @@ def examples():
 #
 #     additional_kwargs = {}
 #     command, bound, ignored = app.parse_args(tokens)
-#     if "opt_flags" in ignored:
-#         additional_kwargs["opt_flags"] = opt_flags
-#     if opt_flags.debug:
+#     if "opts" in ignored:
+#         additional_kwargs["opts"] = opts
+#     if opts.debug:
 #         display_function_name()
 #         console.print(f"command = {command.__name__}")
 #         console.print(f"{bound=}")
-#         console.print(f"{opt_flags=}")
+#         console.print(f"{opts=}")
 #         console.print(f"{additional_kwargs=}")
 #
 #     return command(*bound.args, **bound.kwargs, **additional_kwargs)

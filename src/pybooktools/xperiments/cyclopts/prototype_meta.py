@@ -93,8 +93,8 @@ def meta(
 
     additional_kwargs = {}
     command, bound, ignored = app.parse_args(tokens)
-    if "opt_flags" in ignored:
-        additional_kwargs["opt_flags"] = opt_flags
+    if "opts" in ignored:
+        additional_kwargs["opts"] = opt_flags
     if opt_flags.debug:
         display_function_name()
         console.print(f"command = {command.__name__}")

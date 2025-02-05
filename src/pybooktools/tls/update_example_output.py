@@ -37,9 +37,9 @@ class OptFlags:
     debug: Annotated[bool, Parameter(name="-d", help="Debug", group=optg)] = False
 
 
-def report(fname: str, files: list[Path], opt_flags: OptFlags):
+def report(fname: str, files: list[Path], opts: OptFlags):
     global display
-    r = f"{fname}:\n{files = }\n{opt_flags = }"
+    r = f"{fname}:\n{files = }\n{opts = }"
     if display:
         print(r)
     return r
@@ -56,7 +56,7 @@ def process_files(files: list[PyExample], *, opts: Optional[OptFlags] = None):
     opts = opts or OptFlags()
     for file in files:
         process(file, opts.verbose, not opts.no_wrap)
-    return report("process_files", files, opt_flags=opts)
+    return report("process_files", files, opts=opts)
 
 
 @app.command(name="-a", sort_key=2)
@@ -65,7 +65,7 @@ def all_files_in_dir(target_dir: ExistingDirectory = Path("."), opts: Optional[O
     opts = opts or OptFlags()
     # paths = list(valid_dir_path(target_dir).glob("*.py"))
     paths = list(target_dir.glob("*.py"))
-    result = report("all_files_in_dir", paths, opt_flags=opts)
+    result = report("all_files_in_dir", paths, opts=opts)
     process_files(paths, opts=opts)
     return result
 
@@ -76,7 +76,7 @@ def recursive(target_dir: ExistingDirectory = Path("."), opts: Optional[OptFlags
     opts = opts or OptFlags()
     # paths = list(valid_dir_path(target_dir).rglob("*.py"))
     paths = list(target_dir.rglob("*.py"))
-    result = report("recursive", paths, opt_flags=opts)
+    result = report("recursive", paths, opts=opts)
     process_files(paths, opts=opts)
     return result
 
