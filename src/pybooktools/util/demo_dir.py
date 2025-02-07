@@ -1,4 +1,5 @@
 # demo_dir.py
+# Next: Create DemoDir from existing directory tree
 import re
 import shutil
 from dataclasses import dataclass, field
@@ -15,6 +16,7 @@ class Example:
     example_text: str = field(init=False)
     lines: list[str] = field(init=False)
     _filename: str = field(init=False)
+    _relative_path: str = field(init=False)
 
     def __post_init__(self) -> None:
         self.input_text = self.input_text.strip()
@@ -23,6 +25,10 @@ class Example:
         if not self.lines[0].startswith(f"# {self._filename}"):
             self.lines.insert(0, f"# {self._filename}")
         self.example_text = "\n".join(self.lines)
+        self.relative_path = self.file_path.relative_to(self.demo_dir_path).parent.as_posix()
+        # Avoid outputting '.' if the file is in the root directory
+        if self.relative_path == ".":
+            self.relative_path = ""
 
     def _extract_filename(self) -> str | None:
         match = re.match(r"^---\s*([\w/]+\.py)", self.lines[0])
@@ -46,11 +52,14 @@ class Example:
         self.file_path.write_text(self.example_text + "\n", encoding="utf-8")
 
     def __repr__(self) -> str:
-        relative_path = self.file_path.relative_to(self.demo_dir_path).parent.as_posix()
-        # Avoid outputting '.' if the file is in the root directory
-        if relative_path == ".":
-            relative_path = ""
-        return f"--- {relative_path}\n" + self.example_text
+        slugline = f"# {self.filename}"
+        content_without_slug = self.example_text \
+            if not self.example_text.startswith(slugline) \
+            else "\n".join(self.lines[1:])
+        return f"--- {self.relative_path}\n" + content_without_slug
+
+    def __str__(self) -> str:
+        return f"{self.file_path.as_posix()}:\n" + self.example_text
 
 
 @dataclass
@@ -102,6 +111,9 @@ class DemoDir:
     def __repr__(self) -> str:
         return f"[{self.dirpath.name}]\n" + "\n".join(repr(e) for e in self.examples)
 
+    def __str__(self):
+        return f"[{self.dirpath.name}]\n" + "\n".join(str(e) for e in self.examples)
+
     def __iter__(self):
         return iter(self.examples)
 
@@ -111,31 +123,34 @@ test_str = """
 [demo_dir_name]
 ---              # Create in demo_dir_name
 print('Valid')
-print('Example')
+print('Example #1')
 --- foo          # Create in demo_dir_name/foo
+print('Another')
 print('Valid')
-print('Example')
+print('Example #2')
 --- bar          # Create in demo_dir_name/bar
 print('Valid')
 print('Example')
+print('#3')
 --- bar/baz      # Create in demo_dir_name/baz
 print('No slug line')
-print('Example')
+print('Example #4')
 print('long enough')
 --- baz/qux      # Create in demo_dir_name/baz/qux
 print('For loop')
 for i in range(5):
-    print(f"{i = }")
+    print(f"{i = } Example #5")
 --- baz/qux/zap  # Create in demo_dir_name/baz/qux/zap
 print('While')
 i = 0
 while i < 5:
     i += 1
-    print(f"{i = }")
+    print(f"{i = } Example #6")
 """
 
 if __name__ == "__main__":
     examples = DemoDir(test_str)
+    print(examples)
     print(repr(examples))
     print("-" * 40)
     for example in examples:
