@@ -45,7 +45,7 @@ class Example:
         self.file_path.write_text(self.example_text + "\n", encoding="utf-8")
 
     def __repr__(self) -> str:
-        return self.example_text
+        return f"--- {self.dir_path}\n" + self.example_text
 
 
 @dataclass
@@ -94,7 +94,7 @@ class DemoDir:
             shutil.rmtree(self.dirpath)
 
     def __repr__(self) -> str:
-        return "\n---\n".join(repr(e) for e in self.examples)
+        return f"[{self.dirpath.name}]\n" + "\n".join(repr(e) for e in self.examples)
 
     def __iter__(self):
         return iter(self.examples)
@@ -131,7 +131,7 @@ while i < 5:
 if __name__ == "__main__":
     examples = DemoDir(test_str)
     print(repr(examples))
-    print("-" * 40)
-    for example in examples:
-        print(example.file_path)
-    examples.delete()
+    # print("-" * 40)
+    # for example in examples:
+    #     print(example.file_path)
+    # examples.delete()
