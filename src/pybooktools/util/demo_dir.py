@@ -9,6 +9,7 @@ from typing import ClassVar
 @dataclass
 class Example:
     id_counter: ClassVar[int] = 0  # Class-level counter for IDs
+    demo_dir_path: ClassVar[Path] = field(init=False)
     dir_path: Path
     input_text: str
     example_text: str = field(init=False)
@@ -45,7 +46,9 @@ class Example:
         self.file_path.write_text(self.example_text + "\n", encoding="utf-8")
 
     def __repr__(self) -> str:
-        return f"--- {self.dir_path}\n" + self.example_text
+        # return f"--- {self.dir_path}\n" + self.example_text
+        relative_path = self.file_path.relative_to(self.demo_dir_path)
+        return f"--- {relative_path}\n" + self.example_text
 
 
 @dataclass
@@ -58,6 +61,7 @@ class DemoDir:
     def __post_init__(self) -> None:
         self.input_lines = self.input_text.strip().splitlines()
         self.dirpath = Path(self.input_lines[0].strip(' []'))
+        Example.demo_dir_path = self.dirpath
         self._parse_examples()
         self._reset_example_dir()
         self._write_examples_to_disk()
@@ -112,15 +116,15 @@ print('Example')
 --- bar           # Create in demo_dir_name/bar
 print('Valid')
 print('Example')
---- bar/baz1      # Create in demo_dir_name/baz1
+--- bar/baz      # Create in demo_dir_name/baz
 print('No slug line')
 print('Example')
 print('long enough')
---- baz/qux      # Create in demo_dir_name/baz2/qux
+--- baz/qux      # Create in demo_dir_name/baz/qux
 print('For loop')
 for i in range(5):
     print(f"{i = }")
---- baz/zap   # Create in demo_dir_name/baz2/zap
+--- baz/zap      # Create in demo_dir_name/baz/zap
 print('While')
 i = 0
 while i < 5:
@@ -134,4 +138,4 @@ if __name__ == "__main__":
     # print("-" * 40)
     # for example in examples:
     #     print(example.file_path)
-    # examples.delete()
+    examples.delete()
