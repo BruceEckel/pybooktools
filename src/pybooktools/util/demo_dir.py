@@ -47,7 +47,7 @@ class Example:
 
     def __repr__(self) -> str:
         # return f"--- {self.dir_path}\n" + self.example_text
-        relative_path = self.file_path.relative_to(self.demo_dir_path)
+        relative_path = self.file_path.relative_to(self.demo_dir_path).parent.as_posix()
         return f"--- {relative_path}\n" + self.example_text
 
 
