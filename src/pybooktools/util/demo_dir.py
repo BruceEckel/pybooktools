@@ -1,5 +1,4 @@
 # demo_dir.py
-# Next: Create DemoDir from existing directory tree
 import re
 import shutil
 from dataclasses import dataclass, field
@@ -104,6 +103,16 @@ class DemoDir:
     def from_file(cls, file_path: Path) -> "DemoDir":
         return cls(file_path.read_text(encoding="utf-8"))
 
+    @classmethod
+    def from_directory(cls, directory: Path) -> "DemoDir":
+        directory = directory.resolve()
+        examples_text = [f"[{directory.name}]"]
+        for file in directory.rglob("*.py"):
+            relative_path = file.relative_to(directory).as_posix()
+            content = file.read_text(encoding="utf-8").strip()
+            examples_text.append(f"--- {relative_path}\n{content}")
+        return cls("\n".join(examples_text))
+
     def delete(self) -> None:
         if self.dirpath.exists():
             shutil.rmtree(self.dirpath)
@@ -149,10 +158,13 @@ while i < 5:
 """
 
 if __name__ == "__main__":
-    examples = DemoDir(test_str)
+    examples_a = DemoDir(test_str)
+    examples = DemoDir.from_directory(examples_a.dirpath)
+    print(" str ".center(50, '-'))
     print(examples)
+    print(" repr ".center(50, '-'))
     print(repr(examples))
-    print("-" * 40)
+    print(" Paths ".center(50, '-'))
     for example in examples:
         print(example.file_path)
     examples.delete()
