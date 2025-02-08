@@ -118,18 +118,17 @@ class DemoDir:
     def from_directory(cls, directory: Path) -> "DemoDir":
         banner(f"Reading examples from `{directory.name}`")
         directory = directory.resolve()
-        print(f"resolved: {directory}")
-        examples_text = [f"[{directory.name}]"]
-        print(f"examples_text: {examples_text}")
-        for file in directory.rglob("*.py"):
-            relative_path = file.relative_to(directory).as_posix()
-            content = file.read_text(encoding="utf-8").strip()
-            examples_text.append(f"--- {relative_path}\n{content}")
-        print("final examples_text:")
-        for line in examples_text:
-            print(line)
+        examples = [
+            Example(
+                dir_path=directory,
+                input_text=file.read_text(encoding="utf-8").strip()
+            )
+            for file in directory.rglob("*.py")
+        ]
+        demo_dir = cls(input_text=f"[{directory.name}]")
+        demo_dir.examples = examples
         banner(f"END: Reading examples from `{directory.name}`")
-        return cls("\n".join(examples_text))
+        return demo_dir
 
     def delete(self) -> None:
         if self.dirpath.exists():
