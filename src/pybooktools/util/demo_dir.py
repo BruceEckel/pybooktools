@@ -21,16 +21,17 @@ class Example:
         self.input_text = self.input_text.strip()
         self.lines = self.input_text.splitlines()
         self._filename = self._extract_filename() or self._generate_filename()
+
+        # Match or add the slug line
         slugline_pattern = re.compile(r"^#\s*([\w/]+\.py)")
         if self.lines and slugline_pattern.match(self.lines[0]):
             self.lines[0] = f"# {self._filename}"
         else:
             self.lines.insert(0, f"# {self._filename}")
+
         self.example_text = "\n".join(self.lines)
-        self.relative_path = self.file_path.relative_to(self.demo_dir_path).parent.as_posix()
-        if self.relative_path == ".":
-            self.relative_path = ""
-        print(f"relative_path: {self.relative_path}")
+        self.relative_path = self.dir_path.relative_to(self.demo_dir_path).as_posix()
+        print(f"relative_path: {self.relative_path}")  # Debugging output
 
     @classmethod
     def reset_counter(cls):
@@ -59,9 +60,9 @@ class Example:
 
     def __repr__(self) -> str:
         slugline = f"# {self.filename}"
-        content_without_slug = self.example_text \
-            if not self.example_text.startswith(slugline) \
-            else "\n".join(self.lines[1:])
+        content_without_slug = (
+            self.example_text if not self.example_text.startswith(slugline) else "\n".join(self.lines[1:])
+        )
         return f"--- {self.relative_path}\n" + content_without_slug
 
     def __str__(self) -> str:
@@ -80,7 +81,7 @@ class DemoDir:
         self.dirpath = Path(self.input_lines[0].strip(' []'))
         Example.demo_dir_path = self.dirpath
         self._parse_examples()
-        self._reset_example_dir()
+        self._clean_example_dir()
         self._write_examples_to_disk()
 
     def _parse_examples(self) -> None:
@@ -98,7 +99,7 @@ class DemoDir:
         if current_block:
             self.examples.append(Example(self.dirpath / (file_path or ''), input_text="\n".join(current_block)))
 
-    def _reset_example_dir(self) -> None:
+    def _clean_example_dir(self) -> None:
         if self.dirpath.exists():
             shutil.rmtree(self.dirpath)
         self.dirpath.mkdir(parents=True)
@@ -179,4 +180,4 @@ if __name__ == "__main__":
     banner("Paths")
     for example in examples:
         print(example.file_path)
-    # examples.delete()
+    examples.delete()
