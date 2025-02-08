@@ -1,6 +1,5 @@
 # un_flatten.py
-#: unflatten_python_directory.py
-
+import argparse
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -8,11 +7,10 @@ from typing import Generator, Tuple
 
 
 @dataclass
-class DirectoryUnflattener:
+class DirectoryReinflater:
     flattened_file: Path
-    output_directory: Path
 
-    def unflatten_directory(self) -> None:
+    def reinflate(self) -> None:
         """
         Reconstruct the original directory structure from the flattened file.
         """
@@ -21,7 +19,7 @@ class DirectoryUnflattener:
 
         for file_path, content in file_sections:
             relative_path = self._strip_to_top_level(file_path, top_level_dir)
-            output_file = self.output_directory / relative_path
+            output_file = Path(relative_path)
             output_file.parent.mkdir(parents=True, exist_ok=True)
             output_file.write_text(content, encoding="utf-8")
 
@@ -63,25 +61,13 @@ class DirectoryUnflattener:
 
 
 def main() -> None:
-    """
-    Main entry point for the script. Prompts for a flattened file and optional output directory.
-    """
-    import argparse
-
     parser = argparse.ArgumentParser(
-        description="Unflatten a file back into the original directory structure."
+        description="Reinflate a file back into the original directory structure."
     )
     parser.add_argument(
         "flattened_file",
         type=str,
         help="Path to the flattened file to unflatten.",
-    )
-    parser.add_argument(
-        "output_directory",
-        type=str,
-        nargs="?",
-        help="Path to the output directory where the files will be reconstructed. Defaults to a directory named after "
-             "the top-level directory.",
     )
     args = parser.parse_args()
 
@@ -91,20 +77,10 @@ def main() -> None:
         print(f"Error: {flattened_file} is not a valid file.")
         return
 
-    # Detect the top-level directory from the flattened file
-    unflattener = DirectoryUnflattener(flattened_file, Path())
-    top_level_dir = unflattener.detect_top_level_directory()
+    unflattener = DirectoryReinflater(flattened_file)
+    unflattener.reinflate()
 
-    # Set default output directory if not provided
-    output_directory = Path(args.output_directory).resolve() \
-        if args.output_directory \
-        else flattened_file.parent / top_level_dir
-
-    output_directory.mkdir(parents=True, exist_ok=True)
-    unflattener.output_directory = output_directory
-    unflattener.unflatten_directory()
-
-    print(f"Files reconstructed in: {output_directory}")
+    print(f"Files reconstructed from: {flattened_file}")
 
 
 if __name__ == "__main__":
