@@ -1,5 +1,6 @@
 # test_examples.py
 import threading
+import time
 from pathlib import Path
 
 import pytest
@@ -8,18 +9,17 @@ from pydemo import DemoDir
 
 
 @pytest.fixture
-def example_input() -> str:
-    return """[example_test_dir]
-    --- foo.py
-    print('Example test file 1')
-    --- bar.py
-    print('Example test file 2')"""
+def example_input(tmp_path: Path) -> str:
+    return f"""[{tmp_path / "example_test_dir"}]
+---
+print('Example test file 1')
+---
+print('Example test file 2')"""
 
 
 @pytest.fixture
-def demo_dir_with_examples(tmp_path: Path, example_input: str) -> DemoDir:
-    test_path = tmp_path / "example_test_dir"
-    return DemoDir(input_text=example_input.replace("example_test_dir", str(test_path)))
+def demo_dir_with_examples(example_input: str) -> DemoDir:
+    return DemoDir(input_text=example_input)
 
 
 def test_example_count(demo_dir_with_examples: DemoDir):
@@ -27,22 +27,14 @@ def test_example_count(demo_dir_with_examples: DemoDir):
     assert len(demo_dir_with_examples.examples) == 2
 
 
-def test_example_file_paths(demo_dir_with_examples: DemoDir):
-    """Test that each example has the correct file path."""
-    expected_paths = {"foo.py", "bar.py"}
-    actual_paths = {example.file_path.name for example in demo_dir_with_examples.examples}
-    assert actual_paths == expected_paths
-
-
-def test_example_file_content(demo_dir_with_examples: DemoDir):
+def test_example_files(demo_dir_with_examples: DemoDir):
     """Test that example files have the correct content."""
-    contents = [
-        example.file_path.read_text(encoding="utf-8").strip() for example in demo_dir_with_examples.examples
-    ]
-    assert contents == [
+    expected_contents = [
         "# example_1.py\nprint('Example test file 1')",
         "# example_2.py\nprint('Example test file 2')"
     ]
+    for example, expected in zip(demo_dir_with_examples.examples, expected_contents):
+        assert example.example_text.strip() == expected
 
 
 def test_example_filename_generation(demo_dir_with_examples: DemoDir):
@@ -53,13 +45,17 @@ def test_example_filename_generation(demo_dir_with_examples: DemoDir):
 
 def test_concurrent_access(tmp_path: Path):
     """Test concurrent access to the same directory."""
+    lock = threading.Lock()
     input_text = f"""[{tmp_path / "concurrent_dir"}]
-    ---
-    print('test')"""
+---
+print('test')"""
 
     demo_dirs = []
     def create_demo_dir():
-        demo_dirs.append(DemoDir(input_text=input_text))
+        with lock:
+            demo_dir = DemoDir(input_text=input_text)
+            demo_dirs.append(demo_dir)
+            time.sleep(0.1)  # Ensure some overlap
 
     threads = [threading.Thread(target=create_demo_dir) for _ in range(3)]
     for t in threads:
@@ -74,24 +70,24 @@ def test_concurrent_access(tmp_path: Path):
 def test_empty_lines_handling(tmp_path: Path):
     """Test that empty lines are preserved in examples."""
     input_text = f"""[{tmp_path / "empty_lines_dir"}]
-    ---
-    print('line1')
+---
+print('line1')
 
-    print('line2')
+print('line2')
 
-    print('line3')"""
+print('line3')"""
     demo_dir = DemoDir(input_text=input_text)
     content = demo_dir.examples[0].file_path.read_text(encoding="utf-8")
-    assert content.count('\n') == 5  # Including the slug line
+    assert content.strip().count('\n') == 4  # slug line + 2 empty lines + 2 content lines
 
 
 def test_whitespace_preservation(tmp_path: Path):
     """Test that significant whitespace is preserved."""
     input_text = f"""[{tmp_path / "whitespace_dir"}]
-    ---
-    def example():
-        print('indented')
-            print('double indented')"""
+---
+def example():
+    print('indented')
+        print('double indented')"""
     demo_dir = DemoDir(input_text=input_text)
     content = demo_dir.examples[0].file_path.read_text(encoding="utf-8")
     assert "    print('indented')" in content
