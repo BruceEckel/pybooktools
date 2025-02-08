@@ -21,13 +21,20 @@ class Example:
         self.input_text = self.input_text.strip()
         self.lines = self.input_text.splitlines()
         self._filename = self._extract_filename() or self._generate_filename()
-        if not self.lines[0].startswith(f"# {self._filename}"):
+        slugline_pattern = re.compile(r"^#\s*([\w/]+\.py)")
+        if self.lines and slugline_pattern.match(self.lines[0]):
+            self.lines[0] = f"# {self._filename}"
+        else:
             self.lines.insert(0, f"# {self._filename}")
         self.example_text = "\n".join(self.lines)
         self.relative_path = self.file_path.relative_to(self.demo_dir_path).parent.as_posix()
-        # Avoid outputting '.' if the file is in the root directory
         if self.relative_path == ".":
             self.relative_path = ""
+        print(f"relative_path: {self.relative_path}")
+
+    @classmethod
+    def reset_counter(cls):
+        cls.id_counter = 0
 
     def _extract_filename(self) -> str | None:
         match = re.match(r"^---\s*([\w/]+\.py)", self.lines[0])
@@ -77,6 +84,7 @@ class DemoDir:
         self._write_examples_to_disk()
 
     def _parse_examples(self) -> None:
+        Example.reset_counter()
         current_block = []
         file_path = None
         for line in self.input_lines[1:]:
@@ -158,13 +166,17 @@ while i < 5:
 """
 
 if __name__ == "__main__":
+    def banner(msg: str) -> None:
+        print(f" {msg} ".center(50, '-'))
+
+
     examples_a = DemoDir(test_str)
     examples = DemoDir.from_directory(examples_a.dirpath)
-    print(" str ".center(50, '-'))
+    banner("str")
     print(examples)
-    print(" repr ".center(50, '-'))
+    banner("repr")
     print(repr(examples))
-    print(" Paths ".center(50, '-'))
+    banner("Paths")
     for example in examples:
         print(example.file_path)
-    examples.delete()
+    # examples.delete()
