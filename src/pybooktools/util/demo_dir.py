@@ -116,18 +116,16 @@ class DemoDir:
 
     @classmethod
     def from_directory(cls, directory: Path) -> "DemoDir":
-        banner(f"Reading examples from `{directory.name}`")
-        directory = directory.resolve()
+        Example.reset_counter()
         examples = [
             Example(
-                dir_path=directory,
+                dir_path=file.parent.resolve(),
                 input_text=file.read_text(encoding="utf-8").strip()
             )
             for file in directory.rglob("*.py")
         ]
         demo_dir = cls(input_text=f"[{directory.name}]")
         demo_dir.examples = examples
-        banner(f"END: Reading examples from `{directory.name}`")
         return demo_dir
 
     def delete(self) -> None:
