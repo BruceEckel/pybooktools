@@ -7,6 +7,7 @@ readme = "README.md"
 requires-python = ">=3.13.0"
 dependencies = [
     "cyclopts>=3.1.5",
+    "hypothesis>=6.125.2",
     "icecream>=2.1.3",
     "pytest>=8.3.4",
     "rich>=13.9.4",
@@ -14,11 +15,14 @@ dependencies = [
 ]
 
 [project.scripts]
+aiflatten = "ai_flatten.flatten_dir_for_ai:main"
+unflatten = "ai_flatten.un_flatten:main"
 px = "pybooktools.tls.update_example_output:main"
 cr = "pybooktools.reminder:main"
 bookup = "pybooktools.update_markdown_python_examples:app"
 slug = "pybooktools.slug_line:app"
 chapnum = "pybooktools.renumber_chapters:app"
+
 
 [tool.uv]
 package = true
