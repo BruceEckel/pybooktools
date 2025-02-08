@@ -6,9 +6,13 @@ from pathlib import Path
 from typing import ClassVar
 
 
+def banner(msg: str) -> None:
+    print(f" {msg} ".center(60, '-'))
+
+
 @dataclass
 class Example:
-    id_counter: ClassVar[int] = 0  # Class-level counter for IDs
+    id_counter: ClassVar[int] = 0
     demo_dir_path: ClassVar[Path] = field(init=False)
     dir_path: Path
     input_text: str
@@ -21,20 +25,19 @@ class Example:
         self.input_text = self.input_text.strip()
         self.lines = self.input_text.splitlines()
         self._filename = self._extract_filename() or self._generate_filename()
+        self._ensure_slug_line()
+        self.example_text = "\n".join(self.lines)
+        self._relative_path = self.dir_path.relative_to(self.demo_dir_path).as_posix()
 
-        # Match or add the slug line
+    def _ensure_slug_line(self) -> None:
         slugline_pattern = re.compile(r"^#\s*([\w/]+\.py)")
         if self.lines and slugline_pattern.match(self.lines[0]):
             self.lines[0] = f"# {self._filename}"
         else:
             self.lines.insert(0, f"# {self._filename}")
 
-        self.example_text = "\n".join(self.lines)
-        self.relative_path = self.dir_path.relative_to(self.demo_dir_path).as_posix()
-        print(f"relative_path: {self.relative_path}")  # Debugging output
-
     @classmethod
-    def reset_counter(cls):
+    def reset_counter(cls) -> None:
         cls.id_counter = 0
 
     def _extract_filename(self) -> str | None:
@@ -60,13 +63,11 @@ class Example:
 
     def __repr__(self) -> str:
         slugline = f"# {self.filename}"
-        content_without_slug = (
-            self.example_text if not self.example_text.startswith(slugline) else "\n".join(self.lines[1:])
-        )
-        return f"--- {self.relative_path}\n" + content_without_slug
+        content_without_slug = self.example_text.removeprefix(slugline).lstrip()
+        return f"--- {self._relative_path}\n{content_without_slug}"
 
     def __str__(self) -> str:
-        return f"{self.file_path.as_posix()}:\n" + self.example_text
+        return f"{self.file_path.as_posix()}:\n{self.example_text}"
 
 
 @dataclass
@@ -78,35 +79,36 @@ class DemoDir:
 
     def __post_init__(self) -> None:
         self.input_lines = self.input_text.strip().splitlines()
-        self.dirpath = Path(self.input_lines[0].strip(' []'))
+        self.dirpath = Path(self.input_lines.pop(0).strip(' []'))
         Example.demo_dir_path = self.dirpath
         self._parse_examples()
-        self._clean_example_dir()
+        self._prepare_directory()
         self._write_examples_to_disk()
 
     def _parse_examples(self) -> None:
         Example.reset_counter()
-        current_block = []
-        file_path = None
-        for line in self.input_lines[1:]:
+        current_block, file_path = [], None
+
+        for line in self.input_lines:
             if line.startswith('---'):
                 if current_block:
                     self.examples.append(Example(self.dirpath / (file_path or ''), input_text="\n".join(current_block)))
-                    current_block = []
-                file_path = line[3:].split('#')[0].strip()  # Extract file path and remove comments
+                    current_block.clear()
+                file_path = line[3:].split('#')[0].strip()
             else:
                 current_block.append(line)
+
         if current_block:
             self.examples.append(Example(self.dirpath / (file_path or ''), input_text="\n".join(current_block)))
 
-    def _clean_example_dir(self) -> None:
+    def _prepare_directory(self) -> None:
         if self.dirpath.exists():
             shutil.rmtree(self.dirpath)
         self.dirpath.mkdir(parents=True)
 
     def _write_examples_to_disk(self) -> None:
-        for e in self.examples:
-            e.write_to_disk()
+        for example in self.examples:
+            example.write_to_disk()
 
     @classmethod
     def from_file(cls, file_path: Path) -> "DemoDir":
@@ -114,12 +116,19 @@ class DemoDir:
 
     @classmethod
     def from_directory(cls, directory: Path) -> "DemoDir":
+        banner(f"Reading examples from `{directory.name}`")
         directory = directory.resolve()
+        print(f"resolved: {directory}")
         examples_text = [f"[{directory.name}]"]
+        print(f"examples_text: {examples_text}")
         for file in directory.rglob("*.py"):
             relative_path = file.relative_to(directory).as_posix()
             content = file.read_text(encoding="utf-8").strip()
             examples_text.append(f"--- {relative_path}\n{content}")
+        print("final examples_text:")
+        for line in examples_text:
+            print(line)
+        banner(f"END: Reading examples from `{directory.name}`")
         return cls("\n".join(examples_text))
 
     def delete(self) -> None:
@@ -127,13 +136,26 @@ class DemoDir:
             shutil.rmtree(self.dirpath)
 
     def __repr__(self) -> str:
-        return f"[{self.dirpath.name}]\n" + "\n".join(repr(e) for e in self.examples)
+        return f"[{self.dirpath.name}]\n" + "\n".join(repr(example) for example in self.examples)
 
-    def __str__(self):
-        return f"[{self.dirpath.name}]\n" + "\n".join(str(e) for e in self.examples)
+    def __str__(self) -> str:
+        return f"[{self.dirpath.name}]\n" + "\n".join(str(example) for example in self.examples)
 
     def __iter__(self):
         return iter(self.examples)
+
+    def show(self) -> None:
+        banner(self.dirpath.name)
+        banner("str")
+        print(self)
+        banner("repr")
+        print(repr(self))
+        banner("Paths")
+        for example in self:
+            print(example.file_path)
+        banner("Examples")
+        for example in self:
+            print(example)
 
 
 # File names are auto-generated by `Example` class:
@@ -167,17 +189,8 @@ while i < 5:
 """
 
 if __name__ == "__main__":
-    def banner(msg: str) -> None:
-        print(f" {msg} ".center(50, '-'))
-
-
     examples_a = DemoDir(test_str)
+    examples_a.show()
     examples = DemoDir.from_directory(examples_a.dirpath)
-    banner("str")
-    print(examples)
-    banner("repr")
-    print(repr(examples))
-    banner("Paths")
-    for example in examples:
-        print(example.file_path)
+    examples.show()
     examples.delete()
