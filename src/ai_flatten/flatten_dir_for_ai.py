@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Generator, List
 
-header = """
+header = """\
 What follows is intended to be used as input to AI models that can understand Python code.
 
 The files are "flattened" into a single text file with one file per Python file.
@@ -15,6 +15,7 @@ The end of each file is marked with a comment indicating the end of the file.
 Please absorb these files, and produce requested corrections in the same format.
 When producing corrections, please use the same file path format as the original files.
 When producing corrections, only include the files that are modified.
+
 """
 
 
@@ -22,7 +23,7 @@ When producing corrections, only include the files that are modified.
 class DirectoryFlattener:
     directory: Path
     ignore_patterns: List[str] = field(default_factory=lambda: [
-        ".*"  # Ignore directories starting with '.'
+        "\\..*"  # Ignore directories starting with '.'
     ])
 
     def flatten_directory(self) -> Path:
@@ -34,7 +35,6 @@ class DirectoryFlattener:
         output_content = "\n".join(
             self._format(path) for path in self._python_files()
         )
-        print(f"{output_content = }")
         output_file.write_text(header + output_content, encoding="utf-8")
         return output_file
 
@@ -49,9 +49,11 @@ class DirectoryFlattener:
         """
         Check if the file or directory path should be ignored based on the ignore patterns.
         """
-        ignore = any(re.fullmatch(pattern, part) for pattern in self.ignore_patterns for part in file_path.parts)
-        print(f"{file_path = }  {ignore = }")
-        return ignore
+        for part in file_path.parts:
+            if any(re.fullmatch(pattern, part) for pattern in self.ignore_patterns):
+                print(f"Ignoring {file_path} due to pattern match on part '{part}'")
+                return True
+        return False
 
     @staticmethod
     def _format(file_path: Path) -> str:
