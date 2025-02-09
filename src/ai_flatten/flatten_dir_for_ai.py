@@ -16,6 +16,8 @@ Please absorb these files, and produce requested corrections in the same format.
 When producing corrections, please use the same file path format as the original files.
 When producing corrections, only include the files that are modified, but include complete files.
 
+Do not perform analysis or corrections until I ask for them.
+
 """
 
 
