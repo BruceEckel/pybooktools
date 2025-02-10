@@ -14,7 +14,9 @@ The end of each file is marked with a comment indicating the end of the file.
 
 Please absorb these files, and produce requested corrections in the same format.
 When producing corrections, please use the same file path format as the original files.
-When producing corrections, only include the files that are modified.
+When producing corrections, only include the files that are modified, but include complete files.
+
+Do not perform analysis or corrections until I ask for them.
 
 """
 
@@ -42,7 +44,7 @@ class DirectoryFlattener:
         """Recursively yield all Python files in the directory, skipping ignored directories."""
         for file_path in self.directory.rglob("*.py"):
             if not self._ignore(file_path):
-                print(f"{file_path = }")
+                print(file_path)
                 yield file_path
 
     def _ignore(self, file_path: Path) -> bool:
@@ -76,15 +78,13 @@ def main() -> None:
     args = parser.parse_args()
 
     directory = Path(args.directory).resolve()
-    print(f"{directory = }")
     if not directory.is_dir():
         print(f"Error: {directory} is not a valid directory.")
         return
 
     flattener = DirectoryFlattener(directory)
-    print(f"{flattener = }")
     output_file = flattener.flatten_directory()
-    print(f"Flattened content written to: {output_file}")
+    print(f"Flattened [{directory}] into: [{output_file}]")
 
 
 if __name__ == "__main__":

@@ -96,6 +96,7 @@ class DemoDir:
     def _parse_examples(self) -> None:
         Example.reset_counter()
         current_block, file_path = [], None
+        filename_pattern = re.compile(r"^[\w.-]+\.py$")  # Added strict filename validation
 
         for line in self.input_lines:
             if line.startswith('---'):
@@ -103,6 +104,8 @@ class DemoDir:
                     self.examples.append(Example(self.dirpath / (file_path or ''), input_text="\n".join(current_block)))
                     current_block.clear()
                 file_path = line[3:].split('#')[0].strip()
+                if not filename_pattern.match(file_path):
+                    raise ValueError(f"Invalid filename: {file_path}")
             else:
                 current_block.append(line)
 
