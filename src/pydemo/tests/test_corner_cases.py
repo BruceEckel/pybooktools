@@ -80,3 +80,13 @@ def test_property_example_content(content: str):
             assert content.strip() in demo_dir.examples[0].example_text
         except ValueError:
             pytest.skip("Invalid input for DemoDir")
+
+
+def test_control_character_preservation(tmp_path: Path):
+    """Test that control characters are preserved in example content."""
+    content = '0\x1e0'  # Control character
+    input_text = f"""[{tmp_path / "control_char_dir"}]
+---
+{content}"""
+    demo_dir = DemoDir(input_text=input_text)
+    assert content in demo_dir.examples[0].example_text
