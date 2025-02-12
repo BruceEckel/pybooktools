@@ -1,14 +1,19 @@
 # flatten_dir_for_ai.py
+"""
+"Flatten" Python directory and place result onto the clipboard.
+"""
+
 import argparse
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Generator, List
 
-header = """\
+import pyperclip
+
+header = """
 What follows is intended to be used as input to AI models that can understand Python code.
 
-The files are "flattened" into a single text file with one file per Python file.
 Each file starts with a comment indicating the file's path, followed by the file's content.
 The end of each file is marked with a comment indicating the end of the file.
 
@@ -28,17 +33,17 @@ class DirectoryFlattener:
         "\\..*"  # Ignore directories starting with '.'
     ])
 
-    def flatten_directory(self) -> Path:
+    def flatten_directory(self) -> str:
         """
         Create a single text file containing all Python files in the directory tree,
         excluding directories that match ignore patterns.
         """
-        output_file = self.directory.parent / f"{self.directory.name}_ai_flattened.txt"
         output_content = "\n".join(
             self._format(path) for path in self._python_files()
         )
-        output_file.write_text(header + output_content, encoding="utf-8")
-        return output_file
+        full_content = header + output_content
+        pyperclip.copy(full_content)  # Copy to clipboard
+        return full_content
 
     def _python_files(self) -> Generator[Path, None, None]:
         """Recursively yield all Python files in the directory, skipping ignored directories."""
@@ -68,7 +73,7 @@ class DirectoryFlattener:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Flatten a Python directory tree into a single text file"
+        description="Flatten a Python directory tree and copy it to the clipboard"
     )
     parser.add_argument(
         "directory",
@@ -83,8 +88,8 @@ def main() -> None:
         return
 
     flattener = DirectoryFlattener(directory)
-    output_file = flattener.flatten_directory()
-    print(f"Flattened [{directory}] into: [{output_file}]")
+    flattener.flatten_directory()
+    print(f"Flattened [{directory}] and copied to clipboard.")
 
 
 if __name__ == "__main__":
