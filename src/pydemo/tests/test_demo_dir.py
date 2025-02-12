@@ -86,26 +86,26 @@ def test_demo_dir_delete(tmp_path, simple_demo_input):
 
 
 # Test Example class
-def test_example_filename_generation(demo_dir_path):
+def test_example_filename_generation(tmp_path):
     """Test automatic filename generation."""
     Example.reset_counter()
-    example = Example(demo_dir_path, "print('test')")
+    example = Example(tmp_path, "print('test')")
     assert example.filename == "example_1.py"
 
-    example2 = Example(demo_dir_path, "print('test2')")
+    example2 = Example(tmp_path, "print('test2')")
     assert example2.filename == "example_2.py"
 
 
-def test_example_slug_line(demo_dir_path):
+def test_example_slug_line(tmp_path):
     """Test slug line handling."""
     Example.reset_counter()
     # Even with an explicit filename in the content, it should use generated filename
-    example = Example(demo_dir_path, """# test1.py
+    example = Example(tmp_path, """# test1.py
 print('test')""")
     assert example.lines[0] == "# example_1.py"
 
     # Test with no initial slug line
-    example2 = Example(demo_dir_path, "print('test')")
+    example2 = Example(tmp_path, "print('test')")
     assert example2.lines[0] == "# example_2.py"
 
 
@@ -120,10 +120,10 @@ def test_example_write_to_disk(tmp_path):
     assert content.strip() == f"# {example.filename}\nprint('test')"
 
 
-def test_example_repr_and_str(demo_dir_path):
+def test_example_repr_and_str(tmp_path):
     """Test string representations."""
     Example.reset_counter()
-    example = Example(demo_dir_path, """# test.py
+    example = Example(tmp_path, """# test.py
 print('test')""")
     assert repr(example).startswith("---")
     assert str(example).endswith("print('test')")
