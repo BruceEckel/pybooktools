@@ -1,28 +1,8 @@
 # test_demo_dir.py
-import shutil
-from pathlib import Path
 
 import pytest
+
 from pydemo import DemoDir, Example
-
-
-# Test fixtures
-@pytest.fixture
-def temp_dir(tmp_path):
-    """Create a temporary directory for testing."""
-    yield tmp_path
-    # Cleanup after tests
-    if tmp_path.exists():
-        shutil.rmtree(tmp_path)
-
-
-@pytest.fixture
-def demo_dir_path():
-    """Set up the demo directory path for Example class."""
-    path = Path("test_demo")
-    Example.demo_dir_path = path
-    Example.reset_counter()  # Reset counter before each test
-    return path
 
 
 @pytest.fixture
@@ -50,7 +30,7 @@ print('Third file')
 
 
 # Test DemoDir class
-def test_demo_dir_creation(temp_dir, simple_demo_input):
+def test_demo_dir_creation(tmp_path, simple_demo_input):
     """Test basic DemoDir creation and file writing."""
     demo = DemoDir(simple_demo_input)
     assert demo.dirpath.name == "test_demo"
@@ -58,7 +38,7 @@ def test_demo_dir_creation(temp_dir, simple_demo_input):
     assert demo.examples[0].filename == "example_1.py"
 
 
-def test_demo_dir_complex_structure(temp_dir, complex_demo_input):
+def test_demo_dir_complex_structure(complex_demo_input):
     """Test DemoDir with multiple files."""
     Example.reset_counter()  # Ensure counter is reset
     demo = DemoDir(complex_demo_input)
@@ -69,10 +49,10 @@ def test_demo_dir_complex_structure(temp_dir, complex_demo_input):
     assert "example_3.py" in filenames
 
 
-def test_demo_dir_from_directory(temp_dir):
+def test_demo_dir_from_directory(tmp_path):
     """Test creating DemoDir from existing directory."""
     # Create test files
-    test_dir = temp_dir / "test_from_dir"
+    test_dir = tmp_path / "test_from_dir"
     test_dir.mkdir()
     Example.demo_dir_path = test_dir  # Set before creating files
 
@@ -97,7 +77,7 @@ def test_demo_dir_invalid_input():
         DemoDir("Invalid input without directory name")
 
 
-def test_demo_dir_delete(temp_dir, simple_demo_input):
+def test_demo_dir_delete(tmp_path, simple_demo_input):
     """Test directory deletion."""
     demo = DemoDir(simple_demo_input)
     assert demo.dirpath.exists()
@@ -129,11 +109,11 @@ print('test')""")
     assert example2.lines[0] == "# example_2.py"
 
 
-def test_example_write_to_disk(temp_dir):
+def test_example_write_to_disk(tmp_path):
     """Test writing example to disk."""
     Example.reset_counter()
-    Example.demo_dir_path = temp_dir
-    example = Example(temp_dir, "print('test')")
+    Example.demo_dir_path = tmp_path
+    example = Example(tmp_path, "print('test')")
     example.write_to_disk()
     assert example.file_path.exists()
     content = example.file_path.read_text()
@@ -150,7 +130,7 @@ print('test')""")
 
 
 # Integration tests
-def test_flat_structure_workflow(temp_dir):
+def test_flat_structure_workflow(tmp_path):
     """Test the workflow with flat file structure."""
     Example.reset_counter()
     input_text = """
