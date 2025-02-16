@@ -129,11 +129,11 @@ def split_directory_and_filename(root_dir: Path, candidate: str) -> tuple[Path, 
         path_obj = Path(candidate)
         # If the parent is just ".", that means there's no subdirectory.
         if path_obj.parent.name == "." and path_obj.parent != path_obj:
-            return (root_dir, path_obj.name)
-        return (root_dir / path_obj.parent, path_obj.name)
+            return root_dir, path_obj.name
+        return root_dir / path_obj.parent, path_obj.name
     else:
         # The user gave a directory path (or nothing), so let the Example auto-generate the filename.
-        return (root_dir / candidate, None)
+        return root_dir / candidate, None
 
 
 def parse_file_blocks(lines: list[str], root_dir: Path) -> list["Example"]:
