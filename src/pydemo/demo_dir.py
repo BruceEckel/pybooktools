@@ -49,15 +49,19 @@ def banner(msg: str) -> None:
     print(f" {msg} ".center(60, '-'))
 
 
-def parse_demo_dir_name(lines: list[str]) -> Path:
+def parse_demo_dir_name(lines: list[str]) -> tuple[Path, list[str]]:
     """
-    Extract the demo directory name from the first valid line enclosed in square brackets.
+    Find the line containing [some_directory_name], extract that name, and
+    return the corresponding Path plus the remaining lines after that line.
+
+    This version skips all lines before the '[directory_name]' line so that
+    docstring text preceeding it doesn't become part of the first example.
 
     Args:
-        lines: A list of lines where one of them should match the pattern '[dir_name]'.
+        lines: A list of lines (strings).
 
     Returns:
-        A Path object representing the directory name.
+        A tuple: (Path(directory_name), list_of_remaining_lines_after_that_line)
 
     Raises:
         ValueError: If the pattern '[dir_name]' is not found in the list of lines.
@@ -69,9 +73,9 @@ def parse_demo_dir_name(lines: list[str]) -> Path:
     if start_index is None:
         raise ValueError("Input text does not contain a valid directory name in square brackets.")
 
-    # Extract the directory line, remove it from the list, and parse out the directory name
-    dir_line = lines.pop(start_index).strip(" []")
-    return Path(dir_line)
+    dir_line = lines[start_index].strip(" []")  # e.g. "demo_dir_name"
+    remaining = lines[start_index + 1:]  # All lines after the directory line
+    return Path(dir_line), remaining
 
 
 def extract_path_part(block_line: str) -> str:
@@ -95,9 +99,9 @@ def extract_path_part(block_line: str) -> str:
 def split_directory_and_filename(root_dir: Path, candidate: str) -> tuple[Path, str | None]:
     """
     Split the candidate path into a directory path and optional filename. If it ends with ".py",
-    we treat everything before the last slash (if any) as the directory path, and the final
-    component as the actual filename. Otherwise, we treat the entire candidate as a directory,
-    and return None for the filename to be auto-generated later.
+    treat everything before the last slash (if any) as the directory path, and the final
+    component as the actual filename. Otherwise, treat the entire candidate as a directory,
+    returning None as the filename (auto-generate later).
 
     Example:
       candidate = "foo/bar.py"
@@ -115,25 +119,19 @@ def split_directory_and_filename(root_dir: Path, candidate: str) -> tuple[Path, 
       candidate = ""
         -> dir_path = root_dir
         -> filename = None   (auto-generate)
-
-    Args:
-        root_dir: The base directory for these files.
-        candidate: The extracted path portion (may or may not end with ".py").
-
-    Returns:
-        A 2-tuple: (dir_path, filename or None)
     """
+    path_obj = Path(candidate)
+    # If user explicitly provided a .py file:
     if candidate.endswith(".py"):
-        # The user provided a .py file. Separate directory vs. the last component.
-        # For example, "foo/bar.py" => path "foo", filename "bar.py".
-        path_obj = Path(candidate)
-        # If the parent is just ".", that means there's no subdirectory.
+        # Separate the final file component from any parent dirs
         if path_obj.parent.name == "." and path_obj.parent != path_obj:
+            # 'parent.name == "."' means there's no meaningful subdir
             return root_dir, path_obj.name
-        return root_dir / path_obj.parent, path_obj.name
+        else:
+            return root_dir / path_obj.parent, path_obj.name
     else:
-        # The user gave a directory path (or nothing), so let the Example auto-generate the filename.
-        return root_dir / candidate, None
+        # It's a directory path or empty => let Example auto-generate .py name
+        return root_dir / path_obj, None
 
 
 def parse_file_blocks(lines: list[str], root_dir: Path) -> list["Example"]:
@@ -146,7 +144,7 @@ def parse_file_blocks(lines: list[str], root_dir: Path) -> list["Example"]:
     to build `Example` objects.
 
     Args:
-        lines: Remaining lines after removing the directory name line.
+        lines: Lines after removing the directory name line.
         root_dir: The resolved directory where the examples will be stored.
 
     Returns:
@@ -162,7 +160,7 @@ def parse_file_blocks(lines: list[str], root_dir: Path) -> list["Example"]:
 
     for line in lines:
         if line.startswith('---'):
-            # If there is a current block accumulated, save it as an Example
+            # If there is a current block, finalize it into an Example
             if from_line_blocks:
                 examples.append(
                     Example(
@@ -205,7 +203,8 @@ class Example:
 
     dir_path: Path
     input_text: str
-    filename: str | None = field(default=None)  # If None, we generate or extract from the block
+    filename: str | None = field(default=None)  # If None, we auto-generate or extract from a slug line
+
     example_text: str = field(init=False)
     lines: list[str] = field(init=False)
     _final_filename: str = field(init=False)
@@ -219,16 +218,19 @@ class Example:
         self.input_text = self.input_text.strip()
         self.lines = self.input_text.splitlines()
 
-        # If user didn't provide an explicit filename, check if the first line starts with '--- <something>.py'
-        # or else auto-generate a unique filename.
+        # If user didn't provide an explicit filename, see if the block includes '--- <something>.py'
+        # else auto-generate a unique filename.
         if not self.filename:
             extracted = self._extract_filename_from_slugline()
             self._final_filename = extracted or self._generate_filename()
         else:
             self._final_filename = self.filename
 
+        # Insert or fix the slug line
         self._ensure_slug_line()
         self.example_text = "\n".join(self.lines)
+
+        # Compute relative path from the top-level demo directory
         self._relative_path = (
             self.dir_path.resolve()
             .relative_to(self.demo_dir_path.resolve())
@@ -237,20 +239,14 @@ class Example:
 
     @classmethod
     def reset_counter(cls) -> None:
-        """
-        Reset the global counter used to auto-generate unique filenames.
-        """
+        """Reset the global counter for auto-generated filenames."""
         cls.id_counter = 0
 
     def _extract_filename_from_slugline(self) -> str | None:
         """
         If the first line starts with '--- <something>.py', extract <something>.py if present.
-
-        Returns:
-            The extracted filename (as a string) or None if not found.
+        Returns the extracted filename or None if not found.
         """
-        # e.g. the line could be: "--- foo/bar.py"
-        # We'll see if it has a pattern that includes .py
         if not self.lines:
             return None
         match_obj = re.match(r"^---\s*([\w/.\-]+\.py)", self.lines[0])
@@ -258,19 +254,14 @@ class Example:
 
     @staticmethod
     def _generate_filename() -> str:
-        """
-        Auto-generate a unique filename using the global id_counter.
-
-        Returns:
-            A string representing the generated filename.
-        """
+        """Auto-generate a unique filename like 'example_1.py'."""
         Example.id_counter += 1
         return f"example_{Example.id_counter}.py"
 
     def _ensure_slug_line(self) -> None:
         """
-        Ensure the first line of the example is a slug line (i.e., '# <filename>').
-        Overwrite any existing slug line if necessary.
+        Ensure the first line of the example is a slug line in the form "# <filename>".
+        Overwrite or insert if needed.
         """
         slugline_pattern = re.compile(r"^#\s*([\w/]+\.py)")
         expected_slug = f"# {self._final_filename}"
@@ -278,36 +269,29 @@ class Example:
         if self.lines and slugline_pattern.match(self.lines[0]):
             self.lines[0] = expected_slug
         else:
-            # Insert a new slug line at the top
             self.lines.insert(0, expected_slug)
 
     @property
     def file_path(self) -> Path:
-        """
-        The full path where this example will be written.
-        """
+        """The full path for the example."""
         return self.dir_path / self._final_filename
 
     def write_to_disk(self) -> None:
-        """
-        Create any necessary directories and write the example to the designated file path.
-        """
+        """Write the example text to disk, creating parent dirs as needed."""
         self.file_path.parent.mkdir(parents=True, exist_ok=True)
         self.file_path.write_text(self.example_text + "\n", encoding="utf-8")
 
     def __repr__(self) -> str:
         """
-        String representation suitable for debugging. Shows the relative path
-        and the content of the example (excluding the slug line).
+        Debug-friendly string representation: shows the relative path and the content
+        (minus the slug line).
         """
         slugline = f"# {self._final_filename}"
         content_without_slug = self.example_text.removeprefix(slugline).lstrip()
         return f"--- {self._relative_path}\n{content_without_slug}"
 
     def __str__(self) -> str:
-        """
-        A more user-friendly string representation showing the file path and content.
-        """
+        """User-friendly string representation with the path and full content."""
         return f"{self.file_path.as_posix()}:\n{self.example_text}"
 
 
@@ -326,34 +310,34 @@ class DemoDir:
 
     def __post_init__(self) -> None:
         """
-        Perform initialization by extracting the directory name, parsing file blocks to build Example objects,
-        preparing and writing the directory structure to disk.
+        Perform initialization by extracting the directory name (and ignoring lines before it),
+        parsing file blocks, then writing files to disk.
         """
-        self.input_lines = self.input_text.strip().splitlines()
+        all_lines = self.input_text.strip().splitlines()
 
-        # Extract directory name and remove that line from the input lines
-        self.dirpath = parse_demo_dir_name(self.input_lines).resolve()
+        # Extract directory name and skip lines before it
+        parsed_dirpath, remaining_lines = parse_demo_dir_name(all_lines)
+        self.dirpath = parsed_dirpath.resolve()
         Example.demo_dir_path = self.dirpath
 
-        # Parse examples into objects
+        # Save the lines after extracting the dir name
+        self.input_lines = remaining_lines
+
+        # Parse the examples
         self.examples = parse_file_blocks(self.input_lines, self.dirpath)
 
-        # Prepare the directory and write files
+        # Prepare and write
         self._prepare_directory()
         self._write_examples_to_disk()
 
     def _prepare_directory(self) -> None:
-        """
-        Clear any existing directory at self.dirpath and recreate it.
-        """
+        """Recreate the directory from scratch."""
         if self.dirpath.exists():
             shutil.rmtree(self.dirpath)
         self.dirpath.mkdir(parents=True)
 
     def _write_examples_to_disk(self) -> None:
-        """
-        Write each Example object to disk.
-        """
+        """Write each example file to disk."""
         for example in self.examples:
             example.write_to_disk()
 
@@ -363,10 +347,10 @@ class DemoDir:
         Build a DemoDir from a file containing the input string.
 
         Args:
-            file_path: A Path object pointing to the file.
+            file_path: A Path to the file.
 
         Returns:
-            A DemoDir instance built by reading the file's contents.
+            A DemoDir built from that file's contents.
         """
         content = file_path.read_text(encoding="utf-8")
         return cls(content)
@@ -374,58 +358,55 @@ class DemoDir:
     @classmethod
     def from_directory(cls, directory: Path) -> "DemoDir":
         """
-        Build a DemoDir by scanning an existing directory for .py files and creating
-        Example objects from each file's contents.
+        Build a DemoDir by scanning an existing directory for .py files and forming
+        Example objects from each file's content.
 
         Args:
-            directory: A Path object representing the directory to scan.
+            directory: A Path representing the directory to scan.
 
         Returns:
-            A DemoDir instance representing the existing structure.
+            A DemoDir for the existing structure.
         """
         Example.reset_counter()
         found_examples = [
             Example(
                 dir_path=file.parent.resolve(),
-                filename=file.name,  # we know the last part is the actual .py name
+                filename=file.name,
                 input_text=file.read_text(encoding="utf-8").strip()
             )
             for file in directory.rglob("*.py")
         ]
+
+        # We store minimal text here: just "[dirname]" to create a consistent structure
         demo_dir = cls(f"[{directory.name}]")
         demo_dir.examples = found_examples
         return demo_dir
 
     def delete(self) -> None:
-        """
-        Delete the entire directory structure for this DemoDir instance.
-        """
+        """Delete the entire directory structure for this DemoDir instance."""
         if self.dirpath.exists():
             shutil.rmtree(self.dirpath)
 
     def __repr__(self) -> str:
         """
-        Debug-friendly string representation that shows the directory name and all examples' repr strings.
+        Debug-friendly string: shows `[dirpath.name]` plus the repr of each example.
         """
         return f"[{self.dirpath.name}]\n" + "\n".join(repr(example) for example in self.examples)
 
     def __str__(self) -> str:
         """
-        More user-friendly string representation that shows the directory name and all examples' content.
+        User-friendly string: shows `[dirpath.name]` plus the str of each example.
         """
         return f"[{self.dirpath.name}]\n" + "\n".join(str(example) for example in self.examples)
 
     def __iter__(self):
-        """
-        Allow iteration over the internal list of Example objects.
-        """
+        """Iterate over contained examples."""
         return iter(self.examples)
 
-    def show(self) -> None:
-        """
-        Print banners, the string representation, the repr representation,
-        and each example's file path for demonstration purposes.
-        """
+    def show(self, msg: str | None = None) -> None:
+        if msg:
+            banner(msg)
+        """Print banners, the string representation, the repr, and paths for each example."""
         banner(self.dirpath.name)
         banner("str")
         print(self)
@@ -439,12 +420,14 @@ class DemoDir:
 if __name__ == "__main__":
     # Create a DemoDir from the docstring above
     examples_a = DemoDir(__doc__)
-    examples_a.show()
+    examples_a.show("examples_a")
 
     # Now load the same structure back from the newly created directory
-    # This time, each .py file will be recognized properly as a file, not a directory.
     examples_b = DemoDir.from_directory(examples_a.dirpath)
-    examples_b.show()
+    examples_b.show("examples_b")
+
+    examples_c = DemoDir(repr(examples_b))
+    examples_c.show("examples_c")
 
     # Finally, delete the directory structure to clean up
     examples_b.delete()
