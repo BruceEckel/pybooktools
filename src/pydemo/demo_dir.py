@@ -42,13 +42,6 @@ from pathlib import Path
 from typing import ClassVar
 
 
-def banner(msg: str) -> None:
-    """
-    Print a banner with the given message, centered and surrounded by dashes for clarity.
-    """
-    print(f" {msg} ".center(60, '-'))
-
-
 def parse_demo_dir_name(lines: list[str]) -> tuple[Path, list[str]]:
     """
     Find the line containing [some_directory_name], extract that name, and
@@ -74,7 +67,7 @@ def parse_demo_dir_name(lines: list[str]) -> tuple[Path, list[str]]:
         raise ValueError("Input text does not contain a valid directory name in square brackets.")
 
     dir_line = lines[start_index].strip(" []")  # e.g. "demo_dir_name"
-    remaining = lines[start_index + 1:]         # All lines after the directory line
+    remaining = lines[start_index + 1:]  # All lines after the directory line
     return Path(dir_line), remaining
 
 
@@ -206,7 +199,7 @@ class Example:
 
     dir_path: Path
     input_text: str
-    filename: str | None = field(default=None)    # If None, we auto-generate or extract from a slug line
+    filename: str | None = field(default=None)  # If None, we auto-generate or extract from a slug line
     original_label: str | None = field(default=None)  # The user-typed label (e.g. "foo", "named_file.py")
 
     example_text: str = field(init=False)
@@ -426,7 +419,7 @@ class DemoDir:
 
     def __repr__(self) -> str:
         """
-        Debug-friendly string: shows `[dirpath.name]` plus the repr of each example.
+        For reconstructing the DemoDir
         """
         return f"[{self.dirpath.name}]\n" + "\n".join(repr(example) for example in self.examples)
 
@@ -442,8 +435,12 @@ class DemoDir:
 
     def show(self, msg: str | None = None) -> None:
         """
-        Print an optional message banner, then show the directory name, string repr, debug repr, and paths.
+        For understanding & debugging.
         """
+
+        def banner(msg: str) -> None:
+            print(f" {msg} ".center(60, '-'))
+
         if msg:
             banner(msg)
         banner(self.dirpath.name)
