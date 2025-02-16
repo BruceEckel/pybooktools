@@ -55,7 +55,7 @@ def parse_demo_dir_name(lines: list[str]) -> tuple[Path, list[str]]:
     return the corresponding Path plus the remaining lines after that line.
 
     This version skips all lines before the '[directory_name]' line so that
-    docstring text preceeding it doesn't become part of the first example.
+    docstring text preceding it doesn't become part of the first example.
 
     Args:
         lines: A list of lines (strings).
@@ -74,7 +74,7 @@ def parse_demo_dir_name(lines: list[str]) -> tuple[Path, list[str]]:
         raise ValueError("Input text does not contain a valid directory name in square brackets.")
 
     dir_line = lines[start_index].strip(" []")  # e.g. "demo_dir_name"
-    remaining = lines[start_index + 1:]  # All lines after the directory line
+    remaining = lines[start_index + 1:]         # All lines after the directory line
     return Path(dir_line), remaining
 
 
@@ -121,11 +121,9 @@ def split_directory_and_filename(root_dir: Path, candidate: str) -> tuple[Path, 
         -> filename = None   (auto-generate)
     """
     path_obj = Path(candidate)
-    # If user explicitly provided a .py file:
     if candidate.endswith(".py"):
         # Separate the final file component from any parent dirs
         if path_obj.parent.name == "." and path_obj.parent != path_obj:
-            # 'parent.name == "."' means there's no meaningful subdir
             return root_dir, path_obj.name
         else:
             return root_dir / path_obj.parent, path_obj.name
@@ -154,6 +152,7 @@ def parse_file_blocks(lines: list[str], root_dir: Path) -> list["Example"]:
     examples: list[Example] = []
     current_dir: Path = root_dir
     current_filename: str | None = None
+    current_label: str | None = None
 
     # Reset the Example class counter before building new ones
     Example.reset_counter()
@@ -167,6 +166,7 @@ def parse_file_blocks(lines: list[str], root_dir: Path) -> list["Example"]:
                         dir_path=current_dir,
                         filename=current_filename,
                         input_text="\n".join(from_line_blocks),
+                        original_label=current_label
                     )
                 )
                 from_line_blocks.clear()
@@ -174,6 +174,8 @@ def parse_file_blocks(lines: list[str], root_dir: Path) -> list["Example"]:
             # Extract the path part from the line
             candidate_path = extract_path_part(line)
             current_dir, current_filename = split_directory_and_filename(root_dir, candidate_path)
+            # Save the exact text as typed by the user
+            current_label = candidate_path if candidate_path else None
 
         else:
             from_line_blocks.append(line)
@@ -185,6 +187,7 @@ def parse_file_blocks(lines: list[str], root_dir: Path) -> list["Example"]:
                 dir_path=current_dir,
                 filename=current_filename,
                 input_text="\n".join(from_line_blocks),
+                original_label=current_label
             )
         )
 
@@ -203,12 +206,14 @@ class Example:
 
     dir_path: Path
     input_text: str
-    filename: str | None = field(default=None)  # If None, we auto-generate or extract from a slug line
+    filename: str | None = field(default=None)    # If None, we auto-generate or extract from a slug line
+    original_label: str | None = field(default=None)  # The user-typed label (e.g. "foo", "named_file.py")
 
     example_text: str = field(init=False)
     lines: list[str] = field(init=False)
     _final_filename: str = field(init=False)
     _relative_path: str = field(init=False)
+    _repr_label: str = field(init=False)
 
     def __post_init__(self) -> None:
         """
@@ -231,11 +236,16 @@ class Example:
         self.example_text = "\n".join(self.lines)
 
         # Compute relative path from the top-level demo directory
-        self._relative_path = (
-            self.dir_path.resolve()
-            .relative_to(self.demo_dir_path.resolve())
-            .as_posix()
-        )
+        rel_path = self.dir_path.resolve().relative_to(self.demo_dir_path.resolve())
+        self._relative_path = rel_path.as_posix() if rel_path != Path('.') else '.'
+
+        # Decide what to show in the "repr" after "--- "
+        # 1) If we have an original_label, that means the user typed it. Use it.
+        # 2) Otherwise, try to guess from the directory and filename
+        if self.original_label is not None:
+            self._repr_label = self.original_label or '.'  # if empty => '.'
+        else:
+            self._repr_label = self._compute_auto_label()
 
     @classmethod
     def reset_counter(cls) -> None:
@@ -271,6 +281,29 @@ class Example:
         else:
             self.lines.insert(0, expected_slug)
 
+    def _compute_auto_label(self) -> str:
+        """
+        Compute a best-guess label (for use in repr) if we do not have a user-typed label.
+        - If the dir_path is `.`, just show the filename (if not auto-generated, or `.` if auto).
+        - If the filename is auto-generated, we might just show the subdirectory portion.
+        - If the filename is user-provided, show subdir/filename.
+
+        This is only used when we re-construct from disk and have no original_label.
+        """
+        # If there's no relative subdir (i.e. '.'), we either show the actual filename or '.' if auto-generated
+        is_auto = self._final_filename.startswith("example_") and self._final_filename.endswith(".py")
+        if self._relative_path == '.' and not is_auto:
+            # We have a real user-provided .py filename, so show that
+            return self._final_filename
+        elif self._relative_path == '.' and is_auto:
+            return '.'
+        elif is_auto:
+            # Show just the relative subdirectory portion
+            return self._relative_path
+        else:
+            # We have a user-provided filename in some subdirectory
+            return f"{self._relative_path}/{self._final_filename}"
+
     @property
     def file_path(self) -> Path:
         """The full path for the example."""
@@ -283,12 +316,12 @@ class Example:
 
     def __repr__(self) -> str:
         """
-        Debug-friendly string representation: shows the relative path and the content
-        (minus the slug line).
+        Debug-friendly string representation: shows the user-typed path if available (original_label),
+        or else shows a best guess. Then the content minus the slug line.
         """
         slugline = f"# {self._final_filename}"
         content_without_slug = self.example_text.removeprefix(slugline).lstrip()
-        return f"--- {self._relative_path}\n{content_without_slug}"
+        return f"--- {self._repr_label}\n{content_without_slug}"
 
     def __str__(self) -> str:
         """User-friendly string representation with the path and full content."""
@@ -368,16 +401,20 @@ class DemoDir:
             A DemoDir for the existing structure.
         """
         Example.reset_counter()
-        found_examples = [
-            Example(
-                dir_path=file.parent.resolve(),
-                filename=file.name,
-                input_text=file.read_text(encoding="utf-8").strip()
+        found_examples = []
+        # For each .py file, we no longer have a user-typed path. We'll set original_label=None
+        for file in directory.rglob("*.py"):
+            content = file.read_text(encoding="utf-8").strip()
+            found_examples.append(
+                Example(
+                    dir_path=file.parent.resolve(),
+                    filename=file.name,
+                    input_text=content,
+                    original_label=None  # We can't know what the user typed originally
+                )
             )
-            for file in directory.rglob("*.py")
-        ]
 
-        # We store minimal text here: just "[dirname]" to create a consistent structure
+        # We store minimal text here: just "[dirname]" so that parse_demo_dir_name sees it as well
         demo_dir = cls(f"[{directory.name}]")
         demo_dir.examples = found_examples
         return demo_dir
@@ -404,9 +441,11 @@ class DemoDir:
         return iter(self.examples)
 
     def show(self, msg: str | None = None) -> None:
+        """
+        Print an optional message banner, then show the directory name, string repr, debug repr, and paths.
+        """
         if msg:
             banner(msg)
-        """Print banners, the string representation, the repr, and paths for each example."""
         banner(self.dirpath.name)
         banner("str")
         print(self)
@@ -426,6 +465,7 @@ if __name__ == "__main__":
     examples_b = DemoDir.from_directory(examples_a.dirpath)
     examples_b.show("examples_b")
 
+    # Then build a new DemoDir from the repr of examples_b
     examples_c = DemoDir(repr(examples_b))
     examples_c.show("examples_c")
 
