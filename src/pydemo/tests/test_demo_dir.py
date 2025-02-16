@@ -106,15 +106,16 @@ def test_split_directory_and_filename(
     tmp_path: Path,
 ) -> None:
     """
-    Test that split_directory_and_filename splits the path correctly.
+    Test that split_directory_and_filename splits the path correctly into dir_path and filename.
     """
     root = tmp_path
     dir_path, filename = split_directory_and_filename(root, candidate)
 
-    # Compare relative paths (converting to str for easy comparison)
+    # Convert dir_path relative to root -> string
     relative_dir = str(dir_path.relative_to(root))
-    if relative_dir == ".":
-        relative_dir = "."
+
+    # On Windows, this may contain backslashes, so we normalize to forward slashes.
+    relative_dir = relative_dir.replace("\\", "/")
 
     assert relative_dir == expected_dir
     assert filename == expected_file
@@ -128,7 +129,11 @@ def test_parse_file_blocks(sample_input_text: str, tmp_path: Path) -> None:
     lines = sample_input_text.splitlines()
     _, remaining_lines = parse_demo_dir_name(lines)
 
-    # 2. Parse blocks
+    # 2. Because parse_file_blocks calls Example(...) which expects
+    #    Example.demo_dir_path to be set, we must set it here:
+    Example.demo_dir_path = tmp_path
+
+    # 3. Parse blocks
     examples = parse_file_blocks(remaining_lines, tmp_path)
     assert len(examples) == 8  # We have 8 blocks in sample_input_text
 
@@ -151,6 +156,8 @@ def test_example_class(tmp_path: Path) -> None:
     """
     Verify Example functionality: auto-generated filenames, slug insertion, writing to disk, etc.
     """
+    # We must set the class variable so that Example.__post_init__ can compute relative paths
+    Example.demo_dir_path = tmp_path
     Example.reset_counter()
 
     e = Example(
@@ -196,6 +203,7 @@ def test_demo_dir_round_trip(sample_input_text: str, tmp_path: Path) -> None:
     # 1) Create and write
     d1 = DemoDir(sample_input_text)
     assert len(d1.examples) == 8
+
     # 2) from_directory
     d2 = DemoDir.from_directory(d1.dirpath)
     assert len(d2.examples) == 8
@@ -206,7 +214,9 @@ def test_demo_dir_round_trip(sample_input_text: str, tmp_path: Path) -> None:
 
     # Clean up
     d2.delete()
+    assert not d1.dirpath.exists()
     assert not d2.dirpath.exists()
+    assert not d3.dirpath.exists()
 
 
 def test_demo_dir_from_file(tmp_path: Path) -> None:
