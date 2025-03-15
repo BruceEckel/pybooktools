@@ -11,6 +11,7 @@ reminders = f"""
 [{cc}]px        [/{cc}][{dc}]Add/Update Output Comment Lines in Python examples[/{dc}]
 [{cc}]bookup    [/{cc}][{dc}]Update book examples from source repository[/{dc}]
 [{cc}]slug      [/{cc}][{dc}]Add or update sluglines in Python files[/{dc}]
+[{cc}]mdslug    [/{cc}][{dc}]Adds sluglines to Python examples in Markdown files[/{dc}]
 [{cc}]chapnum   [/{cc}][{dc}]Renumber Markdown chapters & align chapter names[/{dc}]
 """.strip()
 

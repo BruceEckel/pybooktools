@@ -22,6 +22,7 @@ px = "pybooktools.tls.update_example_output:main"
 cr = "pybooktools.reminder:main"
 bookup = "pybooktools.update_markdown_python_examples:app"
 slug = "pybooktools.slug_line:app"
+mdslug = "pybooktools.md_auto_slug:main"
 chapnum = "pybooktools.renumber_chapters:app"
 
 
