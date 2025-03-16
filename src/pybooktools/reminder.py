@@ -7,7 +7,7 @@ cc = "deep_sky_blue1"  # Command Color
 dc = "yellow"  # Description Color
 
 reminders = f"""
-[{cc}]cr        [/{cc}][{dc}]Display these commands[/{dc}]
+[{cc}]pybtools  [/{cc}][{dc}]Display these commands[/{dc}]
 [{cc}]px        [/{cc}][{dc}]Add/Update Output Comment Lines in Python examples[/{dc}]
 [{cc}]bookup    [/{cc}][{dc}]Update book examples from source repository[/{dc}]
 [{cc}]slug      [/{cc}][{dc}]Add or update sluglines in Python files[/{dc}]
