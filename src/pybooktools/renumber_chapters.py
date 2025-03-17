@@ -1,8 +1,16 @@
 # renumber_chapters.py
+"""
+Renumbers Markdown chapters in a directory, and updates mkdocs.yml.
+
+The Markdown chapters do not contain the chapter number in the Markdown
+title that begins the file and starts with a `#`. Thus the chapter number
+only exists at the beginning of the file name, and can be modified by
+changing the file name alone.
+"""
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Annotated
+from typing import List, Annotated, Iterator, Tuple
 
 import typer
 
@@ -20,38 +28,29 @@ app = typer.Typer(
 class MarkdownChapter:
     path: Path
     file_name: str = field(init=False)
-    file_name_title: str = field(init=False)
-    markdown_title: str | None = field(init=False)
     title: str = field(init=False)
     number: str = field(init=False)
-    content: list[str] = field(init=False)
+    appendix: bool = False
     sort_index: int = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
+        """
+        Identify number, detect appendix if it starts with 'A',
+        and compute sorting index so chapters can be ordered correctly.
+        """
         self.file_name = self.path.name
-        match = re.match(chapter_pattern, self.file_name)
-        if match:
-            self.number, self.file_name_title = match.groups()
-            print(f"{self.number = }, {self.file_name_title = }")
-        else:
-            raise ValueError(
-                f"File name {self.file_name} does not match expected pattern"
-            )
-        self.sort_index = int(re.sub(r"\D", "", self.number))
-        self.file_name_title = self.file_name_title.title()  # Title case
+        if not (match := re.match(chapter_pattern, self.file_name)):
+            raise ValueError(f"File name {self.file_name} does not match the pattern.")
 
-        self.content = self.path.read_text(encoding="utf-8").splitlines()
-        if self.content and self.content[0].startswith("# "):
-            self.markdown_title = self.content[0][2:].strip().title()
-        else:
-            self.markdown_title = None
+        raw_num, raw_title = match.groups()
+        self.appendix = raw_num.startswith('A')
+        # Convert 'A12' -> '12' or '10' -> '10'
+        numeric_part = re.sub(r"\D", "", raw_num)
+        self.number = f"{int(numeric_part):02d}"
+        self.sort_index = int(numeric_part)
 
-        self.title = self.markdown_title or self.file_name_title
-
-        if not self.content or not self.content[0].startswith("# "):
-            self.content.insert(0, f"# {self.title}")
-        else:
-            self.content[0] = f"# {self.title}"
+        # Use either the matched title or (optionally) a title from file contents.
+        self.title = raw_title
 
     def new_name(self, new_number: str) -> str:
         self.number = new_number
@@ -62,37 +61,40 @@ class MarkdownChapter:
         new_name = self.new_name(new_number)
         self.path.rename(self.path.parent / new_name)
         self.path = self.path.parent / new_name
-        self.path.write_text("\n".join(self.content) + "\n", encoding="utf-8")
 
     def __str__(self) -> str:
-        return f"{self.number} {self.title}"
+        return f"{'A' if self.appendix else ''}{self.number} {self.title}"
 
 
 @dataclass
 class Book:
     directory: Path
-    chapters: List[MarkdownChapter] = field(init=False)
+    chapters: List[MarkdownChapter] = field(default_factory=list)
 
     def __post_init__(self) -> None:
-        chapter_files = [
-            f
-            for f in self.directory.iterdir()
-            if f.is_file() and re.match(chapter_pattern, f.name)
-        ]
-        chapters = [MarkdownChapter(path=file) for file in chapter_files]
-        self.chapters = sorted(
-            chapters, key=lambda ch: (ch.sort_index, ch.number)
-        )
+        """
+        Gather all Markdown chapters/appendices in one list
+        and sort them so appendices appear at the end.
+        """
+        for f in self.directory.iterdir():
+            if f.is_file() and re.match(chapter_pattern, f.name):
+                self.chapters.append(MarkdownChapter(path=f))
+
+        # Non-appendices first, then appendices. If needed, sort by sort_index second.
+        self.chapters.sort(key=lambda ch: (ch.appendix, ch.sort_index))
+
+    def __iter__(self) -> Iterator[Tuple[int, str, MarkdownChapter]]:
+        for i, chapter in enumerate(self.chapters, start=1):
+            formatted_updated_number = f"{i:0{len(str(len(self.chapters)))}}"
+            yield i, formatted_updated_number, chapter
 
     def show_without_updating(self) -> None:
-        for i, chapter in enumerate(self.chapters, start=1):
-            updated_number = f"{i:0{len(str(len(self.chapters)))}}"
-            print(chapter.new_name(updated_number))
+        for i, fmt_num, chapter in self:
+            print(f"{i:02d} {fmt_num} {chapter.title}")
 
     def update_chapter_numbers(self) -> None:
-        for i, chapter in enumerate(self.chapters, start=1):
-            updated_number = f"{i:0{len(str(len(self.chapters)))}}"
-            chapter.update_chapter_number(updated_number)
+        for i, fmt_num, chapter in self:
+            chapter.update_chapter_number(fmt_num)
 
     def __str__(self) -> str:
         return "\n".join(str(chapter) for chapter in self.chapters)
@@ -114,10 +116,6 @@ class Book:
             updated_mkdocs_yml += f"  - {chapter.new_name(chapter.number)}\n"
         print(updated_mkdocs_yml)
         # mdkocs_yml_path.write_text(updated_mkdocs_yml, encoding="utf-8")
-
-    # def display_chapters(self) -> None:
-    #     for chapter in self.chapters:
-    #         print(chapter.file_name)
 
 
 @app.command()
