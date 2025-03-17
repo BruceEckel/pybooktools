@@ -24,6 +24,28 @@ app = typer.Typer(
 )
 
 
+@dataclass
+class ChapterID:
+    file_name: str
+    number: int = field(init=False)
+    root_name: str = field(init=False)
+    appendix: bool = False
+
+    def __post_init__(self) -> None:
+        if not (match := re.match(chapter_pattern, self.file_name)):
+            raise ValueError(f"File name {self.file_name} does not match the pattern.")
+        number_str, self.root_name = match.group
+        self.appendix = number_str.startswith('A')
+        self.number = int(re.sub(r"\D", "", number_str))
+
+    def __increment__(self) -> "ChapterID":
+        self.number += 1
+        return self
+
+    def __str__(self) -> str:
+        return f"{'A' if self.appendix else ''}{self.number:02d}"  # Could include width classvar
+
+
 @dataclass(order=True)
 class MarkdownChapter:
     path: Path
