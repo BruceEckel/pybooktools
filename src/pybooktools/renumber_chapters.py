@@ -32,6 +32,7 @@ class MarkdownChapter:
         match = re.match(chapter_pattern, self.file_name)
         if match:
             self.number, self.file_name_title = match.groups()
+            print(f"{self.number = }, {self.file_name_title = }")
         else:
             raise ValueError(
                 f"File name {self.file_name} does not match expected pattern"
@@ -96,30 +97,48 @@ class Book:
     def __str__(self) -> str:
         return "\n".join(str(chapter) for chapter in self.chapters)
 
-    def display_chapters(self) -> None:
+    def update_nav(self) -> None:
+        mdkocs_yml_path = self.directory.parent / "mkdocs.yml"
+        if not mdkocs_yml_path.exists():
+            print(f"mkdocs.yml not found in {self.directory.parent}")
+            return
+        mdkocs_yml = mdkocs_yml_path.read_text(encoding="utf-8")
+        if "nav:" not in mdkocs_yml:
+            print("'nav:' not found in mkdocs.yml")
+            return
+        # Assume nav section is at the end of the file.
+        base = mdkocs_yml.rindex("nav:")
+        print(mdkocs_yml[:base])
+        updated_mkdocs_yml = mdkocs_yml[:base] + "nav:\n"
         for chapter in self.chapters:
-            print(chapter.file_name)
+            updated_mkdocs_yml += f"  - {chapter.new_name(chapter.number)}\n"
+        print(updated_mkdocs_yml)
+        # mdkocs_yml_path.write_text(updated_mkdocs_yml, encoding="utf-8")
+
+    # def display_chapters(self) -> None:
+    #     for chapter in self.chapters:
+    #         print(chapter.file_name)
 
 
 @app.command()
 def main(
-        ctx: typer.Context,
-        directory: Annotated[str, typer.Argument(
-            help="Directory containing Markdown chapters (default: current directory)"
-        )] = None,
-        renumber: Annotated[bool, typer.Option(
-            "--renumber", "-r", help="Renumber the chapters"
-        )] = False,
-        display: Annotated[bool, typer.Option(
-            "--display",
-            "-d",
-            help="Display the existing chapters without renumbering",
-        )] = False,
-        test: Annotated[bool, typer.Option(
-            "--test",
-            "-t",
-            help="Without making differences, show the renumbered chapters",
-        )] = False,
+    ctx: typer.Context,
+    directory: Annotated[str, typer.Argument(
+        help="Directory containing Markdown chapters (default: current directory)"
+    )] = None,
+    renumber: Annotated[bool, typer.Option(
+        "--renumber", "-r", help="Renumber the chapters"
+    )] = False,
+    display: Annotated[bool, typer.Option(
+        "--display",
+        "-d",
+        help="Display the existing chapters without renumbering",
+    )] = False,
+    test: Annotated[bool, typer.Option(
+        "--test",
+        "-t",
+        help="Without making differences, show the renumbered chapters",
+    )] = False,
 ) -> None:
     """[deep_sky_blue1]Renumbers Markdown chapters in a directory[/deep_sky_blue1]"""
 
@@ -141,9 +160,10 @@ def main(
         book.update_chapter_numbers()
         print(book)
     elif display:
-        book.display_chapters()
+        print(book)
     elif test:
         book.show_without_updating()
+        book.update_nav()
 
 
 if __name__ == "__main__":
