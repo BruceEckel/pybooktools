@@ -31,7 +31,8 @@ class MarkdownChapterID:
     _number: int = field(init=False)
     root_name: str = field(init=False)  # Does not include _number or '.md'
     appendix: bool = False
-    number_width: ClassVar[int] = 2
+    chapternum_width: ClassVar[int] = 2
+    appendixnum_width: ClassVar[int] = 1
 
     def __post_init__(self) -> None:
         assert self.path.is_file(), f"{self.path} is not a file."
@@ -50,8 +51,10 @@ class MarkdownChapterID:
             raise ValueError(f"{self.path.name} must start with a single-# headline.")
 
     def file_name(self) -> str:
-        _a = 'A' if self.appendix else ''
-        return f"{_a}{self._number:0{self.number_width}d} {self.root_name}.md"
+        if self.appendix:
+            return f"A{self._number:0{self.appendixnum_width}d} {self.root_name}.md"
+        else:
+            return f"{self._number:0{self.chapternum_width}d} {self.root_name}.md"
 
     @property
     def number(self) -> int:
@@ -85,9 +88,13 @@ class Book:
         return "\n".join([c.file_name() for c in self.chapters])
 
     def renumber(self) -> None:
+        appendix_count = 1
         for i, chapter in enumerate(self.chapters, start=1):
             if not chapter.appendix:
                 chapter.number = i
+            else:
+                chapter.number = appendix_count
+                appendix_count += 1
 
     def update_file_names(self) -> None:
         for chapter in self.chapters:
@@ -102,7 +109,6 @@ class Book:
             raise ValueError("'nav:' not found in mkdocs.yml")
         # Assume nav section is at the end of the file.
         base = mdkocs_yml.rindex("nav:")
-        print(mdkocs_yml[:base])
         updated_mkdocs_yml = mdkocs_yml[:base] + "nav:\n"
         for chapter in self.chapters:
             updated_mkdocs_yml += f"  - {chapter.file_name()}\n"
@@ -157,8 +163,10 @@ def main(
     elif display:
         print(book)
     elif test:
+        print(" Renumbered ".center(60, "-"))
         book.renumber()
         print(book)
+        print(" updated_mkdocs_yml ".center(60, "-"))
         mdkocs_yml_path, updated_mkdocs_yml = book.updated_mkdocs_yml()
         print(f"{mdkocs_yml_path = }")
         print(updated_mkdocs_yml)
