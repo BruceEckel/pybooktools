@@ -25,7 +25,7 @@ app = typer.Typer(
 )
 
 
-@dataclass
+@dataclass(order=True)
 class MarkdownChapterID:
     path: Path
     _number: int = field(init=False)
@@ -60,6 +60,8 @@ class MarkdownChapterID:
     @number.setter
     def number(self, new_number: int) -> None:
         self._number = new_number
+
+    def update_file_name(self) -> None:
         self.path.rename(self.path.parent / self.file_name())
 
 
@@ -76,37 +78,39 @@ class Book:
             if f.is_file() and re.match(chapter_pattern, f.name):
                 self.chapters.append(MarkdownChapterID(path=f))
 
-        # Non-appendices first, then appendices. If needed, sort by index second.
-        self.chapters.sort(key=lambda ch: (ch.appendix, ch.index))
+        # Non-appendices first, then appendices. If needed, sort by number second.
+        self.chapters.sort(key=lambda ch: (ch.appendix, ch.number))
 
-    def show_without_updating(self) -> None:
-        for chapter in self.chapters:
-            print(chapter)
+    def __str__(self) -> str:
+        return "\n".join([c.file_name() for c in self.chapters])
 
     def renumber(self) -> None:
         for i, chapter in enumerate(self.chapters, start=1):
-            chapter.number = i
+            if not chapter.appendix:
+                chapter.number = i
 
-    # def __str__(self) -> str:
-    #     return "\n".join(str(chapter) for chapter in self.chapters)
+    def update_file_names(self) -> None:
+        for chapter in self.chapters:
+            chapter.update_file_name()
 
-    def update_nav(self) -> None:
+    def updated_mkdocs_yml(self) -> (Path, str):
         mdkocs_yml_path = self.directory.parent / "mkdocs.yml"
         if not mdkocs_yml_path.exists():
-            print(f"mkdocs.yml not found in {self.directory.parent}")
-            return
+            raise ValueError(f"mkdocs.yml not found in {self.directory.parent}")
         mdkocs_yml = mdkocs_yml_path.read_text(encoding="utf-8")
         if "nav:" not in mdkocs_yml:
-            print("'nav:' not found in mkdocs.yml")
-            return
+            raise ValueError("'nav:' not found in mkdocs.yml")
         # Assume nav section is at the end of the file.
         base = mdkocs_yml.rindex("nav:")
         print(mdkocs_yml[:base])
         updated_mkdocs_yml = mdkocs_yml[:base] + "nav:\n"
         for chapter in self.chapters:
             updated_mkdocs_yml += f"  - {chapter.file_name()}\n"
-        print(updated_mkdocs_yml)
-        # mdkocs_yml_path.write_text(updated_mkdocs_yml, encoding="utf-8")
+        return mdkocs_yml_path, updated_mkdocs_yml
+
+    def update_nav(self) -> None:
+        mdkocs_yml_path, updated_mkdocs_yml = self.updated_mkdocs_yml()
+        mdkocs_yml_path.write_text(updated_mkdocs_yml, encoding="utf-8")
 
 
 @app.command()
@@ -147,12 +151,17 @@ def main(
 
     if renumber:
         book.renumber()
+        book.update_file_names()
+        book.update_nav()
         print(book)
     elif display:
         print(book)
     elif test:
-        book.show_without_updating()
-        book.update_nav()
+        book.renumber()
+        print(book)
+        mdkocs_yml_path, updated_mkdocs_yml = book.updated_mkdocs_yml()
+        print(f"{mdkocs_yml_path = }")
+        print(updated_mkdocs_yml)
 
 
 if __name__ == "__main__":
