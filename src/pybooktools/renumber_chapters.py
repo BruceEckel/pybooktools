@@ -10,7 +10,7 @@ changing the file name alone.
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Annotated, Iterator, Tuple
+from typing import List, Annotated, Iterator, Tuple, ClassVar
 
 import typer
 
@@ -24,18 +24,29 @@ app = typer.Typer(
 )
 
 
+def sanitize_title(title: str) -> str:
+    """
+    Keep only alphanumeric characters and spaces; replace spaces with underscores.
+    """
+    cleaned = ''.join(ch for ch in title if ch.isalnum() or ch.isspace())
+    return cleaned.replace(" ", "_")
+
+
 @dataclass
 class ChapterID:
     file_name: str
     number: int = field(init=False)
-    root_name: str = field(init=False)
+    root_name: str = field(init=False)  # Does not include number or '.md'
     appendix: bool = False
+    number_width: ClassVar[int] = 2
 
     def __post_init__(self) -> None:
         if not (match := re.match(chapter_pattern, self.file_name)):
             raise ValueError(f"File name {self.file_name} does not match the pattern.")
         number_str, self.root_name = match.group
+        self.root_name = sanitize_title(self.root_name)
         self.appendix = number_str.startswith('A')
+        # Strip non-digit chars from number_str and convert it to an int:
         self.number = int(re.sub(r"\D", "", number_str))
 
     def __increment__(self) -> "ChapterID":
@@ -43,11 +54,33 @@ class ChapterID:
         return self
 
     def __str__(self) -> str:
-        return f"{'A' if self.appendix else ''}{self.number:02d}"  # Could include width classvar
+        _a = 'A' if self.appendix else ''
+        return f"{_a}{self.number:0{self.number_width}d} {self.root_name}.md"
 
 
 @dataclass(order=True)
 class MarkdownChapter:
+    path: Path
+    id: ChapterID = field(init=False)
+    index: int = field(init=False, repr=False)
+
+    def __post_init__(self) -> None:
+        self.id = ChapterID(self.path.name)
+        self.index = self.id.number
+        # Update self.id.root_name to match single-# headline in markdown file
+        with self.path.open(encoding="utf-8") as file:
+            headline = file.readline().rstrip("\n")
+        if headline.startswith("# "):
+            self.id.root_name = sanitize_title(headline[2:].strip())
+        else:
+            raise ValueError(f"File {self.path} does not start with a single-# headline.")
+
+    def __str__(self) -> str:
+        return f"{self.id}"
+
+
+@dataclass(order=True)
+class MarkdownChapterX:
     path: Path
     file_name: str = field(init=False)
     title: str = field(init=False)
@@ -102,8 +135,8 @@ class Book:
             if f.is_file() and re.match(chapter_pattern, f.name):
                 self.chapters.append(MarkdownChapter(path=f))
 
-        # Non-appendices first, then appendices. If needed, sort by sort_index second.
-        self.chapters.sort(key=lambda ch: (ch.appendix, ch.sort_index))
+        # Non-appendices first, then appendices. If needed, sort by index second.
+        self.chapters.sort(key=lambda ch: (ch.appendix, ch.index))
 
     def __iter__(self) -> Iterator[Tuple[int, str, MarkdownChapter]]:
         for i, chapter in enumerate(self.chapters, start=1):
@@ -111,10 +144,10 @@ class Book:
             yield i, formatted_updated_number, chapter
 
     def show_without_updating(self) -> None:
-        for i, fmt_num, chapter in self:
-            print(f"{i:02d} {fmt_num} {chapter.title}")
+        for chapter in self.chapters:
+            print(chapter)
 
-    def update_chapter_numbers(self) -> None:
+    def renumber(self) -> None:
         for i, fmt_num, chapter in self:
             chapter.update_chapter_number(fmt_num)
 
@@ -135,7 +168,7 @@ class Book:
         print(mdkocs_yml[:base])
         updated_mkdocs_yml = mdkocs_yml[:base] + "nav:\n"
         for chapter in self.chapters:
-            updated_mkdocs_yml += f"  - {chapter.new_name(chapter.number)}\n"
+            updated_mkdocs_yml += f"  - {chapter.id}\n"
         print(updated_mkdocs_yml)
         # mdkocs_yml_path.write_text(updated_mkdocs_yml, encoding="utf-8")
 
@@ -177,7 +210,7 @@ def main(
         help_error(f"No chapters found in {dir_path}")
 
     if renumber:
-        book.update_chapter_numbers()
+        book.renumber()
         print(book)
     elif display:
         print(book)

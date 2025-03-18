@@ -55,7 +55,7 @@ def test_book(
     markdown_title,
 ):
     book = Book(directory=temp_book_directory)
-    book.update_chapter_numbers()
+    book.renumber()
     expected_name = f"{expected_number} {markdown_title}.md"
     expected_content = f"{expected_number} {markdown_title}"
 
@@ -95,7 +95,7 @@ def test_book_update_chapter_numbers(
     temp_book_directory, chapter_index, expected_number
 ):
     book = Book(directory=temp_book_directory)
-    book.update_chapter_numbers()
+    book.renumber()
     expected_name = (
         f"{expected_number} {book.chapters[chapter_index].markdown_title}.md"
     )
