@@ -60,7 +60,7 @@ def test_book(
     expected_content = f"{expected_number} {markdown_title}"
 
     assert len(book.chapters) == len(chapter_data)
-    assert book.chapters[chapter_index].number == expected_number
+    assert book.chapters[chapter_index]._number == expected_number
     assert book.chapters[chapter_index].path.name == expected_name
     book_str = str(book)
     assert expected_content in book_str
@@ -82,7 +82,7 @@ def test_book_initialization(
     print(book)
     assert len(book.chapters) == len(chapter_data)
     # Ensure numbering matches expected padded format:
-    assert book.chapters[chapter_index].number == initial_number
+    assert book.chapters[chapter_index]._number == initial_number
     assert book.chapters[chapter_index].file_name_title == file_title
     assert book.chapters[chapter_index].markdown_title == markdown_title
 
@@ -101,7 +101,7 @@ def test_book_update_chapter_numbers(
     )
 
     assert len(book.chapters) == len(chapter_data)
-    assert book.chapters[chapter_index].number == expected_number
+    assert book.chapters[chapter_index]._number == expected_number
     assert book.chapters[chapter_index].path.name == expected_name
 
 
@@ -122,7 +122,7 @@ def test_markdown_chapter_initialization(temp_book_directory):
     chapter_file = temp_book_directory / "01 Intro.md"
     chapter = MarkdownChapter(path=chapter_file)
 
-    assert chapter.number == "01"
+    assert chapter._number == "01"
     assert chapter.file_name_title == "Intro"
     assert chapter.markdown_title == "Intro"
     assert chapter.title == "Intro"
@@ -135,7 +135,7 @@ def test_markdown_chapter_update_chapter_number(temp_book_directory):
     chapter = MarkdownChapter(path=chapter_file)
     chapter.update_chapter_number("2")
 
-    assert chapter.number == "2"
+    assert chapter._number == "2"
     assert chapter.path.name == "2 Intro.md"
     assert chapter.content[0] == "# Intro"
     assert chapter.path.read_text(encoding="utf-8").endswith("\n")
