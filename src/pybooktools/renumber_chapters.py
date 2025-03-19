@@ -13,15 +13,6 @@ from cyclopts.types import ExistingDirectory
 from pybooktools.util.config import chapter_pattern
 from pybooktools.util.path_utils import sanitize_title
 
-# console = Console()
-app = App(
-    version_flags=[],
-    # console=console,
-    # help_format="plaintext",
-    help=__doc__,
-    # default_parameter=Parameter(negative=()),
-)
-
 
 @dataclass(order=True)
 class MarkdownChapterID:
@@ -118,6 +109,18 @@ class Book:
     def update_nav(self) -> None:
         mdkocs_yml_path, updated_mkdocs_yml = self.updated_mkdocs_yml()
         mdkocs_yml_path.write_text(updated_mkdocs_yml, encoding="utf-8")
+
+
+# Command-line interface using Cyclopts:
+
+# console = Console()
+app = App(
+    version_flags=[],
+    # console=console,
+    # help_format="plaintext",
+    help=__doc__,
+    # default_parameter=Parameter(negative=()),
+)
 
 
 @app.command(name="-r")
