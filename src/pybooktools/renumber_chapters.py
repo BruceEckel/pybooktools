@@ -1,28 +1,17 @@
 # renumber_chapters.py
 """
-Renumbers Markdown chapters in a directory, and updates mkdocs.yml.
-
-The Markdown chapters do not contain the chapter _number in the Markdown
-title that begins the file and starts with a `#`. Thus the chapter _number
-only exists at the beginning of the file name, and can be modified by
-changing the file name alone.
+Renumbers Markdown chapters and adjusts file names. Updates mkdocs.yml.
 """
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Annotated, ClassVar
+from typing import List, ClassVar
 
-import typer
+from cyclopts import App
+from cyclopts.types import ExistingDirectory
 
-from pybooktools.util import HelpError
 from pybooktools.util.config import chapter_pattern
 from pybooktools.util.path_utils import sanitize_title
-
-app = typer.Typer(
-    context_settings={"help_option_names": ["--help", "-h"]},
-    add_completion=False,
-    rich_markup_mode="rich",
-)
 
 
 @dataclass(order=True)
@@ -81,6 +70,9 @@ class Book:
             if f.is_file() and re.match(chapter_pattern, f.name):
                 self.chapters.append(MarkdownChapterID(path=f))
 
+        if not self.chapters:
+            raise ValueError(f"No chapters found in {self.directory}")
+
         # Non-appendices first, then appendices. If needed, sort by number second.
         self.chapters.sort(key=lambda ch: (ch.appendix, ch.number))
 
@@ -119,57 +111,46 @@ class Book:
         mdkocs_yml_path.write_text(updated_mkdocs_yml, encoding="utf-8")
 
 
-@app.command()
-def main(
-    ctx: typer.Context,
-    directory: Annotated[str, typer.Argument(
-        help="Directory containing Markdown chapters (default: current directory)"
-    )] = None,
-    renumber: Annotated[bool, typer.Option(
-        "--renumber", "-r", help="Renumber the chapters"
-    )] = False,
-    display: Annotated[bool, typer.Option(
-        "--display",
-        "-d",
-        help="Display the existing chapters without renumbering",
-    )] = False,
-    test: Annotated[bool, typer.Option(
-        "--test",
-        "-t",
-        help="Without making differences, show the renumbered chapters",
-    )] = False,
-) -> None:
-    """[deep_sky_blue1]Renumbers Markdown chapters in a directory[/deep_sky_blue1]"""
+# Command-line interface using Cyclopts:
 
-    help_error = HelpError(ctx)
+# console = Console()
+app = App(
+    version_flags=[],
+    # console=console,
+    # help_format="plaintext",
+    help=__doc__,
+    # default_parameter=Parameter(negative=()),
+)
 
-    if not (renumber or display or test):
-        help_error("Specify either --renumber, --display, or --test")
 
-    dir_path = Path(directory) if directory else Path.cwd()
+@app.command(name="-r")
+def renumber(path: ExistingDirectory = Path(".")):
+    """Renumber the chapters, update mkdocs.yml"""
+    book = Book(path)
+    book.renumber()
+    book.update_file_names()
+    book.update_nav()
+    print(book)
 
-    if not dir_path.is_dir():
-        help_error(f"{dir_path} is not a valid directory path")
 
-    book = Book(dir_path)
-    if not book.chapters:
-        help_error(f"No chapters found in {dir_path}")
+@app.command(name="-d")
+def display(path: ExistingDirectory = Path(".")):
+    """Display the existing chapters without renumbering"""
+    book = Book(path)
+    print(book)
 
-    if renumber:
-        book.renumber()
-        book.update_file_names()
-        book.update_nav()
-        print(book)
-    elif display:
-        print(book)
-    elif test:
-        print(" Renumbered ".center(60, "-"))
-        book.renumber()
-        print(book)
-        print(" updated_mkdocs_yml ".center(60, "-"))
-        mdkocs_yml_path, updated_mkdocs_yml = book.updated_mkdocs_yml()
-        print(f"{mdkocs_yml_path = }")
-        print(updated_mkdocs_yml)
+
+@app.command(name="-t")
+def test(path: ExistingDirectory = Path(".")):
+    """Test info, no changes"""
+    book = Book(path)
+    print(" Renumbered ".center(60, "-"))
+    book.renumber()
+    print(book)
+    print(" updated_mkdocs_yml ".center(60, "-"))
+    mdkocs_yml_path, updated_mkdocs_yml = book.updated_mkdocs_yml()
+    print(f"{mdkocs_yml_path = }")
+    print(updated_mkdocs_yml)
 
 
 if __name__ == "__main__":
