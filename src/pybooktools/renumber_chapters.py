@@ -1,31 +1,25 @@
 # renumber_chapters.py
 """
-Renumbers Markdown chapters in a directory, and updates mkdocs.yml.
+Renumbers Markdown chapters and adjusts file names. Updates mkdocs.yml.
 """
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, ClassVar, Annotated
+from typing import List, ClassVar
 
-from cyclopts import App, Parameter, Group
+from cyclopts import App
 from cyclopts.types import ExistingDirectory
-from rich.console import Console
 
 from pybooktools.util.config import chapter_pattern
 from pybooktools.util.path_utils import sanitize_title
 
-console = Console()
+# console = Console()
 app = App(
     version_flags=[],
-    console=console,
-    help_flags="-h",
-    help_format="plaintext",
+    # console=console,
+    # help_format="plaintext",
     help=__doc__,
-    default_parameter=Parameter(negative=()),
-)
-optg = Group(
-    "Option Flags (any combination)",
-    default_parameter=Parameter(negative=""),  # Disable "--no-" flags
+    # default_parameter=Parameter(negative=()),
 )
 
 
@@ -127,7 +121,7 @@ class Book:
 
 
 @app.command(name="-r")
-def renumber(path: Annotated[Path, Parameter(validator=ExistingDirectory())]):
+def renumber(path: ExistingDirectory = Path(".")):
     """Renumber the chapters, update mkdocs.yml"""
     book = Book(path)
     book.renumber()
@@ -137,14 +131,14 @@ def renumber(path: Annotated[Path, Parameter(validator=ExistingDirectory())]):
 
 
 @app.command(name="-d")
-def display(path: Annotated[Path, Parameter(validator=ExistingDirectory())]):
+def display(path: ExistingDirectory = Path(".")):
     """Display the existing chapters without renumbering"""
     book = Book(path)
     print(book)
 
 
 @app.command(name="-t")
-def test(path: Annotated[Path, Parameter(validator=ExistingDirectory())]):
+def test(path: ExistingDirectory = Path(".")):
     """Test info, no changes"""
     book = Book(path)
     print(" Renumbered ".center(60, "-"))
@@ -156,52 +150,5 @@ def test(path: Annotated[Path, Parameter(validator=ExistingDirectory())]):
     print(updated_mkdocs_yml)
 
 
-app()
-
-# def main(
-#     ctx: typer.Context,
-#     directory: Annotated[str, typer.Argument(
-#         help="Directory containing Markdown chapters (default: current directory)"
-#     )] = None,
-#     renumber: Annotated[bool, typer.Option(
-#         "--renumber", "-r", help="Renumber the chapters"
-#     )] = False,
-#     display: Annotated[bool, typer.Option(
-#         "--display",
-#         "-d",
-#         help="Display the existing chapters without renumbering",
-#     )] = False,
-#     test: Annotated[bool, typer.Option(
-#         "--test",
-#         "-t",
-#         help="Without making differences, show the renumbered chapters",
-#     )] = False,
-# ) -> None:
-#     """[deep_sky_blue1]Renumbers Markdown chapters in a directory[/deep_sky_blue1]"""
-#
-#     help_error = HelpError(ctx)
-#
-#     if not (renumber or display or test):
-#         help_error("Specify either --renumber, --display, or --test")
-#
-#     dir_path = Path(directory) if directory else Path.cwd()
-#
-#     if not dir_path.is_dir():
-#         help_error(f"{dir_path} is not a valid directory path")
-#
-#     book = Book(dir_path)
-#     if renumber:
-#         book.renumber()
-#         book.update_file_names()
-#         book.update_nav()
-#         print(book)
-#     elif display:
-#         print(book)
-#     elif test:
-#         print(" Renumbered ".center(60, "-"))
-#         book.renumber()
-#         print(book)
-#         print(" updated_mkdocs_yml ".center(60, "-"))
-#         mdkocs_yml_path, updated_mkdocs_yml = book.updated_mkdocs_yml()
-#         print(f"{mdkocs_yml_path = }")
-#         print(updated_mkdocs_yml)
+if __name__ == "__main__":
+    app()
