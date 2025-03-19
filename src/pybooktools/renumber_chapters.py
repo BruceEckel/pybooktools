@@ -136,13 +136,12 @@ def renumber(path: ExistingDirectory = Path(".")):
 @app.command(name="-d")
 def display(path: ExistingDirectory = Path(".")):
     """Display the existing chapters without renumbering"""
-    book = Book(path)
-    print(book)
+    print(Book(path))
 
 
 @app.command(name="-t")
-def test(path: ExistingDirectory = Path(".")):
-    """Test info, no changes"""
+def trace_info(path: ExistingDirectory = Path(".")):
+    """Display trace info, no changes"""
     book = Book(path)
     print(" Renumbered ".center(60, "-"))
     book.renumber()
