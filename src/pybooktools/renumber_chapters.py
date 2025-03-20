@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import List, ClassVar
 
 from cyclopts import App
-from cyclopts.types import ExistingDirectory
+from cyclopts.types import ResolvedExistingDirectory
 
 from pybooktools.util.config import chapter_pattern
 from pybooktools.util.path_utils import sanitize_title
@@ -66,6 +66,7 @@ class Book:
         """
         Collect Markdown chapters/appendices from directory.
         """
+        self.directory = self.directory.resolve()
         for f in self.directory.iterdir():
             if f.is_file() and re.match(chapter_pattern, f.name):
                 self.chapters.append(MarkdownChapterID(path=f))
@@ -124,7 +125,7 @@ app = App(
 
 
 @app.command(name="-r")
-def renumber(path: ExistingDirectory = Path(".")):
+def renumber(path: ResolvedExistingDirectory = Path(".")):
     """Renumber the chapters, update mkdocs.yml"""
     book = Book(path)
     book.renumber()
@@ -134,15 +135,19 @@ def renumber(path: ExistingDirectory = Path(".")):
 
 
 @app.command(name="-d")
-def display(path: ExistingDirectory = Path(".")):
+def display(path: ResolvedExistingDirectory = Path(".")):
     """Display the existing chapters without renumbering"""
     print(Book(path))
 
 
 @app.command(name="-t")
-def trace_info(path: ExistingDirectory = Path(".")):
+def trace_info(path: ResolvedExistingDirectory = Path(".")):
     """Display trace info, no changes"""
+    print(" Trace info ".center(60, "-"))
+    print(f"{path = }")
     book = Book(path)
+    print(f"{book.directory = }")
+    print(book)
     print(" Renumbered ".center(60, "-"))
     book.renumber()
     print(book)
