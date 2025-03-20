@@ -41,9 +41,9 @@ class MarkdownChapterID:
 
     def file_name(self) -> str:
         if self.appendix:
-            return f"A{self._number:0{self.appendixnum_width}d} {self.root_name}.md"
+            return f"A{self._number:0{self.appendixnum_width}d}_{self.root_name}.md"
         else:
-            return f"{self._number:0{self.chapternum_width}d} {self.root_name}.md"
+            return f"{self._number:0{self.chapternum_width}d}_{self.root_name}.md"
 
     @property
     def number(self) -> int:
