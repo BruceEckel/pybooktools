@@ -98,19 +98,19 @@ def split_directory_and_filename(root_dir: Path, candidate: str) -> tuple[Path, 
 
     Example:
       candidate = "foo/bar.py"
-        -> dir_path = root_dir / "foo"
+        -> dir_path = target_path / "foo"
         -> filename = "bar.py"
 
       candidate = "foo/bar"
-        -> dir_path = root_dir / "foo/bar"
+        -> dir_path = target_path / "foo/bar"
         -> filename = None   (auto-generate)
 
       candidate = "named_file.py"
-        -> dir_path = root_dir
+        -> dir_path = target_path
         -> filename = "named_file.py"
 
       candidate = ""
-        -> dir_path = root_dir
+        -> dir_path = target_path
         -> filename = None   (auto-generate)
     """
     path_obj = Path(candidate)

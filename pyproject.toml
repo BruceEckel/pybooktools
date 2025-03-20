@@ -24,6 +24,7 @@ bookup = "pybooktools.update_markdown_python_examples:app"
 slug = "pybooktools.slug_line:app"
 mdslug = "pybooktools.md_auto_slug:main"
 chapnum = "pybooktools.renumber_chapters:app"
+mdexex = "pybooktools.extract_examples.extractor:app"
 
 
 [tool.uv]

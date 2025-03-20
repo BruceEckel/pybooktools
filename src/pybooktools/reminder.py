@@ -13,6 +13,7 @@ reminders = f"""
 [{cc}]slug      [/{cc}][{dc}]Add or update sluglines in Python files[/{dc}]
 [{cc}]mdslug    [/{cc}][{dc}]Adds sluglines to Python examples in Markdown files[/{dc}]
 [{cc}]chapnum   [/{cc}][{dc}]Renumber Markdown chapters & align chapter names[/{dc}]
+[{cc}]mdexex    [/{cc}][{dc}]Extract examples from Markdown[/{dc}]
 """.strip()
 
 
