@@ -24,7 +24,7 @@ class Example:
     def __str__(self) -> str:
         full_path = " " + str(self.code_dir / self.filename) + " "
         return f"""\
-{full_path.center(70, "-")}
+---{full_path.center(70, "-")}---
 {self.content.strip()}"""
 
 
@@ -114,5 +114,6 @@ def extract_directory(markdown_dir: ResolvedExistingDirectory, target_dir: Path)
     markdown_files = list(markdown_dir.glob("*.md"))
     for markdown_file in markdown_files:
         examples = extract_examples(markdown_file, target_dir)
-        for example in examples:
-            print(example)
+        # for example in examples:
+        #     print(example)
+        write_examples(examples)
