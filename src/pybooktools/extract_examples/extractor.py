@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import List
 
 from cyclopts import App
+from cyclopts.types import ResolvedExistingDirectory
 
 
 @dataclass
@@ -21,7 +22,7 @@ class Example:
 
     def __str__(self) -> str:
         full_path = " " + str(self.target_dir / self.filename) + " "
-        return f"""
+        return f"""\
 {full_path.center(70, "-")}
 {self.content.strip()}"""
 
@@ -74,7 +75,8 @@ def extract_examples(markdown_file: Path, target_dir: Path) -> List[Example]:
         if match:
             filename = match.group(1)
             # The remainder of the block (after the slug line) is the example content.
-            content = "\n".join(lines[1:]).rstrip() + "\n"
+            # content = "\n".join(lines[1:]).rstrip() + "\n"
+            content = "\n".join(lines).rstrip() + "\n"
             examples.append(Example(filename=filename, content=content, target_dir=target_dir))
 
     return examples
@@ -106,7 +108,12 @@ def extract(markdown_file: Path, target_path: Path):
         print(example)
     # write_examples(examples)
 
-# Example usage:
-# if __name__ == "__main__":
-#     from pathlib import Path
-#     extract_examples(Path("path/to/target_path"), Path("path/to/04 Basic_Annotations.md"))
+
+@app.command(name="-d")
+def extract_directory(markdown_dir: ResolvedExistingDirectory, target_path: Path):
+    """Extract examples from all markdown files in a directory"""
+    markdown_files = list(markdown_dir.glob("*.md"))
+    for markdown_file in markdown_files:
+        examples = extract_examples(markdown_file, target_path)
+        for example in examples:
+            print(example)
