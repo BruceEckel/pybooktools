@@ -8,10 +8,9 @@ from typing import Annotated, Optional
 
 from cyclopts import App, Parameter, Group, ValidationError
 from cyclopts.types import ExistingDirectory, ExistingFile
+from pybooktools.util import PyExample, CreateExamples
 from rich.console import Console
 from rich.panel import Panel
-
-from pybooktools.util import PyExample, CreateExamples
 
 console = Console()
 app = App(
@@ -110,7 +109,3 @@ def examples(example_text_path: ExistingFile = Path("bad_examples.txt"), retain:
     run(["-r", "updater_examples", "-v", "-t", "-d"])
     if not retain:
         demo_files.delete()
-
-
-if __name__ == "__main__":
-    app()

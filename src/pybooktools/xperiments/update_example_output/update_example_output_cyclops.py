@@ -16,8 +16,7 @@ from typing import Literal, Optional, Annotated
 
 import cyclopts
 from cyclopts import Parameter
-
-from pybooktools.tls.example_updater import ExampleUpdater
+from pybooktools.update_example_output.example_updater import ExampleUpdater
 from pybooktools.util import console
 
 app = cyclopts.App(name="px", help_format="rich")
@@ -65,14 +64,14 @@ class Args:
 # def px(a: Args = Args()):
 @app.default
 def main(
-        pyfiles: Annotated[Optional[list[Path]], Parameter(help="The Python example file(s) (optional)")] = None,
-        all_files: Annotated[Optional[Literal["-a", "--all"]], Parameter(
-            help="Process all Python examples in the current directory")] = None,
-        recurse: Annotated[
-            Optional[Literal["-r", "--recurse"]], Parameter(help="Find Python examples in subdirectories")] = None,
-        verbose: Annotated[Optional[Literal["-v", "--verbose"]], Parameter(
-            help="Trace info, save intermediate files, don't overwrite original file")] = None,
-        nowrap: Annotated[Optional[Literal["--nowrap"]], Parameter(help="Do not wrap output lines")] = None,
+    pyfiles: Annotated[Optional[list[Path]], Parameter(help="The Python example file(s) (optional)")] = None,
+    all_files: Annotated[Optional[Literal["-a", "--all"]], Parameter(
+        help="Process all Python examples in the current directory")] = None,
+    recurse: Annotated[
+        Optional[Literal["-r", "--recurse"]], Parameter(help="Find Python examples in subdirectories")] = None,
+    verbose: Annotated[Optional[Literal["-v", "--verbose"]], Parameter(
+        help="Trace info, save intermediate files, don't overwrite original file")] = None,
+    nowrap: Annotated[Optional[Literal["--nowrap"]], Parameter(help="Do not wrap output lines")] = None,
 ):
     """
     [green]Update embedded outputs in Python examples[/green]

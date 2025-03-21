@@ -4,8 +4,7 @@ from typing import Optional, Annotated
 
 import cyclopts
 from cyclopts import Parameter
-
-from pybooktools.tls.example_updater import ExampleUpdater
+from pybooktools.update_example_output.example_updater import ExampleUpdater
 from pybooktools.util import console
 
 app = cyclopts.App(name="px", help_format="rich", help="[green]Update embedded outputs in Python examples[/green]")
@@ -31,10 +30,10 @@ def collect_files(recurse: bool, all_files: bool) -> list[Path]:
 
 @app.command
 def files(
-        pyfiles: Annotated[Optional[list[Path]], Parameter(help="The Python example file(s) (optional)")],
-        verbose: Annotated[bool, Parameter(name=["--verbose", "-v"],
-                                           help="Trace info, save intermediate files, don't overwrite original file")] = False,
-        nowrap: Annotated[bool, Parameter(name=["--nowrap"], help="Do not wrap output lines")] = False,
+    pyfiles: Annotated[Optional[list[Path]], Parameter(help="The Python example file(s) (optional)")],
+    verbose: Annotated[bool, Parameter(name=["--verbose", "-v"],
+                                       help="Trace info, save intermediate files, don't overwrite original file")] = False,
+    nowrap: Annotated[bool, Parameter(name=["--nowrap"], help="Do not wrap output lines")] = False,
 ):
     """
     Provide one or more Python files to update
@@ -55,9 +54,9 @@ def files(
 
 @app.command
 def star(
-        verbose: Annotated[bool, Parameter(name=["--verbose", "-v"],
-                                           help="Trace info, save intermediate files, don't overwrite original file")] = False,
-        nowrap: Annotated[bool, Parameter(name=["--nowrap"], help="Do not wrap output lines")] = False,
+    verbose: Annotated[bool, Parameter(name=["--verbose", "-v"],
+                                       help="Trace info, save intermediate files, don't overwrite original file")] = False,
+    nowrap: Annotated[bool, Parameter(name=["--nowrap"], help="Do not wrap output lines")] = False,
 ):
     """
     Update all files in current directory
@@ -78,9 +77,9 @@ def star(
 
 @app.command
 def recurse(
-        verbose: Annotated[bool, Parameter(name=["--verbose", "-v"]),
-        Parameter(help="Trace info, save intermediate files, don't overwrite original file")] = False,
-        nowrap: Annotated[bool, Parameter(name=["--nowrap"], help="Do not wrap output lines")] = False,
+    verbose: Annotated[bool, Parameter(name=["--verbose", "-v"]),
+    Parameter(help="Trace info, save intermediate files, don't overwrite original file")] = False,
+    nowrap: Annotated[bool, Parameter(name=["--nowrap"], help="Do not wrap output lines")] = False,
 ):
     """
     Recursively update all files in current directory and subdirectories

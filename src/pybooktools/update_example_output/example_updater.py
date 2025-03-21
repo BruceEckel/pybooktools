@@ -5,10 +5,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from icecream import ic
-
-from insert_tls_tags import insert_top_level_separators
 from pybooktools.util import cleaned_dir, run_script, python_example_validator
-from tls_results_to_dict import tls_tags_to_dict
+
+from .insert_tls_tags import insert_top_level_separators
+from .tls_results_to_dict import tls_tags_to_dict
 
 
 @dataclass

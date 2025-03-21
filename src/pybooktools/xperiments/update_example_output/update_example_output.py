@@ -2,10 +2,9 @@
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pathlib import Path
 
-from rich.text import Text
-
-from pybooktools.tls.example_updater import ExampleUpdater
+from pybooktools.update_example_output.example_updater import ExampleUpdater
 from pybooktools.util import console
+from rich.text import Text
 
 
 class RichHelpFormatter(RawDescriptionHelpFormatter):

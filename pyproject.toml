@@ -18,7 +18,7 @@ dependencies = [
 [project.scripts]
 aiflatten = "ai_flatten.flatten_dir_for_ai:main"
 unflatten = "ai_flatten.un_flatten:main"
-px = "pybooktools.tls.update_example_output:main"
+px = "pybooktools.update_example_output.update_example_output:app"
 pybtools = "pybooktools.reminder:main"
 bookup = "pybooktools.update_markdown_python_examples:app"
 slug = "pybooktools.slug_line:app"

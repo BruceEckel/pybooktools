@@ -1,8 +1,9 @@
 # tls_results_to_dict.py
 from typing import Dict, List
 
-from output_formatter import output_format
 from pybooktools.validate import UseCase, validate_transformer
+
+from .output_formatter import output_format
 
 
 def tls_tags_to_dict(input_str: str, wrap: bool = True) -> Dict[str, List[str]]:
@@ -14,7 +15,7 @@ def tls_tags_to_dict(input_str: str, wrap: bool = True) -> Dict[str, List[str]]:
         wrap (bool): Set to False prevents wrapping
 
     Returns:
-        Dict[str, List[str]]: A dictionary where keys are tls markers and values
+        Dict[str, List[str]]: A dictionary where keys are update_example_output markers and values
                               are lists of lines preceding each marker.
     """
     result: Dict[str, List[str]] = {}
@@ -59,7 +60,7 @@ __$4$_tls__
             "__$4$_tls__": ["## foo", "## bar", "## baz", "## bingo"],
         },
     ),
-    # Single tls at the beginning
+    # Single update_example_output at the beginning
     UseCase(
         2,
         """
