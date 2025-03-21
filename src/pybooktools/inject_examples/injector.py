@@ -61,6 +61,7 @@ def update_markdown_with_repo_examples(markdown_file: Path, repo: Path) -> str:
 
 app = App(
     version_flags=[],
+    help_flags="-h",
     help=__doc__,
     # default_parameter=Parameter(negative=()),
 )
