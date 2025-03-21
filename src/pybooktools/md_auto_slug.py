@@ -77,7 +77,7 @@ class SlugInserter:
 
             # Check if the first non-blank line is already a slug
             first_line = lines[0].rstrip()
-            slug_pattern = re.compile(r"^#\s*example_\d+\.py\s*$")
+            slug_pattern = re.compile(r"^#\s+\S+\.py\s*$")
             if slug_pattern.match(first_line):
                 # Already has a slug line
                 return match.group(0)

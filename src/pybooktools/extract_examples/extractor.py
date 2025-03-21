@@ -1,3 +1,5 @@
+# extractor.py
+"""Extract code examples from Markdown files."""
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -30,7 +32,7 @@ class Example:
 
 def extract_examples(markdown_file: Path, code_repo: Path) -> List[Example]:
     """
-    Extracts all fenced code examples from a markdown file that contain a "slug line".
+    Extracts all fenced code examples containing a "slug line" from a markdown file.
 
     A slug line is the first line in a fenced code block that is a comment containing the
     filename (for example, "# example_1.py" or "// example_1.java"). This function supports
@@ -94,6 +96,7 @@ app = App(
     version_flags=[],
     # console=console,
     # help_format="plaintext",
+    help_flags="-h",
     help=__doc__,
     # default_parameter=Parameter(negative=()),
 )
@@ -101,7 +104,7 @@ app = App(
 
 @app.command(name="-e")
 def extract(markdown_file: Path, target_dir: Path):
-    """Extract examples from a single markdown file"""
+    """Extract examples from a single markdown file to a repo directory."""
     examples = extract_examples(markdown_file, target_dir)
     for example in examples:
         print(example)
@@ -110,7 +113,7 @@ def extract(markdown_file: Path, target_dir: Path):
 
 @app.command(name="-d")
 def extract_directory(markdown_dir: ResolvedExistingDirectory, target_dir: Path):
-    """Extract examples from all markdown files in a directory"""
+    """Extract examples from all markdown files in a directory to a repo directory."""
     markdown_files = list(markdown_dir.glob("*.md"))
     for markdown_file in markdown_files:
         examples = extract_examples(markdown_file, target_dir)
