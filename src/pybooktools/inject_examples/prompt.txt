@@ -1,0 +1,16 @@
+I need a function that takes a Markdown `target_file` containing Python examples within
+Markdown code fences that each start with a "slug line," which is a commented first
+line containing the name of that example's file.
+
+It also takes a `repo` directory containing the python examples for that Markdown file.
+Each Python example has a file name corresponding to its slug line.
+
+The function should return a new version of the Markdown file with the fenced examples
+replaced by the corresponding Python files from the `repo` directory.
+
+----
+
+Create a second function that takes a directory `markdown_files` and a directory `root_repo`.
+For each file in `markdown_files`, produce the corresponding subdirectory name under `root_repo`
+by lowercasing the name and removing the trailing `.md`.
+Then call `update_markdown_with_repo_examples` using that markdown file and that subdirectory.

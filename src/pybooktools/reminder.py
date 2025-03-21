@@ -1,7 +1,6 @@
 # reminder.py
-from rich.panel import Panel
-
 from pybooktools.util import console
+from rich.panel import Panel
 
 cc = "deep_sky_blue1"  # Command Color
 dc = "yellow"  # Description Color
@@ -13,7 +12,8 @@ reminders = f"""
 [{cc}]slug      [/{cc}][{dc}]Add or update sluglines in Python files[/{dc}]
 [{cc}]mdslug    [/{cc}][{dc}]Adds sluglines to Python examples in Markdown files[/{dc}]
 [{cc}]chapnum   [/{cc}][{dc}]Renumber Markdown chapters & align chapter names[/{dc}]
-[{cc}]mdexex    [/{cc}][{dc}]Extract examples from Markdown[/{dc}]
+[{cc}]mdexex    [/{cc}][{dc}]Extract examples from Markdown to repo[/{dc}]
+[{cc}]mdinject  [/{cc}][{dc}]Inject examples from repo to Markdown[/{dc}]
 """.strip()
 
 

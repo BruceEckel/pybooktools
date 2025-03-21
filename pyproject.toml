@@ -25,7 +25,7 @@ slug = "pybooktools.slug_line:app"
 mdslug = "pybooktools.md_auto_slug:main"
 chapnum = "pybooktools.renumber_chapters:app"
 mdexex = "pybooktools.extract_examples.extractor:app"
-
+mdinject = "pybooktools.inject_examples.injector:app"
 
 [tool.uv]
 package = true
