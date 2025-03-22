@@ -3,6 +3,7 @@ import re
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 from icecream import ic
 from pybooktools.util import cleaned_dir, run_script, python_example_validator
@@ -15,11 +16,11 @@ from .tls_results_to_dict import tls_tags_to_dict
 class ExampleUpdater:
     example_path: Path
     verbose: bool
-    example_name: str = None
-    validate_dir: Path = None
-    original_source: str = None
-    cleaned_code: str = None
-    updated_code: str = None
+    example_name: Optional[str] = None
+    validate_dir: Optional[Path] = None
+    original_source: Optional[str] = None
+    cleaned_code: Optional[str] = None
+    updated_code: Optional[str] = None
 
     def __post_init__(self):
         self.example_name = self.example_path.name
@@ -41,11 +42,18 @@ class ExampleUpdater:
         shutil.rmtree(self.validate_dir)
 
     def update_output(self, wrap: bool = True) -> None:
+        if self.verbose:
+            print(f"update_output Updating {self.example_name}")
         with_tls_tags = insert_top_level_separators(self.cleaned_code)
         tls_tagged = self.__write_with_ext(with_tls_tags, "1_tls_tags")
-        output = run_script(tls_tagged)
-        self.__write_with_ext(output, "2_output", "txt")
-        tls_tag_dict = tls_tags_to_dict(output, wrap=wrap)
+        returncode, result_value = run_script(tls_tagged)
+        if returncode != 0:
+            print(f"Not updated: {self.example_path.parent}/{self.example_name}: {returncode = }")
+            if not self.verbose:
+                self.remove_validate_dir()
+            return
+        self.__write_with_ext(result_value, "2_output", "txt")
+        tls_tag_dict = tls_tags_to_dict(result_value, wrap=wrap)
         self.__write_with_ext(
             "\n".join(tls_tag_dict.keys()), "3_tls_tag_keys", ftype="txt"
         )
@@ -72,6 +80,7 @@ class ExampleUpdater:
             print(self.updated_code)
             print(f"Original {self.example_name} NOT overwritten")
         else:
-            self.example_path.write_text(self.updated_code, encoding="utf-8")
-            print(f"Updated {self.example_name}")
+            if self.original_source != self.updated_code:
+                self.example_path.write_text(self.updated_code, encoding="utf-8")
+                print(f"Updated {self.example_name}")
             self.remove_validate_dir()

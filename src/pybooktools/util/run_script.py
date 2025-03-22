@@ -3,11 +3,12 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from typing import NamedTuple
 
 from rich.syntax import Syntax
 
 from .console import console
-from .display import error, warn
+from .display import warn
 
 
 def get_virtual_env_python() -> str:
@@ -17,15 +18,20 @@ def get_virtual_env_python() -> str:
     venv_path = os.getenv("VIRTUAL_ENV")
     if venv_path:
         python_path = (
-                Path(venv_path)
-                / ("Scripts" if os.name == "nt" else "bin")
-                / "python"
+            Path(venv_path)
+            / ("Scripts" if os.name == "nt" else "bin")
+            / "python"
         )
         return str(python_path)
     return sys.executable
 
 
-def run_script(script_path: Path) -> str:
+class ScriptResult(NamedTuple):
+    returncode: int
+    result_value: str
+
+
+def run_script(script_path: Path) -> ScriptResult:
     """
     Runs the script in its virtual environment and returns the output
     """
@@ -43,7 +49,7 @@ def run_script(script_path: Path) -> str:
             line_numbers=True,
         )
         console.print(syntax)
-        error(f"{result.stderr}")
-        return result.stderr
+        warn(f"{result.stderr}")
+        return ScriptResult(result.returncode, result.stderr)
     else:
-        return result.stdout
+        return ScriptResult(result.returncode, result.stdout)

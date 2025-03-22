@@ -8,6 +8,7 @@ from typing import Annotated, Optional
 
 from cyclopts import App, Parameter, Group, ValidationError
 from cyclopts.types import ExistingDirectory, ExistingFile
+from pybooktools.update_example_output import ExampleUpdater
 from pybooktools.util import PyExample, CreateExamples
 from rich.console import Console
 from rich.panel import Panel
@@ -45,8 +46,9 @@ def report(fname: str, files: list[Path], opts: OptFlags):
 
 
 def process(file_path: Path, verbose=False, wrap: bool = True) -> None:
-    print(f"process({file_path}, verbose={verbose}, wrap={wrap}) ...")
-    # ExampleUpdater(file_path, verbose=verbose).update_output(wrap=wrap)
+    if verbose:
+        print(f"process({file_path}, verbose={verbose}, wrap={wrap}) ...")
+    ExampleUpdater(file_path, verbose=verbose).update_output(wrap=wrap)
 
 
 @app.command(name="-f", sort_key=1)
@@ -55,7 +57,9 @@ def process_files(files: list[PyExample], *, opts: Optional[OptFlags] = None):
     opts = opts or OptFlags()
     for file in files:
         process(file, opts.verbose, not opts.no_wrap)
-    return report("process_files", files, opts=opts)
+    if opts.verbose:
+        return report("process_files", files, opts=opts)
+    return None
 
 
 @app.command(name="-a", sort_key=2)
@@ -64,7 +68,10 @@ def all_files_in_dir(target_dir: ExistingDirectory = Path("."), opts: Optional[O
     opts = opts or OptFlags()
     # paths = list(valid_dir_path(target_dir).glob("*.py"))
     paths = list(target_dir.glob("*.py"))
-    result = report("all_files_in_dir", paths, opts=opts)
+    if opts.verbose:
+        result = report("all_files_in_dir", paths, opts=opts)
+    else:
+        result = None
     process_files(paths, opts=opts)
     return result
 
@@ -73,9 +80,11 @@ def all_files_in_dir(target_dir: ExistingDirectory = Path("."), opts: Optional[O
 def recursive(target_dir: ExistingDirectory = Path("."), opts: Optional[OptFlags] = None):
     """Recursive: Process all Python examples in specified directory [.] AND subdirectories"""
     opts = opts or OptFlags()
-    # paths = list(valid_dir_path(target_dir).rglob("*.py"))
     paths = list(target_dir.rglob("*.py"))
-    result = report("recursive", paths, opts=opts)
+    if opts.verbose:
+        result = report("recursive", paths, opts=opts)
+    else:
+        result = None
     process_files(paths, opts=opts)
     return result
 
