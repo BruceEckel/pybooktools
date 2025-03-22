@@ -48,7 +48,7 @@ class ExampleUpdater:
         tls_tagged = self.__write_with_ext(with_tls_tags, "1_tls_tags")
         returncode, result_value = run_script(tls_tagged)
         if returncode != 0:
-            print(f"Not updated: {self.example_path.parent}/{self.example_name}: {returncode = }")
+            print(f"Failed: {self.example_path.parent}/{self.example_name}    {returncode = }")
             if not self.verbose:
                 self.remove_validate_dir()
             return
