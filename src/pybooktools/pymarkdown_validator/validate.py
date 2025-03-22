@@ -25,9 +25,19 @@ def check_duplicate_slug_lines(markdown_content: str) -> List[str]:
     return duplicates
 
 
+def check_for_main(markdown_content: str) -> List[str]:
+    """Checks for __main__ in a Markdown file."""
+    mains = []
+    for n, line in enumerate(markdown_content.splitlines()):
+        if "__main__" in line:
+            mains.append(f"__main__ found on line {n + 1}")
+    return mains
+
+
 # Define and populate the list of test functions
 tests: List[Callable[[str], List[str]]] = [
     check_duplicate_slug_lines,
+    check_for_main,
     # Add more test functions here as needed
 ]
 
