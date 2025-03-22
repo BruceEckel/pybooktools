@@ -11,7 +11,7 @@ def is_slug(line: str) -> bool:
 
 def ensure_slug_line(pycode: str, file_path: Path) -> str:
     """
-    Ensure slug line at the top of pycode based on file_path
+    Ensure slug line at the top of pycode based on example_path
     """
     lines = pycode.splitlines(True)
     slug_line = f"# {file_path.name}\n"

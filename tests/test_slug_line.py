@@ -66,9 +66,9 @@ def test_ensure_slug_line_empty_file():
 # @pytest.fixture
 # def temp_file(tmp_path: Path) -> Path:
 #     """A temporary file."""
-#     file_path = tmp_path / "testfile.py"
-#     file_path.write_text('print("Hello")')
-#     return file_path
+#     example_path = tmp_path / "testfile.py"
+#     example_path.write_text('print("Hello")')
+#     return example_path
 #
 #
 # @patch("argparse.ArgumentParser.parse_args")

@@ -9,7 +9,7 @@ from typing import Annotated, Optional
 from cyclopts import App, Parameter, Group, ValidationError
 from cyclopts.types import ExistingDirectory, ExistingFile
 from pybooktools.update_example_output import ExampleUpdater
-from pybooktools.util import PyExample, CreateExamples
+from pybooktools.util import PyExample
 from rich.console import Console
 from rich.panel import Panel
 
@@ -45,26 +45,30 @@ def report(fname: str, files: list[Path], opts: OptFlags):
     return r
 
 
-def process(file_path: Path, verbose=False, wrap: bool = True) -> None:
+def process_example(example_path: Path, verbose=False, wrap: bool = True) -> None:
+    """Process a single example"""
     if verbose:
-        print(f"process({file_path}, verbose={verbose}, wrap={wrap}) ...")
-    ExampleUpdater(file_path, verbose=verbose).update_output(wrap=wrap)
+        print(f"process({example_path}, verbose={verbose}, wrap={wrap}) ...")
+    if "# R:" in example_path.read_text():
+        print(f"Skipping {example_path.name} because it has R: comments")
+        return
+    ExampleUpdater(example_path, verbose=verbose).update_output(wrap=wrap)
 
 
 @app.command(name="-f", sort_key=1)
-def process_files(files: list[PyExample], *, opts: Optional[OptFlags] = None):
+def update_examples(files: list[PyExample], *, opts: Optional[OptFlags] = None):
     """Files: Process one or more Python files provided as arguments"""
     opts = opts or OptFlags()
     for file in files:
-        process(file, opts.verbose, not opts.no_wrap)
+        process_example(file, opts.verbose, not opts.no_wrap)
     if opts.verbose:
         return report("process_files", files, opts=opts)
     return None
 
 
 @app.command(name="-a", sort_key=2)
-def all_files_in_dir(target_dir: ExistingDirectory = Path("."), opts: Optional[OptFlags] = None):
-    """All: Process all Python examples in specified directory [.]"""
+def update_all_examples_in_dir(target_dir: ExistingDirectory = Path("."), opts: Optional[OptFlags] = None):
+    """All: Update all Python examples in specified directory [.]"""
     opts = opts or OptFlags()
     # paths = list(valid_dir_path(target_dir).glob("*.py"))
     paths = list(target_dir.glob("*.py"))
@@ -72,20 +76,20 @@ def all_files_in_dir(target_dir: ExistingDirectory = Path("."), opts: Optional[O
         result = report("all_files_in_dir", paths, opts=opts)
     else:
         result = None
-    process_files(paths, opts=opts)
+    update_examples(paths, opts=opts)
     return result
 
 
 @app.command(name="-r", sort_key=3)
 def recursive(target_dir: ExistingDirectory = Path("."), opts: Optional[OptFlags] = None):
-    """Recursive: Process all Python examples in specified directory [.] AND subdirectories"""
+    """Recursive: Update all Python examples in specified directory [.] AND subdirectories"""
     opts = opts or OptFlags()
     paths = list(target_dir.rglob("*.py"))
     if opts.verbose:
         result = report("recursive", paths, opts=opts)
     else:
         result = None
-    process_files(paths, opts=opts)
+    update_examples(paths, opts=opts)
     return result
 
 
@@ -109,12 +113,16 @@ def run(arglist: list[str]):
 @app.command(name="-x")
 def examples(example_text_path: ExistingFile = Path("bad_examples.txt"), retain: bool = False):
     """Run examples"""
-    demo_files = CreateExamples.from_file("updater_examples", example_text_path)
-    global display
-    display = False
-    for demo in demo_files:
-        run(["-f", str(demo.file_path), "-v", "-t", "-d"])
-    run(["-a", "updater_examples", "-v", "-t", "-d"])
-    run(["-r", "updater_examples", "-v", "-t", "-d"])
-    if not retain:
-        demo_files.delete()
+    print("Abandon this approach")
+    return
+    # Abandon CreateExamples and instead use simpler Pytest approach
+    # of creating a temporary cloned directory.
+    # demo_files = CreateExamples.from_file("updater_examples", example_text_path)
+    # global display
+    # display = False
+    # for demo in demo_files:
+    #     run(["-f", str(demo.example_path), "-v", "-t", "-d"])
+    # run(["-a", "updater_examples", "-v", "-t", "-d"])
+    # run(["-r", "updater_examples", "-v", "-t", "-d"])
+    # if not retain:
+    #     demo_files.delete()
