@@ -5,10 +5,9 @@ import sys
 from pathlib import Path
 from typing import NamedTuple
 
+from pybooktools.util.console import console
+from pybooktools.util.display import warn
 from rich.syntax import Syntax
-
-from .console import console
-from .display import warn
 
 
 def get_virtual_env_python() -> str:

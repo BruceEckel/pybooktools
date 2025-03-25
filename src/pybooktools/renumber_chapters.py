@@ -9,7 +9,6 @@ from typing import List, ClassVar
 
 from cyclopts import App
 from cyclopts.types import ResolvedExistingDirectory
-
 from pybooktools.util.config import chapter_pattern
 from pybooktools.util.path_utils import sanitize_title
 
@@ -44,6 +43,11 @@ class MarkdownChapterID:
             return f"A{self._number:0{self.appendixnum_width}d}_{self.root_name}.md"
         else:
             return f"{self._number:0{self.chapternum_width}d}_{self.root_name}.md"
+
+    def yaml_entry(self) -> str:
+        prefix = f"A{self._number}" if self.appendix else str(self._number)
+        title = f"{prefix}: {self.root_name.replace('_', ' ')}"
+        return f"  - '{title}': {self.file_name()}"
 
     @property
     def number(self) -> int:
@@ -104,7 +108,7 @@ class Book:
         base = mdkocs_yml.rindex("nav:")
         updated_mkdocs_yml = mdkocs_yml[:base] + "nav:\n"
         for chapter in self.chapters:
-            updated_mkdocs_yml += f"  - {chapter.file_name()}\n"
+            updated_mkdocs_yml += f"{chapter.yaml_entry()}\n"
         return mdkocs_yml_path, updated_mkdocs_yml
 
     def update_nav(self) -> None:
