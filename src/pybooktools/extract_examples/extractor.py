@@ -8,6 +8,12 @@ from typing import List
 from cyclopts import App
 from cyclopts.types import ResolvedExistingDirectory
 
+# Matches fenced code blocks.
+code_block_pattern = re.compile(r"```[^\n]*\n(.*?)\n```", re.DOTALL)
+
+# Matches a slug line; supports different comment markers and matches a filename with an extension.
+slug_line_pattern = re.compile(r"^\s*(?:#|//)\s*(\S+\.[a-zA-Z0-9_]+)")
+
 
 @dataclass
 class Example:
@@ -15,7 +21,7 @@ class Example:
     Represents an extracted code example from a markdown file.
 
     Attributes:
-        filename: The filename as indicated in the slug line (e.g. "# example_1.py" or "// DefaultValues.java").
+        filename: The filename as extracted from the slug line (e.g. "# example_1.py" or "// DefaultValues.java").
         content: The code content of the example (excluding the slug line).
         code_dir: The directory where the example will be written.
     """
@@ -46,25 +52,18 @@ def extract_examples(markdown_file: Path, code_repo: Path) -> List[Example]:
 
     Each extracted example is written into its own file within the target directory.
 
+    If a slugline contains a '/' character, the file will be written to a corresponding
+    path from the root directory under the 'src' directory.
+
     Args:
         markdown_file: The markdown file to extract examples from.
         code_repo: The root directory under which the target directory will be created.
     """
-    # Create target directory from markdown file name.
+    # Create target directory from markdown file name:
     target_dir_name = markdown_file.stem.lower().replace(" ", "_")
-    code_directory = code_repo / "src" / target_dir_name
-
-    # Read markdown file contents.
+    # Parse code blocks from file:
     markdown_text = markdown_file.read_text(encoding="utf-8")
-
-    # Regular expression to match fenced code blocks.
-    # This pattern matches any fenced block regardless of the language.
-    code_block_pattern = re.compile(r"```[^\n]*\n(.*?)\n```", re.DOTALL)
     code_blocks = code_block_pattern.findall(markdown_text)
-
-    # Regular expression to match a slug line as the first line of the code block.
-    # Supports comment markers such as '#' and '//' and matches a filename with an extension.
-    slug_line_pattern = re.compile(r"^\s*(?:#|//)\s*(\S+\.[a-zA-Z0-9_]+)")
 
     examples: List[Example] = []
 
@@ -77,8 +76,17 @@ def extract_examples(markdown_file: Path, code_repo: Path) -> List[Example]:
         match = slug_line_pattern.match(lines[0])
         if match:
             filename = match.group(1)
+            parts = filename.split('/')
+            code_dir = code_repo / "src"
+            if '/' in filename:
+                for part in parts[:-1]:
+                    code_dir = code_dir / part
+                code_dir.mkdir(parents=True, exist_ok=True)
+            else:
+                code_dir = code_dir / target_dir_name
+
             content = "\n".join(lines).rstrip() + "\n"
-            examples.append(Example(filename=filename, content=content, code_dir=code_directory))
+            examples.append(Example(filename=parts[-1], content=content, code_dir=code_dir))
 
     return examples
 
@@ -105,18 +113,19 @@ app = App(
 @app.command(name="-e")
 def extract(markdown_file: Path, target_dir: Path):
     """Extract examples from a single markdown file to a repo directory."""
+    print(f" {markdown_file.name} -> {target_dir} ".center(80, "-"))
     examples = extract_examples(markdown_file, target_dir)
     for example in examples:
         print(example)
-    # write_examples(examples)
+    write_examples(examples)
 
 
 @app.command(name="-d")
 def extract_directory(markdown_dir: ResolvedExistingDirectory, target_dir: Path):
     """Extract examples from all markdown files in a directory to a repo directory."""
-    markdown_files = list(markdown_dir.glob("*.md"))
-    for markdown_file in markdown_files:
-        examples = extract_examples(markdown_file, target_dir)
-        # for example in examples:
-        #     print(example)
-        write_examples(examples)
+    for markdown_file in list(markdown_dir.glob("*.md")):
+        extract(markdown_file, target_dir)
+        # examples = extract_examples(markdown_file, target_dir)
+        # # for example in examples:
+        # #     print(example)
+        # write_examples(examples)
