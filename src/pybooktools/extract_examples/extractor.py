@@ -97,7 +97,7 @@ def write_examples(examples: List[Example]) -> None:
         example.code_dir.mkdir(parents=True, exist_ok=True)
         file_path = example.code_dir / example.filename
         file_path.write_text(example.content, encoding="utf-8")
-        print(f"Extracted example written to: {file_path}")
+        print(f"{file_path}")
 
 
 app = App(
@@ -116,7 +116,7 @@ def extract(markdown_file: Path, target_dir: Path):
     print(f" {markdown_file.name} -> {target_dir} ".center(80, "-"))
     examples = extract_examples(markdown_file, target_dir)
     for example in examples:
-        print(example)
+        print(example.filename)
     write_examples(examples)
 
 
