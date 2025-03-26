@@ -8,10 +8,11 @@ from typing import Annotated, Optional, Iterable
 
 from cyclopts import App, Parameter, Group, ValidationError
 from cyclopts.types import ExistingDirectory
-from pybooktools.update_example_output import ExampleUpdater
-from pybooktools.util import PyExample
 from rich.console import Console
 from rich.panel import Panel
+
+from pybooktools.update_example_output.example_updater import ExampleUpdater
+from pybooktools.util.python_example_validator import PyExample
 
 console = Console()
 app = App(

@@ -2,8 +2,10 @@
 from pathlib import Path
 
 import typer
+
 from pybooktools.update_example_output.example_updater import ExampleUpdater
-from pybooktools.util import console, HelpError
+from pybooktools.util.console import console
+from pybooktools.util.typer_help_error import HelpError
 
 app = typer.Typer()
 

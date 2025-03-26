@@ -4,7 +4,7 @@ Contains everything that determines a valid book example
 """
 from pathlib import Path
 
-from pybooktools.util import is_slug
+from pybooktools.sluglines.slug import is_slug
 
 
 def invalid_example(pyfile: Path, msg: str = "", main_allowed=False) -> str | None:

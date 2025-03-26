@@ -4,8 +4,9 @@ from typing import Optional, Annotated
 
 import cyclopts
 from cyclopts import Parameter
+
 from pybooktools.update_example_output.example_updater import ExampleUpdater
-from pybooktools.util import console
+from pybooktools.util.console import console
 
 app = cyclopts.App(name="px", help_format="rich", help="[green]Update embedded outputs in Python examples[/green]")
 

@@ -11,7 +11,7 @@ from cyclopts import App, Parameter, Group
 from rich.console import Console
 from rich.panel import Panel
 
-from pybooktools.util import PyExample
+from pybooktools.util.python_example_validator import PyExample
 
 console = Console()
 app = App(

@@ -7,7 +7,8 @@ from typing import Annotated
 
 from cyclopts import Parameter
 
-from pybooktools.util import is_slug, create_demo_files
+from pybooktools.sluglines.slug import is_slug
+from pybooktools.util.create_demo_files import create_demo_files
 
 
 def python_example_validator(pyfile: Path, main_allowed=False) -> None:

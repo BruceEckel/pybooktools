@@ -9,7 +9,7 @@ from typing import Any
 
 from rich.pretty import Pretty
 
-from pybooktools.util import console
+from pybooktools.util.console import console
 
 
 @dataclass
@@ -51,7 +51,7 @@ class Trace:
                 case _:
                     # Fallback for strings and other objects
                     if hasattr(arg, "__dataclass_fields__") or hasattr(
-                            arg, "__dict__"
+                        arg, "__dict__"
                     ):
                         console.print(Pretty(arg))
                     else:

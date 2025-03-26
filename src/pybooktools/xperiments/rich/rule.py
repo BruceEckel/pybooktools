@@ -3,7 +3,7 @@ from rich.jupyter import JupyterMixin
 from rich.rule import Rule
 from rich.text import Text
 
-from pybooktools.util import console
+from pybooktools.util.console import console
 
 
 # def display_path_list(paths: list[Path], title: str = "") -> None:

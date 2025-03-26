@@ -6,10 +6,12 @@ from pathlib import Path
 from typing import Optional
 
 from icecream import ic
-from pybooktools.util import cleaned_dir, run_script, python_example_validator
 
-from .insert_tls_tags import insert_top_level_separators
-from .tls_results_to_dict import tls_tags_to_dict
+from pybooktools.update_example_output.insert_tls_tags import insert_top_level_separators
+from pybooktools.update_example_output.run_script import run_script
+from pybooktools.update_example_output.tls_results_to_dict import tls_tags_to_dict
+from pybooktools.util.path_utils import cleaned_dir
+from pybooktools.util.python_example_validator import python_example_validator
 
 
 @dataclass

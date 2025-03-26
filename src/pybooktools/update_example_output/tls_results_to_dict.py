@@ -1,9 +1,9 @@
 # tls_results_to_dict.py
 from typing import Dict, List
 
-from pybooktools.validate import UseCase, validate_transformer
-
-from .output_formatter import output_format
+from pybooktools.update_example_output.output_formatter import output_format
+from pybooktools.validate.use_case import UseCase
+from pybooktools.validate.validate_transformer import validate_transformer
 
 
 def tls_tags_to_dict(input_str: str, wrap: bool = True) -> Dict[str, List[str]]:

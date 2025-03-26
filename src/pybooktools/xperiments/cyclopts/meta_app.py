@@ -16,7 +16,7 @@ from typing import Annotated
 
 from cyclopts import App, Parameter
 
-from pybooktools.util import error
+from pybooktools.util.display import error
 
 app = App(
     name="px",

@@ -1,8 +1,8 @@
-# ensure_slug_line.py
 import re
 from pathlib import Path
+from typing import Final
 
-from pybooktools.util.config import slug_pattern
+slug_pattern: Final[str] = r"^#\s+\w+\.py$"
 
 
 def is_slug(line: str) -> bool:

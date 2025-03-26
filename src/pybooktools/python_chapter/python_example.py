@@ -4,8 +4,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import LiteralString
 
-from pybooktools.util import console
-from pybooktools.util import panic
+from pybooktools.util.console import console
+from pybooktools.util.display import panic
 
 
 @dataclass
@@ -27,9 +27,9 @@ class PythonExample:
         if not self.repo_example_path.suffix == ".py":
             panic(f"repo_example_path is not a Python file: {self.repo_example_path}")
         self.repo_example = (
-                "```python\n"
-                + self.repo_example_path.read_text(encoding="utf-8").strip()
-                + "\n```"
+            "```python\n"
+            + self.repo_example_path.read_text(encoding="utf-8").strip()
+            + "\n```"
         )
         self.differs = self.markdown_example != self.repo_example
         if self.differs:

@@ -4,8 +4,11 @@ from typing import Annotated
 
 import typer
 
-from pybooktools.trace import trace
-from pybooktools.util import display_function_name, console, ensure_slug_line, HelpError
+from pybooktools.sluglines.slug import ensure_slug_line
+from pybooktools.trace.tracer import trace
+from pybooktools.util.console import console
+from pybooktools.util.display import display_function_name
+from pybooktools.util.typer_help_error import HelpError
 
 app = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]},
@@ -16,17 +19,17 @@ app = typer.Typer(
 
 @app.command()
 def main(
-        ctx: typer.Context,
-        recursive: Annotated[bool, typer.Option(
-            "--recursive", "-r",
-            help="Recursively search for Python files in subdirectories (that don't start with '.' or '_')"
-        )] = False,
-        files: Annotated[list[Path], typer.Option(
-            "--files", "-f", help="Specify one or more files to process"
-        )] = None,
-        trace_flag: Annotated[bool, typer.Option(
-            "--trace", "-t", help="Enable tracing"
-        )] = False,
+    ctx: typer.Context,
+    recursive: Annotated[bool, typer.Option(
+        "--recursive", "-r",
+        help="Recursively search for Python files in subdirectories (that don't start with '.' or '_')"
+    )] = False,
+    files: Annotated[list[Path], typer.Option(
+        "--files", "-f", help="Specify one or more files to process"
+    )] = None,
+    trace_flag: Annotated[bool, typer.Option(
+        "--trace", "-t", help="Enable tracing"
+    )] = False,
 ) -> None:
     """Create or update slug lines (commented file name at top) in Python files"""
     help_error = HelpError(ctx)

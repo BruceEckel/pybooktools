@@ -5,9 +5,10 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from pybooktools.util import display_dict, display_path_list, console
-from .python_example import PythonExample
-from ..util.config import code_location_pattern, listing_pattern
+from pybooktools.python_chapter.python_example import PythonExample
+from pybooktools.util.config import code_location_pattern, listing_pattern
+from pybooktools.util.console import console
+from pybooktools.util.display import display_path_list, display_dict
 
 
 @dataclass

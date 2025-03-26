@@ -17,7 +17,7 @@ from typing import Annotated
 from cyclopts import App, Parameter, Group
 from rich.console import Console
 
-from pybooktools.util import display_function_name
+from pybooktools.util.display import display_function_name
 
 console = Console()
 app = App(
