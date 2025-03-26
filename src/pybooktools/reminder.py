@@ -1,6 +1,8 @@
 # reminder.py
-from pybooktools.util import console
+from rich.console import Console
 from rich.panel import Panel
+
+console = Console()
 
 cc = "deep_sky_blue1"  # Command Color
 dc = "yellow"  # Description Color
