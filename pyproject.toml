@@ -16,18 +16,28 @@ dependencies = [
 ]
 
 [project.scripts]
+# Flatten a directory tree to give to an AI
 aiflatten = "ai_flatten.flatten_dir_for_ai:main"
+# Take results from an AI and turn back into a directory tree
 unflatten = "ai_flatten.un_flatten:main"
+# Add/Update Output Comment Lines in Python examples
 px = "pybooktools.update_example_output.update_example_output:app"
-pybtools = "pybooktools.reminder:main"
+# Display these commands
+pybooktools = "pybooktools.reminders_from_pyproject:main"
+# Add or update sluglines in Python files
 slug = "pybooktools.sluglines.slug_line:app"
+# Adds sluglines to Python examples in Markdown files
 mdslug = "pybooktools.sluglines.md_auto_slug:main"
+# Renumber Markdown chapters & align chapter names
 chapnum = "pybooktools.renumber_chapters:app"
+# Run validation checks on Markdown chapters
 mdvalid = "pybooktools.pymarkdown_validator.validate:app"
+# Extract examples from Markdown to repo
 mdextract = "pybooktools.extract_examples.extractor:app"
+# Inject examples from repo to Markdown
 mdinject = "pybooktools.inject_examples.injector:app"
+# Remove chapter directories from example repository
 repoclean = "pybooktools.repo_cleaner.clean_example_repo:app"
-#bookup = "pybooktools.update_markdown_python_examples:app"
 
 [tool.uv]
 package = true
