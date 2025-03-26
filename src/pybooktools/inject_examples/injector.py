@@ -18,6 +18,8 @@ def update_markdown_with_repo_examples(markdown_file: Path, repo: Path) -> str:
     with that filename is read and its content is inserted in a new fenced block (with the
     "python" language tag).
 
+    Code blocks with slug lines containing a '/' character are ignored; these are book utilities.
+
     Args:
         markdown_file: The Markdown file to process.
         repo: The directory containing Python examples. Each example must have a filename
@@ -35,7 +37,7 @@ def update_markdown_with_repo_examples(markdown_file: Path, repo: Path) -> str:
     # Group 2: slug line including comment marker (e.g. "# example_1.py\n")
     # Group 3: the filename from the slug line (e.g. "example_1.py")
     # Group 4: the rest of the code block (which will be replaced)
-    pattern = re.compile(
+    fenced_python_block = re.compile(
         r"(```python\s*\n)"  # opening fence with language tag.
         r"(\s*(?:#|//)\s*(\S+\.py)\s*\n)"  # slug line: comment marker and filename.
         r"(.*?)"  # the rest of the code block.
@@ -45,6 +47,9 @@ def update_markdown_with_repo_examples(markdown_file: Path, repo: Path) -> str:
 
     def replacer(match: re.Match) -> str:
         file_name: str = match.group(3)
+        if "/" in file_name:
+            print(f"Skipping book utility {file_name}")
+            return match.group(0)
         file_path: Path = repo / file_name
         try:
             # Read the content of the corresponding file.
@@ -55,7 +60,7 @@ def update_markdown_with_repo_examples(markdown_file: Path, repo: Path) -> str:
         return f"```python\n{file_content}\n```"
 
     # Substitute all matching code blocks with the updated content.
-    new_markdown: str = pattern.sub(replacer, markdown_text)
+    new_markdown: str = fenced_python_block.sub(replacer, markdown_text)
     return new_markdown
 
 
