@@ -20,34 +20,39 @@ app = App(
 
 
 def chapter_dirs(root: Path) -> list[Path]:
-    """
-    Directories from the given root that match `repo_chapter_pattern`.
-    """
+    """Directories from the given root that match `repo_chapter_pattern`."""
     return [
-        chapter for chapter in root.iterdir()
-        if chapter.is_dir()
-           and re.match(repo_chapter_pattern, chapter.name)
+        p for p in root.iterdir()
+        if p.is_dir() and re.match(repo_chapter_pattern, p.name)
     ]
 
 
+def remove_dirs(dirs: list[Path]) -> None:
+    """Print and remove the specified directories."""
+    for d in dirs:
+        if d.exists():
+            print(f"removing: {d.name}")
+            shutil.rmtree(d)
+
+
 @app.command(name="-d")
-def display(path: ResolvedExistingDirectory = Path(".")):
-    """Display the existing repo chapters"""
-    for f in chapter_dirs(path):
-        print(f.name)
+def display(path: ResolvedExistingDirectory = Path(".")) -> None:
+    """Display the existing repo chapters."""
+    for d in chapter_dirs(path):
+        print(d.name)
 
 
 @app.command(name="-c")
-def remove_chapters(path: ResolvedExistingDirectory = Path(".")):
-    """Remove numbered repo chapters"""
-    for chapter in chapter_dirs(path):
-        print(f"removing: {chapter.name}")
-        shutil.rmtree(chapter)
+def remove_chapters(path: ResolvedExistingDirectory = Path(".")) -> None:
+    """Remove numbered repo chapters."""
+    remove_dirs(chapter_dirs(path))
 
 
 @app.command(name="-a")
 def remove_all(path: ResolvedExistingDirectory = Path(".")) -> None:
-    """Remove repo chapters AND 'util' subdirectory"""
-    for chapter in chapter_dirs(path) + [path / "util"]:
-        print(f"removing: {chapter.name}")
-        shutil.rmtree(chapter)
+    """Remove repo chapters AND 'util' subdirectory."""
+    targets = chapter_dirs(path)
+    util_dir = path / "util"
+    if util_dir.exists():
+        targets.append(util_dir)
+    remove_dirs(targets)
