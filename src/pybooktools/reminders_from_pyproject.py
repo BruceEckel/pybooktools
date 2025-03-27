@@ -60,12 +60,12 @@ def format_reminders(commands: list[Command]) -> str:
 
 
 def main() -> None:
-    start_dir = Path.cwd()
+    start_dir = Path(__file__).resolve().parent
     pyproject_path = find_pyproject(start_dir)
     if not pyproject_path:
         console.print("[red]pyproject.toml not found[/red]")
         return
-
+    
     commands = extract_commands(pyproject_path)
     reminders = format_reminders(commands)
 

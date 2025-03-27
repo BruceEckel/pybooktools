@@ -18,7 +18,7 @@ dependencies = [
 [project.scripts]
 # Display these commands
 pybooktools = "pybooktools.reminders_from_pyproject:main"
-# Add/Update Output Comment Lines in Python examples
+# Add or update "Output Comment Lines" in Python examples
 px = "pybooktools.update_example_output.update_example_output:app"
 # Add or update sluglines in Python files
 slug = "pybooktools.sluglines.slug_line:app"

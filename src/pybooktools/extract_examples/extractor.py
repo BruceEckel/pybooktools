@@ -77,7 +77,7 @@ def extract_examples(markdown_file: Path, code_repo: Path) -> List[Example]:
         if match:
             filename = match.group(1)
             parts = filename.split('/')
-            code_dir = code_repo / "src"
+            code_dir = code_repo
             if '/' in filename:
                 for part in parts[:-1]:
                     code_dir = code_dir / part
@@ -113,10 +113,8 @@ app = App(
 @app.command(name="-e")
 def extract(markdown_file: Path, target_dir: Path):
     """Extract examples from a single markdown file to a repo directory."""
-    print(f" {markdown_file.name} -> {target_dir} ".center(80, "-"))
+    print(f" {markdown_file.name} ".center(80, "-"))
     examples = extract_examples(markdown_file, target_dir)
-    for example in examples:
-        print(example.filename)
     write_examples(examples)
 
 

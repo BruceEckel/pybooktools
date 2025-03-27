@@ -90,7 +90,7 @@ def update_markdown_files(markdown_files: ResolvedExistingDirectory, root_repo: 
         if md_file.is_file() and md_file.suffix.lower() == ".md":
             # Compute subdirectory name: lowercase the markdown file name (without '.md').
             subdir_name: str = md_file.stem.lower()
-            repo_subdir: Path = root_repo / "src" / subdir_name
+            repo_subdir: Path = root_repo / subdir_name
             print(f"Processing {md_file.name} with repo subdir {repo_subdir}")
             if not repo_subdir.exists():
                 print(f"Warning: Repository subdirectory {repo_subdir} does not exist for {md_file.name}. Skipping.")
