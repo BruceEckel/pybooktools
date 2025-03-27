@@ -50,9 +50,9 @@ def remove_chapters(path: ResolvedExistingDirectory = Path(".")) -> None:
 
 @app.command(name="-a")
 def remove_all(path: ResolvedExistingDirectory = Path(".")) -> None:
-    """Remove repo chapters AND 'util' subdirectory."""
-    targets = chapter_dirs(path)
-    util_dir = path / "util"
-    if util_dir.exists():
-        targets.append(util_dir)
-    remove_dirs(targets)
+    """Remove repo chapters AND additional specified directories."""
+    additional = ["util"]
+    remove_dirs([
+        *chapter_dirs(path),
+        *(d for name in additional if (d := path / name).exists())
+    ])
