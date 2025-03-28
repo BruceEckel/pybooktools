@@ -1,0 +1,6 @@
+I'm writing Python examples and I'd like a utility that runs top-level statements (TLS) so that:
+1. If the TLS is sucessful the result is printed. If the result is None then we assume that the TLS has a side effect and do not print None.
+2. If the TLS throws an exception, that exception is caught and the error message is displayed.
+
+This utility should be as minimal & non-intrusive as possible, to keep from distracting from the meaning of the examples.
+In addition, it would be great if the utility could be used once for a group of TLS's, again to make it less obtrusive.
