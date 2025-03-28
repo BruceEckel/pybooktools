@@ -1,9 +1,11 @@
-#!/usr/bin/env python3
 """
-Utility: Catcher
-
 A context manager that catches exceptions and prints their error messages,
-and can be used as a callable to execute a delayed function call.
+and can be used as a callable via its __call__ method.
+
+When used as a callable, argument evaluation must be delayed until inside
+the context manager in case argument evaluation raises an exception.
+To do this the function should be provided as a zero-argument callable.
+If the function takes arguments, it must be wrapped in a lambda to delay evaluation.
 """
 
 from dataclasses import dataclass
@@ -12,15 +14,9 @@ from typing import Any, Callable, TypeVar
 R = TypeVar("R")
 
 
-class Catcher:
-    """A context manager that catches exceptions and prints their error messages,
-    and can be used as a callable via its __call__ method.
+class Catch:
 
-    When used as a callable, the function should be provided as a zero-argument callable,
-    which allows argument evaluation to be delayed until inside the context manager.
-    """
-
-    def __enter__(self) -> "Catcher":
+    def __enter__(self) -> "Catch":
         return self
 
     def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> bool:
@@ -30,7 +26,10 @@ class Catcher:
         return True
 
     def __call__(self, func: Callable[[], R]) -> R:
-        """Execute a zero-argument callable, catching and printing errors so that subsequent calls run."""
+        """
+        Execute a zero-argument callable, catching and
+        printing errors so that subsequent calls run.
+        """
         try:
             result = func()
             if result is not None:
@@ -38,7 +37,7 @@ class Catcher:
             return result
         except Exception as e:
             print(f"Error: {e}")
-            return None  # type: ignore
+            return None
 
 
 # Test code
@@ -63,21 +62,21 @@ def mark(marker) -> None:
 
 
 if __name__ == "__main__":
-    with Catcher():  # Single-failure simple form
+    with Catch():  # Single-failure simple form
         mark(1)
         foo(1, Fob(-1))
 
-    with Catcher():  # Success does NOT automatically display the output
+    with Catch():  # Success does NOT automatically display the result
         mark(2)
         print(foo(42, Fob(42)))  # Must explicitly print
         # Or call print inside the function
 
-    with Catcher() as _:  # Lambda form does display the output
+    with Catch() as _:  # Lambda form does display the result
         mark(3)
         _(lambda: foo(42, Fob(42)))
 
     # Multi-failure lambda form:
-    with Catcher() as _:
+    with Catch() as _:
         mark("A")
         _(lambda: foo(1, Fob(1)))
         mark("B")
@@ -92,3 +91,10 @@ if __name__ == "__main__":
         _(lambda: foo(10, Fob(11)))
 
     print("completed")
+
+"""
+Here's where I am with this:
+1. This will be applied to my own examples, so I can adjust them to fit my needs.
+2. Most of the time, when I need this, I will know that a function fails and can just use the simple form.
+3. I probably won't use the lambda form much, if at all, but if I need it, it's there. 
+"""
