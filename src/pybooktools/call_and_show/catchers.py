@@ -7,7 +7,7 @@ Utilities: perr, Catcher, and catch
     for capturing exceptions on a per‑call basis without exiting the block.
 `catch` is used as a decorator that prints the return value before returning it.
 """
-
+from dataclasses import dataclass
 from typing import Any, Callable, TypeVar
 
 R = TypeVar("R")
@@ -66,37 +66,54 @@ def catch(func: Callable[..., R]) -> Callable[..., R]:
     return wrapper
 
 
-def foo(a: int, b: str, c: float) -> str:
+### Tests
+
+@dataclass
+class Fob:
+    x: int
+
+    def __post_init__(self) -> None:
+        if self.x < 0:
+            raise ValueError(f"{self.x = }, must be positive")
+
+
+def foo(a: int, b: Fob) -> str:
     if a < 0:
         raise ValueError(f"{a = }, must be positive")
-    return f"foo({a}, {b}, {c}) succeeded"
+    return f"foo({a}, {b}) succeeded"
 
 
 if __name__ == "__main__":
-    def mark(n: int) -> None:
-        print(f"[{n}]:", end=" ")
+    def mark(marker: int) -> None:
+        print(f"[{marker}]:", end=" ")
 
 
     mark(1)
-    perr(foo, 1, "bar", 3.14)
+    perr(foo, 1, Fob(1))
     mark(2)
-    perr(foo, -1, "bar", 3.14)
+    perr(foo, -1, Fob(1))
+    # mark(3)
+    # perr(foo, 1, Fob(-1))
 
-    # Using Catcher as a context manager with its .run() method so errors don't abort the block:
-    with Catcher() as catcher:
-        mark(3)
-        catcher.run(foo, 1, "bar", 3.14)
+    # Use Catcher run() method so errors don't abort the block:
+    with Catcher() as _:
         mark(4)
-        catcher.run(foo, -1, "bar", 3.14)
+        _.run(foo, 1, Fob(1))
+        mark(5)
+        _.run(foo, -1, Fob(1))
+        mark(6)
+        _.run(foo, 1, Fob(-1))
 
 
     @catch
-    def decorated_foo(a: int, b: str, c: float) -> str:
-        return foo(a, b, c)
+    def decorated_foo(a: int, b: Fob) -> str:
+        return foo(a, b)
 
 
-    mark(5)
-    decorated_foo(1, "bar", 3.14)
-    mark(6)
-    decorated_foo(-1, "bar", 3.14)
+    mark(7)
+    decorated_foo(1, Fob(1))
+    mark(8)
+    decorated_foo(-1, Fob(1))
+    # mark(9)
+    # decorated_foo(1, Fob(-1))
     print("completed")
