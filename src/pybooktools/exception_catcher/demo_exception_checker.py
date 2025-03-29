@@ -1,7 +1,7 @@
 # demo_exception_checker.py
 from dataclasses import dataclass
 
-from pybooktools.exception_catcher.exception_catcher import Catch
+from exception_catcher import Catch
 
 
 @dataclass
@@ -35,12 +35,12 @@ with Catch():  # Success does NOT automatically display the result
     print(foo(42, Fob(42)))  # Must explicitly print
     # Or call print inside the function
 
-# But if you know it succeeds you can just run it without a context:
+# If you know it succeeds you can just run it without a context:
 mark(4)
 print(foo(42, Fob(42)))
 
 mark(5)
-with Catch() as _:  # Lambda form does display the result
+with Catch() as _:  # Lambda form displays successful result
     _(lambda: foo(42, Fob(42)))
 
 # Multi-failure block requires lambda form:

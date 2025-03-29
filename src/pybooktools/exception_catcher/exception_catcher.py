@@ -1,6 +1,6 @@
 # book_util/exception_catcher.py
 """
-A context manager that catches exceptions and prints their error messages,
+Context manager that catches exceptions and prints their error messages,
 and can be used as a callable via its __call__ method.
 
 When used as a callable, argument evaluation must be delayed until inside
@@ -38,11 +38,3 @@ class Catch:
         except Exception as e:
             print(f"Error: {e}")
             return None
-
-
-"""
-Here's where I am with this:
-1. This will be applied to my own examples, so I can adjust them to fit my needs.
-2. Most of the time, when I need this, I will know that a function fails and can just use the simple form.
-3. I probably won't use the lambda form much, if at all, but if I need it, it's there. 
-"""
