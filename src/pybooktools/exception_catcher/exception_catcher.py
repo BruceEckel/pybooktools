@@ -1,4 +1,4 @@
-# book_util/exception_catcher.py
+# book_utils/exception_catcher.py
 """
 Context manager that catches exceptions and prints their error messages,
 and can be used as a callable via its __call__ method.

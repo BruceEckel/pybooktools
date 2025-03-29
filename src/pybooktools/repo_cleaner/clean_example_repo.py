@@ -11,6 +11,14 @@ from typing import Final
 from cyclopts import App
 from cyclopts.types import ResolvedExistingDirectory
 
+# Extra directories to be removed by `remove_all`:
+additional_dirs = [
+    "book_utils",
+    "book_util",
+    "butil",
+    "util"
+]
+
 repo_chapter_pattern: Final[str] = r"^[a]?\d+_[a-z_]+$"
 
 app = App(
@@ -51,8 +59,7 @@ def remove_chapters(path: ResolvedExistingDirectory = Path(".")) -> None:
 @app.command(name="-a")
 def remove_all(path: ResolvedExistingDirectory = Path(".")) -> None:
     """Remove repo chapters AND additional specified directories."""
-    additional = ["book_utils", "butil", "util"]
     remove_dirs([
         *chapter_dirs(path),
-        *(d for name in additional if (d := path / name).exists())
+        *(d for name in additional_dirs if (d := path / name).exists())
     ])
