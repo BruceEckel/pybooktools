@@ -95,6 +95,10 @@ def write_examples(examples: List[Example]) -> None:
     # Write each example to its corresponding file in the code directory.
     for example in examples:
         example.code_dir.mkdir(parents=True, exist_ok=True)
+        dunder_init = example.code_dir / "__init__.py"
+        if not dunder_init.exists():
+            dunder_init.write_text("# __init__.py\n", encoding="utf-8")
+            print(f"{dunder_init}")
         file_path = example.code_dir / example.filename
         file_path.write_text(example.content, encoding="utf-8")
         print(f"{file_path}")
