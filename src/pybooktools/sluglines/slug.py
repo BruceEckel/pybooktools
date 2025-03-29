@@ -1,3 +1,4 @@
+# slug.py
 import re
 from pathlib import Path
 from typing import Final

@@ -17,7 +17,7 @@ dependencies = [
 
 [project.scripts]
 # Display these commands
-pybooktools = "pybooktools.reminders_from_pyproject:main"
+pybooktools = "pybooktools.pybooktools_reminder.reminders_from_pyproject:main"
 # Add or update "Output Comment Lines" in Python examples
 px = "pybooktools.update_example_output.update_example_output:app"
 # Add or update sluglines in Python files
@@ -25,7 +25,7 @@ slug = "pybooktools.sluglines.slug_line:app"
 # Adds sluglines to Python examples in Markdown files
 mdslug = "pybooktools.sluglines.md_auto_slug:main"
 # Renumber Markdown chapters & align chapter names
-chapnum = "pybooktools.renumber_chapters:app"
+chapnum = "pybooktools.renumber_markdown_chapters.renumber_chapters:app"
 # Run validation checks on Markdown chapters
 mdvalid = "pybooktools.pymarkdown_validator.validate:app"
 # Extract examples from Markdown to repo

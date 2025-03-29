@@ -22,7 +22,7 @@ from pathlib import Path
 
 import pytest
 
-from pydemo.demo_dir import DemoDir
+from xperiments.pydemo.demo_dir import DemoDir
 
 
 @pytest.fixture

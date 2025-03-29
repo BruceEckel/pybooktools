@@ -169,5 +169,5 @@ cython_debug/
 *.lock
 /src/pybooktools/output_validator/testing/_validation
 .validate_*
-/src/pybooktools/xperiments/.check_simple
+/xperiments/xperiments/.check_simple
 /src/pybooktools/util/validate_demos

@@ -9,6 +9,7 @@ from typing import List, ClassVar
 
 from cyclopts import App
 from cyclopts.types import ResolvedExistingDirectory
+
 from pybooktools.util.config import chapter_pattern
 from pybooktools.util.path_utils import sanitize_title
 
@@ -129,7 +130,7 @@ app = App(
 
 
 @app.command(name="-r")
-def renumber(path: ResolvedExistingDirectory = Path(".")):
+def renumber(path: ResolvedExistingDirectory = Path("..")):
     """Renumber the chapters, update mkdocs.yml"""
     book = Book(path)
     book.renumber()
@@ -139,13 +140,13 @@ def renumber(path: ResolvedExistingDirectory = Path(".")):
 
 
 @app.command(name="-d")
-def display(path: ResolvedExistingDirectory = Path(".")):
+def display(path: ResolvedExistingDirectory = Path("..")):
     """Display the existing chapters without renumbering"""
     print(Book(path))
 
 
 @app.command(name="-t")
-def trace_info(path: ResolvedExistingDirectory = Path(".")):
+def trace_info(path: ResolvedExistingDirectory = Path("..")):
     """Display trace info, no changes"""
     print(" Trace info ".center(60, "-"))
     print(f"{path = }")

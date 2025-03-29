@@ -61,7 +61,7 @@ def process_files(files: list[PyExample], *, opt_flags=OptFlags.DEFAULT):
 @app.command(name="-a", sort_key=2)
 def all_files_in_current_dir(opt_flags=OptFlags.DEFAULT):
     """All: Process all Python examples in the current directory"""
-    paths = list(Path(".").glob("*.py"))
+    paths = list(Path("").glob("*.py"))
     result = report("all_files_in_current_dir", paths, opt_flags=opt_flags)
     process_files(paths, opt_flags=opt_flags)
     return result
@@ -70,7 +70,7 @@ def all_files_in_current_dir(opt_flags=OptFlags.DEFAULT):
 @app.command(name="-r", sort_key=3)
 def recursive(opt_flags=OptFlags.DEFAULT):
     """Recursive: Process all Python examples in current directory AND subdirectories"""
-    paths = list(Path(".").rglob("*.py"))
+    paths = list(Path("").rglob("*.py"))
     result = report("recursive", paths, opt_flags=opt_flags)
     process_files(paths, opt_flags=opt_flags)
     return result

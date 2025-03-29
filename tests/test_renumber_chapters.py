@@ -6,7 +6,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from pybooktools.renumber_chapters import MarkdownChapter, Book
+from pybooktools.renumber_markdown_chapters.renumber_chapters import MarkdownChapter, Book
 
 # Centralized parameter data
 chapter_data = [

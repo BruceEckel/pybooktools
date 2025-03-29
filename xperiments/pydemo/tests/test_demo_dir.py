@@ -13,11 +13,11 @@ from pathlib import Path
 
 import pytest
 
-from pydemo import (
+from xperiments.pydemo import (
     DemoDir,
     Example,
 )
-from pydemo.demo_dir import (
+from xperiments.pydemo.demo_dir import (
     parse_demo_dir_name,
     extract_path_part,
     split_directory_and_filename,

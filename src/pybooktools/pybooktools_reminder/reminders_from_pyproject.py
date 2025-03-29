@@ -1,4 +1,4 @@
-#: reminders_from_pyproject.py
+# reminders_from_pyproject.py
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -65,7 +65,7 @@ def main() -> None:
     if not pyproject_path:
         console.print("[red]pyproject.toml not found[/red]")
         return
-    
+
     commands = extract_commands(pyproject_path)
     reminders = format_reminders(commands)
 

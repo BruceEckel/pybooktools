@@ -230,7 +230,7 @@ class Example:
 
         # Compute relative path from the top-level demo directory
         rel_path = self.dir_path.resolve().relative_to(self.demo_dir_path.resolve())
-        self._relative_path = rel_path.as_posix() if rel_path != Path('.') else '.'
+        self._relative_path = rel_path.as_posix() if rel_path != Path('') else '.'
 
         # Decide what to show in the "repr" after "--- "
         # 1) If we have an original_label, that means the user typed it. Use it.
