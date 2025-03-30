@@ -107,7 +107,7 @@ def update_all_examples_in_dir(
 ) -> None:
     """All: Update all Python examples in specified directory [.]"""
     opts = opts or OptFlags()
-    paths = list(target_dir.glob("*.py"))
+    paths = [p for p in target_dir.glob("*.py") if p.name != "__init__.py"]
     if opts.verbose:
         report("all_files_in_dir", paths, opts=opts)
     process_example_list(paths, opts.verbose, not opts.no_wrap)
@@ -118,11 +118,17 @@ def update_all_examples_in_dir(
 def recursive(target_dir: ExistingDirectory = Path("."), opts: Optional[OptFlags] = None) -> None:
     """Recursive: Update all Python examples in specified directory [.] AND subdirectories"""
     opts = opts or OptFlags()
-    paths = list(target_dir.rglob("*.py"))
-    if opts.verbose:
-        report("recursive", paths, opts=opts)
-    process_example_list(paths, opts.verbose, not opts.no_wrap)
-    issues.display(f"{target_dir}")
+    directories = [d for d in target_dir.glob("*") if d.is_dir()]
+    selected_dirs = [d for d in directories if
+                     not d.name.startswith(".") and
+                     d.name not in ["__pycache__", "venv"]
+                     ]
+    for d in selected_dirs:
+        pyfiles = [p for p in d.glob("*.py") if p.name != "__init__.py"]
+        if opts.verbose:
+            report("recursive", pyfiles, opts=opts)
+        process_example_list(pyfiles, opts.verbose, not opts.no_wrap)
+        issues.display(f"{d}")
 
 
 # Demo tests:
