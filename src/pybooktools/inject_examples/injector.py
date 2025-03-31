@@ -4,6 +4,17 @@ from pathlib import Path
 
 from cyclopts import App
 from cyclopts.types import ResolvedExistingDirectory
+from rich.console import Console
+
+console = Console()
+
+
+def pc(path_str: str) -> str:  # Path color
+    return f"[steel_blue1]{path_str}[/steel_blue1]"
+
+
+def nc(notification: str) -> str:  # Notification color
+    return f"[dark_orange]{notification}[/dark_orange]"
 
 
 def update_markdown_with_repo_examples(markdown_file: Path, repo: Path) -> str:
@@ -48,7 +59,7 @@ def update_markdown_with_repo_examples(markdown_file: Path, repo: Path) -> str:
     def replacer(match: re.Match) -> str:
         file_name: str = match.group(3)
         if "/" in file_name:
-            print(f"Skipping book utility {file_name}")
+            console.print(nc("Skipping book utility ") + pc(file_name))
             return match.group(0)
         file_path: Path = repo / file_name
         try:
@@ -91,17 +102,20 @@ def update_markdown_files(markdown_files: ResolvedExistingDirectory, root_repo: 
             # Compute subdirectory name: lowercase the markdown file name (without '.md').
             subdir_name: str = md_file.stem.lower()
             repo_subdir: Path = root_repo / subdir_name
-            print(f"Processing {md_file.name} with repo subdir {repo_subdir}")
             if not repo_subdir.exists():
-                print(f"Warning: Repository subdirectory {repo_subdir} does not exist for {md_file.name}. Skipping.")
+                console.print(
+                    nc("Skipping missing subdirectory ") + \
+                    f"{pc(repo_subdir.name)} for {pc(md_file.name)}"
+                )
                 continue
 
+            # console.print(f"Processing {md_file.name} with repo subdir {repo_subdir.name}")
             try:
                 updated_content: str = update_markdown_with_repo_examples(md_file, repo_subdir)
             except FileNotFoundError as err:
-                print(f"Error processing {md_file.name}: {err}")
+                console.print(f"[red]Error processing[/red] {md_file.name}: {err}")
                 continue
 
             # Overwrite the markdown file with the updated content.
             md_file.write_text(updated_content, encoding="utf-8")
-            print(f"Updated {md_file.name} with content from {repo_subdir}")
+            console.print(f"[green]Updated[/green] {pc(md_file.name)} with {pc(repo_subdir.name)}")
