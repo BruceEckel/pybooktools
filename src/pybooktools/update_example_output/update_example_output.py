@@ -77,8 +77,8 @@ def process_example(example_path: Path, verbose=False, wrap: bool = True) -> str
     """Process a single example"""
     if verbose:
         print(f"process({example_path}, verbose={verbose}, wrap={wrap}) ...")
-    if "# R:" in example_path.read_text():
-        return f"Skipping {example_path.name} because it has '# R:' comments"
+    # if "# R:" in example_path.read_text():
+    #     return f"Skipping {example_path.name} because it has '# R:' comments"
     return ExampleUpdater(example_path, verbose=verbose).update_output(wrap=wrap)
 
 

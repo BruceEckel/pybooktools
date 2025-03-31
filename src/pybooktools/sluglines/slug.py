@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 from typing import Final
 
-slug_pattern: Final[str] = r"^#\s+\w+\.py$"
+slug_pattern: Final[str] = r"^#\s+[\w/]+\.py$"
 
 
 def is_slug(line: str) -> bool:
