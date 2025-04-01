@@ -1,0 +1,12 @@
+# Justfile
+# set shell := ["pwsh", "-Command"]
+set shell := ["cmd", "/C"]
+
+default:
+    just --summary
+
+build:
+    echo "Building project..."
+
+test:
+    echo "testing project..."
