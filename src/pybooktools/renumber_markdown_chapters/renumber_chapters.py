@@ -21,7 +21,7 @@ class MarkdownChapterID:
     root_name: str = field(init=False)  # Does not include _number or '.md'
     appendix: bool = False
     chapternum_width: ClassVar[int] = 2
-    appendixnum_width: ClassVar[int] = 1
+    appendixnum_width: ClassVar[int] = 2
 
     def __post_init__(self) -> None:
         assert self.path.is_file(), f"{self.path} is not a file."
