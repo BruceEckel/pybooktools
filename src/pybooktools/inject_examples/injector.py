@@ -104,7 +104,7 @@ def update_markdown_files(markdown_files: ResolvedExistingDirectory, root_repo: 
             repo_subdir: Path = root_repo / subdir_name
             if not repo_subdir.exists():
                 console.print(
-                    nc("Skipping missing subdirectory ") + \
+                    nc("Skipping missing subdirectory ") +
                     f"{pc(repo_subdir.name)} for {pc(md_file.name)}"
                 )
                 continue
