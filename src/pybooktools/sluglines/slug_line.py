@@ -5,7 +5,6 @@ from typing import Annotated
 import typer
 
 from pybooktools.sluglines.slug import ensure_slug_line
-from pybooktools.trace.tracer import trace
 from pybooktools.util.console import console
 from pybooktools.util.display import display_function_name
 from pybooktools.util.typer_help_error import HelpError
@@ -35,7 +34,6 @@ def main(
     help_error = HelpError(ctx)
 
     if trace_flag:
-        trace.enable()
         display_function_name()
 
     if files:  # Multiple files on command line
