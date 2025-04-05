@@ -5,22 +5,13 @@ from functools import partial
 from pathlib import Path
 from typing import List, Pattern, Set, Callable
 
-from .fenced_blocks import fenced_blocks
+from pybooktools.md_examples.fenced_blocks import fenced_blocks
 
 default_slug_line_pattern: Pattern[str] = re.compile(r"^\s*(?:#|//)\s*(\S+\.[a-zA-Z0-9_]+)")
 
 
 @dataclass
 class Example:
-    """
-    An extracted code example from a markdown file.
-
-    Attributes:
-        filename: The filename as extracted from the slug line (e.g. "# example_1.py" or "// DefaultValues.java").
-        content: The code content of the example (excluding the slug line).
-        code_dir: The directory where the example will be written.
-        fence_tag: The fence tag of the code block (e.g. "python", "java").
-    """
     filename: str
     content: str
     code_dir: Path
@@ -33,16 +24,14 @@ class Example:
 
 
 def examples_with_sluglines(
-    markdown_file: Path,
+    markdown_content: str,
     code_repo: Path,
     slug_pattern: Pattern[str] = default_slug_line_pattern,
     fence_tags: Set[str] | None = None
 ) -> List[Example]:
-    target_dir_name = markdown_file.stem.lower().replace(" ", "_")
-    markdown_text = markdown_file.read_text(encoding="utf-8")
     examples: List[Example] = []
 
-    for block in fenced_blocks(markdown_text):
+    for block in fenced_blocks(markdown_content):
         if fence_tags is not None and block.fence_tag not in fence_tags:
             continue
 
@@ -60,7 +49,7 @@ def examples_with_sluglines(
                     code_dir = code_dir / part
                 code_dir.mkdir(parents=True, exist_ok=True)
             else:
-                code_dir = code_dir / target_dir_name
+                code_dir = code_dir / "markdown"
 
             content = "\n".join(lines).rstrip() + "\n"
             examples.append(Example(filename=parts[-1], content=content, code_dir=code_dir, fence_tag=block.fence_tag))
@@ -68,21 +57,19 @@ def examples_with_sluglines(
     return examples
 
 
-python_examples: Callable[[Path, Path], List[Example]] = partial(examples_with_sluglines, fence_tags={"python"})
+python_examples: Callable[[str, Path], List[Example]] = partial(examples_with_sluglines, fence_tags={"python"})
 
 
-def examples_without_sluglines(markdown_file: Path) -> List[str]:
-    markdown_text = markdown_file.read_text(encoding="utf-8")
+def examples_without_sluglines(markdown_content: str) -> List[str]:
     return [
-        block.content
-        for block in fenced_blocks(markdown_text)
+        block.raw
+        for block in fenced_blocks(markdown_content)
         if block.content.splitlines() and not default_slug_line_pattern.match(block.content.splitlines()[0])
     ]
 
 
-def examples_without_fence_tags(markdown_file: Path) -> List[str]:
-    markdown_text = markdown_file.read_text(encoding="utf-8")
-    return [block.content for block in fenced_blocks(markdown_text) if not block.fence_tag]
+def examples_without_fence_tags(markdown_content: str) -> List[str]:
+    return [block.raw for block in fenced_blocks(markdown_content) if not block.fence_tag]
 
 
 def write_examples(examples: List[Example]) -> None:
@@ -95,6 +82,9 @@ def write_examples(examples: List[Example]) -> None:
         file_path = example.code_dir / example.filename
         file_path.write_text(example.content, encoding="utf-8")
         print(f"{file_path}")
+
+
+# --------------------------- TESTS ---------------------------
 
 
 def test_examples_extraction():
@@ -117,12 +107,10 @@ This is not code.
 ```
 """
     with tempfile.TemporaryDirectory() as tmp_dir:
-        md_file = Path(tmp_dir) / "Example Doc.md"
-        md_file.write_text(md_content, encoding="utf-8")
         code_repo = Path(tmp_dir) / "repo"
         code_repo.mkdir()
 
-        examples = examples_with_sluglines(md_file, code_repo)
+        examples = examples_with_sluglines(md_content, code_repo)
 
         assert len(examples) == 3
         assert {e.filename for e in examples} == {"hello.py", "main.java", "ignore.txt"}
@@ -141,12 +129,10 @@ echo "B"
 ```
 """
     with tempfile.TemporaryDirectory() as tmp_dir:
-        md_file = Path(tmp_dir) / "Filter.md"
-        md_file.write_text(md_content, encoding="utf-8")
         code_repo = Path(tmp_dir) / "repo"
         code_repo.mkdir()
 
-        examples = examples_with_sluglines(md_file, code_repo, fence_tags={"python"})
+        examples = examples_with_sluglines(md_content, code_repo, fence_tags={"python"})
 
         assert len(examples) == 1
         assert examples[0].filename == "a.py"
@@ -164,13 +150,11 @@ print("OK")
 print("No slug line")
 ```
 """
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        md_file = Path(tmp_dir) / "NoSlug.md"
-        md_file.write_text(md_content, encoding="utf-8")
-
-        blocks = examples_without_sluglines(md_file)
-        assert len(blocks) == 1
-        assert blocks[0].strip() == 'print("No slug line")'
+    blocks = examples_without_sluglines(md_content)
+    assert len(blocks) == 1
+    assert "print(\"No slug line\")" in blocks[0]
+    assert blocks[0].strip().startswith("```python")
+    assert blocks[0].strip().endswith("```")
 
 
 def test_examples_without_fence_tags():
@@ -185,13 +169,11 @@ print("Raw")
 print("Tagged")
 ```
 """
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        md_file = Path(tmp_dir) / "NoTag.md"
-        md_file.write_text(md_content, encoding="utf-8")
-
-        blocks = examples_without_fence_tags(md_file)
-        assert len(blocks) == 1
-        assert blocks[0].strip().startswith("# raw.py")
+    blocks = examples_without_fence_tags(md_content)
+    assert len(blocks) == 1
+    assert "# raw.py" in blocks[0]
+    assert blocks[0].strip().startswith("```")
+    assert blocks[0].strip().endswith("```")
 
 
 def test_python_examples():
@@ -212,12 +194,10 @@ print("Two")
 ```
 """
     with tempfile.TemporaryDirectory() as tmp_dir:
-        md_file = Path(tmp_dir) / "PythonOnly.md"
-        md_file.write_text(md_content, encoding="utf-8")
         code_repo = Path(tmp_dir) / "repo"
         code_repo.mkdir()
 
-        examples = python_examples(md_file, code_repo)
+        examples = python_examples(md_content, code_repo)
         assert len(examples) == 2
         assert {e.filename for e in examples} == {"script1.py", "script2.py"}
         assert all(e.fence_tag == "python" for e in examples)
