@@ -36,9 +36,9 @@ class Example:
 {self.content.strip()}"""
 
 
-def extract_examples(markdown_file: Path, code_repo: Path) -> List[Example]:
+def examples_with_sluglines(markdown_file: Path, code_repo: Path) -> List[Example]:
     """
-    Extracts all fenced code examples containing a "slug line" from a markdown file.
+    Returns a list of all fenced code examples containing a "slug line" from a markdown file.
 
     A slug line is the first line in a fenced code block that is a comment containing the
     filename (for example, "# example_1.py" or "// example_1.java"). This function supports
@@ -118,7 +118,7 @@ app = App(
 def extract(markdown_file: Path, target_dir: Path):
     """Extract examples from a single markdown file to a repo directory."""
     print(f" {markdown_file.name} ".center(80, "-"))
-    examples = extract_examples(markdown_file, target_dir)
+    examples = examples_with_sluglines(markdown_file, target_dir)
     write_examples(examples)
 
 

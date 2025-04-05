@@ -1,7 +1,6 @@
 # test_insert_top_level_separators.py
 from pybooktools.update_example_output.insert_tls_tags import insert_top_level_separators
-from pybooktools.validate.use_case import UseCase
-from pybooktools.validate.validate_transformer import validate_transformer
+from pybooktools.update_example_output.validate_transformer import validate_transformer, UseCase
 
 use_cases = [
     UseCase(

@@ -2,8 +2,7 @@
 from typing import Dict, List
 
 from pybooktools.update_example_output.output_formatter import output_format
-from pybooktools.validate.use_case import UseCase
-from pybooktools.validate.validate_transformer import validate_transformer
+from pybooktools.update_example_output.validate_transformer import validate_transformer, UseCase
 
 
 def tls_tags_to_dict(input_str: str, wrap: bool = True) -> Dict[str, List[str]]:

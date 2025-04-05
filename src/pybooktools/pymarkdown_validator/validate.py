@@ -92,7 +92,7 @@ def check_markdown_file(markdown_file: ResolvedExistingFile) -> List[str]:
     return issues
 
 
-@app.command(name="-v")
+@app.command(name="-f")
 def validate_markdown_file(markdown_file: ResolvedExistingFile):
     """Validate a single Markdown file."""
     for issue in check_markdown_file(markdown_file):

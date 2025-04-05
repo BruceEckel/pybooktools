@@ -1,15 +1,27 @@
 # validate_transformer.py
 import difflib
 import inspect
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
-from .config import output_from_marker, DIVIDER, OUTPUT_MARKER
-from .presentation import passed, failed
-from .use_case import UseCase
+
+@dataclass
+class UseCase:
+    case_id: int
+    script: str
+    expected_output: Any
+
+    def __post_init__(self):
+        # self.script = self.script.strip() + "\n"
+        self.expected_output = str(self.expected_output).strip() + "\n"
+
+    def __iter__(self):
+        return iter((self.case_id, self.script, self.expected_output))
 
 
 def validate_transformer(
-        transformer: callable, use_cases: list[UseCase]
+    transformer: callable, use_cases: list[UseCase]
 ) -> None:
     results = []
     for case_id, script, expected_output in use_cases:
@@ -100,3 +112,22 @@ _______________________________
 ================ Case 3 passed ================
 ================ Case 4 passed ================
 """
+OUTPUT_MARKER = '\n""" Output From:'
+
+
+def output_from_marker(function_name: str) -> str:
+    return f"{OUTPUT_MARKER} {function_name}"
+
+
+DIVIDER = "****"
+
+
+def report(test: bool, case_id: int) -> str:
+    if test:
+        return "\n" + f" Case {case_id} passed ".center(47, "=")
+    else:
+        return f" Case {case_id} failed ".center(47, "=")
+
+
+passed = lambda case_id: report(True, case_id)
+failed = lambda case_id: report(False, case_id)

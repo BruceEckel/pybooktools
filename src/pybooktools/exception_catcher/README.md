@@ -12,7 +12,7 @@ with Catch():
 ## Error: division by zero
 ```
 
-Displaying failing expressions one at a time this way is normally all you'll need.
+Displaying failing expressions one at a time is normally all you'll need.
 If you have a number of failing expressions in a row, you can express them as a block using the lambda form:
 
 ```python
@@ -23,7 +23,7 @@ with Catch() as _:
     _(lambda: 1 / 0)
     _(lambda: 1 / 0)
     _(lambda: 1 / 0)
-    print("No lambda aborts the context:")
+    print("Without lambda, aborts the context:")
     1 / 0
     print("This doesn't run:")
     _(lambda: 1 / 0)
