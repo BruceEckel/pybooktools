@@ -88,8 +88,7 @@ class SlugInserter:
             else:
                 replacer.count += 1
 
-            slug_line = f"# example_{replacer.count}.py"
-            lines.insert(0, slug_line)
+            lines.insert(0, f"# example_{replacer.count}.py")  # type: ignore
 
             # Rebuild the code block content
             new_block_content = "\n".join(lines)
