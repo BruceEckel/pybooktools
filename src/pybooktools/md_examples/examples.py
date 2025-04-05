@@ -1,12 +1,12 @@
 import re
 import tempfile
 from dataclasses import dataclass
+from functools import partial
 from pathlib import Path
-from typing import List, Pattern, Set
+from typing import List, Pattern, Set, Callable
 
 from .fenced_blocks import fenced_blocks
 
-# Default pattern to match a slug line:
 default_slug_line_pattern: Pattern[str] = re.compile(r"^\s*(?:#|//)\s*(\S+\.[a-zA-Z0-9_]+)")
 
 
@@ -28,7 +28,7 @@ class Example:
 
     def __str__(self) -> str:
         full_path = " " + str(self.code_dir / self.filename) + " "
-        return f"""---{full_path.center(70, "-")}---
+        return f"""--- {full_path.center(70, "-")} ---
 {self.content.strip()}"""
 
 
@@ -66,6 +66,9 @@ def examples_with_sluglines(
             examples.append(Example(filename=parts[-1], content=content, code_dir=code_dir, fence_tag=block.fence_tag))
 
     return examples
+
+
+python_examples: Callable[[Path, Path], List[Example]] = partial(examples_with_sluglines, fence_tags={"python"})
 
 
 def examples_without_sluglines(markdown_file: Path) -> List[str]:
@@ -189,6 +192,35 @@ print("Tagged")
         blocks = examples_without_fence_tags(md_file)
         assert len(blocks) == 1
         assert blocks[0].strip().startswith("# raw.py")
+
+
+def test_python_examples():
+    md_content = """
+```python
+# script1.py
+print("One")
+```
+
+```java
+// Script.java
+System.out.println("Not Python");
+```
+
+```python
+# script2.py
+print("Two")
+```
+"""
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        md_file = Path(tmp_dir) / "PythonOnly.md"
+        md_file.write_text(md_content, encoding="utf-8")
+        code_repo = Path(tmp_dir) / "repo"
+        code_repo.mkdir()
+
+        examples = python_examples(md_file, code_repo)
+        assert len(examples) == 2
+        assert {e.filename for e in examples} == {"script1.py", "script2.py"}
+        assert all(e.fence_tag == "python" for e in examples)
 
 
 if __name__ == "__main__":
