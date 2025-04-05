@@ -90,14 +90,10 @@ def check_markdown_file(markdown_file: ResolvedExistingFile) -> list[Issue]:
 
 def display_issues(issues: list[Issue], markdown_file: ResolvedExistingFile):
     """Display issues in a human-readable format using rich panels."""
-    if not issues:
-        return
-
-    console = Console()
-    sub_panels = [Panel(issue.text, title=issue.problem, border_style="red") for i, issue in enumerate(issues)]
-    grouped = Group(*sub_panels)
-    main_panel = Panel(grouped, title=str(markdown_file.name), border_style="yellow")
-    console.print(main_panel)
+    if issues:
+        sub_panels = [Panel(issue.text, title=issue.problem, border_style="red") for i, issue in enumerate(issues)]
+        main_panel = Panel(Group(*sub_panels), title=str(markdown_file.name), border_style="yellow")
+        Console().print(main_panel)
 
 
 @app.command(name="-f")
