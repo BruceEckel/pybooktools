@@ -12,6 +12,7 @@ from rich.console import Console
 from rich.panel import Panel
 
 from pybooktools.update_example_output.example_updater import ExampleUpdater
+from pybooktools.util.file_finder import python_files
 from pybooktools.util.python_example_validator import PyExample
 
 console = Console()
@@ -107,7 +108,8 @@ def update_all_examples_in_dir(
 ) -> None:
     """All: Update all Python examples in specified directory [.]"""
     opts = opts or OptFlags()
-    paths = [p for p in target_dir.glob("*.py") if p.name != "__init__.py"]
+    # paths = [p for p in target_dir.glob("*.py") if p.name != "__init__.py"]
+    paths = list(python_files("d", target_dir))
     if opts.verbose:
         report("all_files_in_dir", paths, opts=opts)
     process_example_list(paths, opts.verbose, not opts.no_wrap)
@@ -118,17 +120,22 @@ def update_all_examples_in_dir(
 def recursive(target_dir: ExistingDirectory = Path("."), opts: Optional[OptFlags] = None) -> None:
     """Recursive: Update all Python examples in specified directory [.] AND subdirectories"""
     opts = opts or OptFlags()
-    directories = [d for d in target_dir.glob("*") if d.is_dir()]
-    selected_dirs = [d for d in directories if
-                     not d.name.startswith(".") and
-                     d.name not in ["__pycache__", "venv"]
-                     ]
-    for d in selected_dirs:
-        pyfiles = [p for p in d.glob("*.py") if p.name != "__init__.py"]
+    # directories = [d for d in target_dir.glob("*") if d.is_dir()]
+    # selected_dirs = [d for d in directories if
+    #                  not d.name.startswith(".") and
+    #                  d.name not in ["__pycache__", "venv"]
+    #                  ]
+    # for d in selected_dirs:
+    #     pyfiles = [p for p in d.glob("*.py") if p.name != "__init__.py"]
+    #     if opts.verbose:
+    #         report("recursive", pyfiles, opts=opts)
+    #     process_example_list(pyfiles, opts.verbose, not opts.no_wrap)
+    #     issues.display(f"{d}")
+    for p in python_files("r", target_dir):
         if opts.verbose:
-            report("recursive", pyfiles, opts=opts)
-        process_example_list(pyfiles, opts.verbose, not opts.no_wrap)
-        issues.display(f"{d}")
+            report("recursive", [p], opts=opts)
+        process_example(p, opts.verbose, not opts.no_wrap)
+    issues.display(f"{p}")
 
 
 # Demo tests:
