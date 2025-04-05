@@ -120,6 +120,7 @@ def update_all_examples_in_dir(
 def recursive(target_dir: ExistingDirectory = Path("."), opts: Optional[OptFlags] = None) -> None:
     """Recursive: Update all Python examples in specified directory [.] AND subdirectories"""
     opts = opts or OptFlags()
+    print("recursive: target_dir = ", target_dir, "opts = ", opts, "display = ", display, "issues = ", issues, sep="")
     # directories = [d for d in target_dir.glob("*") if d.is_dir()]
     # selected_dirs = [d for d in directories if
     #                  not d.name.startswith(".") and
