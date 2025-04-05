@@ -1,108 +1,11 @@
 # extractor.py
 """Extract code examples from Markdown files."""
-import re
-from dataclasses import dataclass
 from pathlib import Path
-from typing import List
 
 from cyclopts import App
 from cyclopts.types import ResolvedExistingDirectory
 
-# Matches fenced code blocks.
-code_block_pattern = re.compile(r"```[^\n]*\n(.*?)\n```", re.DOTALL)
-
-# Matches a slug line; supports different comment markers and matches a filename with an extension.
-slug_line_pattern = re.compile(r"^\s*(?:#|//)\s*(\S+\.[a-zA-Z0-9_]+)")
-
-
-@dataclass
-class Example:
-    """
-    Represents an extracted code example from a markdown file.
-
-    Attributes:
-        filename: The filename as extracted from the slug line (e.g. "# example_1.py" or "// DefaultValues.java").
-        content: The code content of the example (excluding the slug line).
-        code_dir: The directory where the example will be written.
-    """
-    filename: str
-    content: str
-    code_dir: Path
-
-    def __str__(self) -> str:
-        full_path = " " + str(self.code_dir / self.filename) + " "
-        return f"""\
----{full_path.center(70, "-")}---
-{self.content.strip()}"""
-
-
-def examples_with_sluglines(markdown_file: Path, code_repo: Path) -> List[Example]:
-    """
-    Returns a list of all fenced code examples containing a "slug line" from a markdown file.
-
-    A slug line is the first line in a fenced code block that is a comment containing the
-    filename (for example, "# example_1.py" or "// example_1.java"). This function supports
-    multiple languages by matching any language tag in the code fence and by recognizing
-    common comment markers.
-
-    The directory is created from the markdown file name by:
-      - Removing the '.md' extension.
-      - Converting the name to lowercase.
-      - Replacing spaces with underscores.
-
-    Each extracted example is written into its own file within the target directory.
-
-    If a slugline contains a '/' character, the file will be written to a corresponding
-    path from the root directory under the 'src' directory.
-
-    Args:
-        markdown_file: The markdown file to extract examples from.
-        code_repo: The root directory under which the target directory will be created.
-    """
-    # Create target directory from markdown file name:
-    target_dir_name = markdown_file.stem.lower().replace(" ", "_")
-    # Parse code blocks from file:
-    markdown_text = markdown_file.read_text(encoding="utf-8")
-    code_blocks = code_block_pattern.findall(markdown_text)
-
-    examples: List[Example] = []
-
-    for block in code_blocks:
-        lines = block.splitlines()
-        if not lines:
-            continue
-
-        # Check if the first line is a slug line.
-        match = slug_line_pattern.match(lines[0])
-        if match:
-            filename = match.group(1)
-            parts = filename.split('/')
-            code_dir = code_repo
-            if '/' in filename:
-                for part in parts[:-1]:
-                    code_dir = code_dir / part
-                code_dir.mkdir(parents=True, exist_ok=True)
-            else:
-                code_dir = code_dir / target_dir_name
-
-            content = "\n".join(lines).rstrip() + "\n"
-            examples.append(Example(filename=parts[-1], content=content, code_dir=code_dir))
-
-    return examples
-
-
-def write_examples(examples: List[Example]) -> None:
-    # Write each example to its corresponding file in the code directory.
-    for example in examples:
-        example.code_dir.mkdir(parents=True, exist_ok=True)
-        dunder_init = example.code_dir / "__init__.py"
-        if not dunder_init.exists():
-            dunder_init.write_text("# __init__.py\n", encoding="utf-8")
-            print(f"{dunder_init}")
-        file_path = example.code_dir / example.filename
-        file_path.write_text(example.content, encoding="utf-8")
-        print(f"{file_path}")
-
+from pybooktools.md_examples.examples_with_sluglines import examples_with_sluglines, write_examples
 
 app = App(
     version_flags=[],
