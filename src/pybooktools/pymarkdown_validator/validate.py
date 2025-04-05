@@ -10,6 +10,7 @@ from rich.panel import Panel
 
 from pybooktools.md_examples import examples_without_sluglines
 
+# TODO: Unify this in one place
 slug_line_pattern = re.compile(r"^\s*(?:#|//)\s*(\S+\.(?:py|pyi|cpp|java))")
 
 
