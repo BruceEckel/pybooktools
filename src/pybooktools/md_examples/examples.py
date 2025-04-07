@@ -6,9 +6,13 @@ from functools import partial
 from pathlib import Path
 from typing import List, Pattern, Set, Callable, Optional
 
+import pytest
+
 from pybooktools.md_examples.fenced_blocks import fenced_blocks
 
-default_slug_line_pattern: Pattern[str] = re.compile(r"^\s*(?:#|//)\s*(\S+\.[a-zA-Z0-9_]+)")
+default_slug_line_pattern: Pattern[str] = re.compile(
+    r"^\s*(?:#|//)\s*(\S+\.[a-zA-Z0-9_]+)"
+)
 
 
 @dataclass
@@ -24,7 +28,11 @@ class Example:
         self.destination_path = self.code_dir / self.slug_filename
 
     def __str__(self) -> str:
-        return f" {self.destination_path.name} ".center(70, "-") + "\n" + self.example_body.strip()
+        return (
+            f" {self.destination_path.name} ".center(70, "-")
+            + "\n"
+            + self.example_body.strip()
+        )
 
     def write(self, verbose: bool = False):
         self.destination_path.write_text(self.example_body, encoding="utf-8")
@@ -36,11 +44,13 @@ def examples_with_sluglines(
     markdown_source: Path,
     code_repo: Path,
     slug_pattern: Pattern[str] = default_slug_line_pattern,
-    fence_tags: Set[str] | None = None
+    fence_tags: Set[str] | None = None,
 ) -> List[Example]:
     def determine_code_dir(slug: str) -> Path:
-        path_parts = slug.split('/')
-        path = code_repo.joinpath(*path_parts[:-1]) if len(path_parts) > 1 else code_repo
+        path_parts = slug.split("/")
+        path = (
+            code_repo.joinpath(*path_parts[:-1]) if len(path_parts) > 1 else code_repo
+        )
         path.mkdir(parents=True, exist_ok=True)
         return path
 
@@ -49,11 +59,11 @@ def examples_with_sluglines(
 
     return [
         Example(
-            slug_filename=match.group(1).split('/')[-1],
+            slug_filename=match.group(1).split("/")[-1],
             example_body="\n".join(block.content.splitlines()).rstrip() + "\n",
             code_dir=determine_code_dir(match.group(1)),
             fence_tag=block.fence_tag,
-            md_source_path=source_path
+            md_source_path=source_path,
         )
         for block in fenced_blocks(markdown_content)
         if (fence_tags is None or block.fence_tag in fence_tags)
@@ -62,19 +72,24 @@ def examples_with_sluglines(
     ]
 
 
-python_examples: Callable[[str, Path], List[Example]] = partial(examples_with_sluglines, fence_tags={"python"})
+python_examples: Callable[[str, Path], List[Example]] = partial(
+    examples_with_sluglines, fence_tags={"python"}
+)
 
 
 def examples_without_sluglines(markdown_content: str) -> List[str]:
     return [
         block.raw
         for block in fenced_blocks(markdown_content)
-        if (lines := block.content.splitlines()) and not default_slug_line_pattern.match(lines[0])
+        if (lines := block.content.splitlines())
+        and not default_slug_line_pattern.match(lines[0])
     ]
 
 
 def examples_without_fence_tags(markdown_content: str) -> List[str]:
-    return [block.raw for block in fenced_blocks(markdown_content) if not block.fence_tag]
+    return [
+        block.raw for block in fenced_blocks(markdown_content) if not block.fence_tag
+    ]
 
 
 def write_examples(examples: List[Example]) -> None:
@@ -90,41 +105,44 @@ def write_examples(examples: List[Example]) -> None:
 # --------------------------- TESTS ---------------------------
 
 
-def test_examples_extraction():
-    md_content = """
-Some text
+def _write_and_parse(
+    md: str, tmp_dir: Path, tag_filter: Optional[Set[str]] = None
+) -> List[Example]:
+    code_repo = tmp_dir / "repo"
+    code_repo.mkdir()
+    md_file = tmp_dir / "example.md"
+    md_file.write_text(md, encoding="utf-8")
+    return examples_with_sluglines(md_file, code_repo, fence_tags=tag_filter)
 
+
+def test_examples_extraction():
+    md = """
 ```python
 # hello.py
 print("Hello World")
 ```
-
 ```java
 // main.java
 System.out.println("Hello");
 ```
-
 ```text
 // ignore.txt
 This is not code.
 ```
 """
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        base = Path(tmp_dir)
-        code_repo = base / "repo"
-        code_repo.mkdir()
-        md_file = base / "example.md"
-        md_file.write_text(md_content, encoding="utf-8")
-
-        examples = examples_with_sluglines(md_file, code_repo)
-
+    with tempfile.TemporaryDirectory() as tmp:
+        examples = _write_and_parse(md, Path(tmp))
         assert len(examples) == 3
-        assert {e.slug_filename for e in examples} == {"hello.py", "main.java", "ignore.txt"}
+        assert {e.slug_filename for e in examples} == {
+            "hello.py",
+            "main.java",
+            "ignore.txt",
+        }
         assert {e.fence_tag for e in examples} == {"python", "java", "text"}
 
 
 def test_fence_tag_filtering():
-    md_content = """
+    md = """
 ```python
 # a.py
 print("A")
@@ -134,110 +152,50 @@ print("A")
 echo "B"
 ```
 """
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        base = Path(tmp_dir)
-        code_repo = base / "repo"
-        code_repo.mkdir()
-        md_file = base / "example.md"
-        md_file.write_text(md_content, encoding="utf-8")
-
-        examples = examples_with_sluglines(md_file, code_repo, fence_tags={"python"})
-
+    with tempfile.TemporaryDirectory() as tmp:
+        examples = _write_and_parse(md, Path(tmp), tag_filter={"python"})
         assert len(examples) == 1
         assert examples[0].slug_filename == "a.py"
-        assert examples[0].fence_tag == "python"
-
-
-def test_examples_without_sluglines():
-    md_content = """
-```python
-# good.py
-print("OK")
-```
-
-```python
-print("No slug line")
-```
-"""
-    blocks = examples_without_sluglines(md_content)
-    assert len(blocks) == 1
-    assert "print(\"No slug line\")" in blocks[0]
-    assert blocks[0].strip().startswith("```python")
-    assert blocks[0].strip().endswith("```")
-
-
-def test_examples_without_fence_tags():
-    md_content = """
-```
-# raw.py
-print("Raw")
-```
-
-```python
-# tagged.py
-print("Tagged")
-```
-"""
-    blocks = examples_without_fence_tags(md_content)
-    assert len(blocks) == 1
-    assert "# raw.py" in blocks[0]
-    assert blocks[0].strip().startswith("```")
-    assert blocks[0].strip().endswith("```")
 
 
 def test_python_examples():
-    md_content = """
+    md = """
 ```python
 # script1.py
 print("One")
 ```
-
 ```java
 // Script.java
 System.out.println("Not Python");
 ```
-
 ```python
 # script2.py
 print("Two")
 ```
 """
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        base = Path(tmp_dir)
-        code_repo = base / "repo"
-        code_repo.mkdir()
-        md_file = base / "example.md"
-        md_file.write_text(md_content, encoding="utf-8")
-
-        examples = python_examples(md_file, code_repo)
+    with tempfile.TemporaryDirectory() as tmp:
+        examples = _write_and_parse(md, Path(tmp), tag_filter={"python"})
         assert len(examples) == 2
         assert {e.slug_filename for e in examples} == {"script1.py", "script2.py"}
         assert all(e.fence_tag == "python" for e in examples)
 
 
 def test_nested_paths_in_sluglines():
-    md_content = """
+    md = """
 ```python
 # examples/nested/test.py
 print("Nested")
 ```
 """
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        base = Path(tmp_dir)
-        code_repo = base / "repo"
-        code_repo.mkdir()
-        md_file = base / "example.md"
-        md_file.write_text(md_content, encoding="utf-8")
-
-        examples = examples_with_sluglines(md_file, code_repo)
+    with tempfile.TemporaryDirectory() as tmp:
+        examples = _write_and_parse(md, Path(tmp))
         assert len(examples) == 1
         assert examples[0].slug_filename == "test.py"
-        assert examples[0].destination_path.name == "test.py"
         assert "nested" in str(examples[0].destination_path)
 
 
 def test_slugline_match_pattern_respects_comment_markers():
-    md_content = """
+    md = """
 ```python
 // correct.java
 System.out.println("Hi");
@@ -247,18 +205,16 @@ System.out.println("Hi");
 print("Hi")
 ```
 """
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        base = Path(tmp_dir)
-        code_repo = base / "repo"
-        code_repo.mkdir()
-        md_file = base / "example.md"
-        md_file.write_text(md_content, encoding="utf-8")
-        examples = examples_with_sluglines(md_file, code_repo)
-        assert {e.slug_filename for e in examples} == {"correct.java", "also_correct.py"}
+    with tempfile.TemporaryDirectory() as tmp:
+        examples = _write_and_parse(md, Path(tmp))
+        assert {e.slug_filename for e in examples} == {
+            "correct.java",
+            "also_correct.py",
+        }
 
 
 def test_ignores_blocks_with_no_lines():
-    md_content = """
+    md = """
 ```python
 ```
 ```python
@@ -266,19 +222,14 @@ def test_ignores_blocks_with_no_lines():
 print("Good")
 ```
 """
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        base = Path(tmp_dir)
-        code_repo = base / "repo"
-        code_repo.mkdir()
-        md_file = base / "example.md"
-        md_file.write_text(md_content, encoding="utf-8")
-        examples = examples_with_sluglines(md_file, code_repo)
+    with tempfile.TemporaryDirectory() as tmp:
+        examples = _write_and_parse(md, Path(tmp))
         assert len(examples) == 1
         assert examples[0].slug_filename == "valid.py"
 
 
 def test_ignore_unmatched_tags():
-    md_content = """
+    md = """
 ```csharp
 // file.cs
 Console.WriteLine("Hello");
@@ -288,18 +239,46 @@ Console.WriteLine("Hello");
 print("hi")
 ```
 """
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        base = Path(tmp_dir)
-        code_repo = base / "repo"
-        code_repo.mkdir()
-        md_file = base / "example.md"
-        md_file.write_text(md_content, encoding="utf-8")
-        examples = examples_with_sluglines(md_file, code_repo, fence_tags={"python"})
+    with tempfile.TemporaryDirectory() as tmp:
+        examples = _write_and_parse(md, Path(tmp), tag_filter={"python"})
         assert len(examples) == 1
         assert examples[0].slug_filename == "script.py"
 
 
-if __name__ == "__main__":
-    import pytest
+def test_examples_without_sluglines():
+    md = """
+```python
+# good.py
+print("OK")
+```
+```python
+print("No slug line")
+```
+"""
+    blocks = examples_without_sluglines(md)
+    assert len(blocks) == 1
+    assert 'print("No slug line")' in blocks[0]
+    assert blocks[0].strip().startswith("```python")
+    assert blocks[0].strip().endswith("```")
 
+
+def test_examples_without_fence_tags():
+    md = """
+```
+# raw.py
+print("Raw")
+```
+```python
+# tagged.py
+print("Tagged")
+```
+"""
+    blocks = examples_without_fence_tags(md)
+    assert len(blocks) == 1
+    assert "# raw.py" in blocks[0]
+    assert blocks[0].strip().startswith("```")
+    assert blocks[0].strip().endswith("```")
+
+
+if __name__ == "__main__":
     pytest.main([__file__])
