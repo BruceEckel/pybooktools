@@ -276,7 +276,7 @@ print("hi")
         examples = examples_with_sluglines(md_content, code_repo, fence_tags={"python"})
         assert len(examples) == 1
         assert examples[0].slug_filename == "script.py"
-        
+
 
 if __name__ == "__main__":
     import pytest
