@@ -33,7 +33,7 @@ class Example:
 
 
 def examples_with_sluglines(
-    markdown_source: Path | str,
+    markdown_source: Path,
     code_repo: Path,
     slug_pattern: Pattern[str] = default_slug_line_pattern,
     fence_tags: Set[str] | None = None
@@ -44,8 +44,8 @@ def examples_with_sluglines(
         path.mkdir(parents=True, exist_ok=True)
         return path
 
-    is_path = isinstance(markdown_source, Path)
-    source_path = markdown_source.resolve() if is_path else None
+    source_path = markdown_source.resolve()
+    markdown_content = markdown_source.read_text(encoding="utf-8")
 
     return [
         Example(
@@ -55,7 +55,7 @@ def examples_with_sluglines(
             fence_tag=block.fence_tag,
             md_source_path=source_path
         )
-        for block in fenced_blocks(markdown_source)
+        for block in fenced_blocks(markdown_content)
         if (fence_tags is None or block.fence_tag in fence_tags)
         if (lines := block.content.splitlines())
         if (match := slug_pattern.match(lines[0]))
@@ -110,10 +110,13 @@ This is not code.
 ```
 """
     with tempfile.TemporaryDirectory() as tmp_dir:
-        code_repo = Path(tmp_dir) / "repo"
+        base = Path(tmp_dir)
+        code_repo = base / "repo"
         code_repo.mkdir()
+        md_file = base / "example.md"
+        md_file.write_text(md_content, encoding="utf-8")
 
-        examples = examples_with_sluglines(md_content, code_repo)
+        examples = examples_with_sluglines(md_file, code_repo)
 
         assert len(examples) == 3
         assert {e.slug_filename for e in examples} == {"hello.py", "main.java", "ignore.txt"}
@@ -132,10 +135,13 @@ echo "B"
 ```
 """
     with tempfile.TemporaryDirectory() as tmp_dir:
-        code_repo = Path(tmp_dir) / "repo"
+        base = Path(tmp_dir)
+        code_repo = base / "repo"
         code_repo.mkdir()
+        md_file = base / "example.md"
+        md_file.write_text(md_content, encoding="utf-8")
 
-        examples = examples_with_sluglines(md_content, code_repo, fence_tags={"python"})
+        examples = examples_with_sluglines(md_file, code_repo, fence_tags={"python"})
 
         assert len(examples) == 1
         assert examples[0].slug_filename == "a.py"
@@ -197,10 +203,13 @@ print("Two")
 ```
 """
     with tempfile.TemporaryDirectory() as tmp_dir:
-        code_repo = Path(tmp_dir) / "repo"
+        base = Path(tmp_dir)
+        code_repo = base / "repo"
         code_repo.mkdir()
+        md_file = base / "example.md"
+        md_file.write_text(md_content, encoding="utf-8")
 
-        examples = python_examples(md_content, code_repo)
+        examples = python_examples(md_file, code_repo)
         assert len(examples) == 2
         assert {e.slug_filename for e in examples} == {"script1.py", "script2.py"}
         assert all(e.fence_tag == "python" for e in examples)
@@ -214,10 +223,13 @@ print("Nested")
 ```
 """
     with tempfile.TemporaryDirectory() as tmp_dir:
-        code_repo = Path(tmp_dir) / "repo"
+        base = Path(tmp_dir)
+        code_repo = base / "repo"
         code_repo.mkdir()
+        md_file = base / "example.md"
+        md_file.write_text(md_content, encoding="utf-8")
 
-        examples = examples_with_sluglines(md_content, code_repo)
+        examples = examples_with_sluglines(md_file, code_repo)
         assert len(examples) == 1
         assert examples[0].slug_filename == "test.py"
         assert examples[0].destination_path.name == "test.py"
@@ -236,9 +248,12 @@ print("Hi")
 ```
 """
     with tempfile.TemporaryDirectory() as tmp_dir:
-        code_repo = Path(tmp_dir) / "repo"
+        base = Path(tmp_dir)
+        code_repo = base / "repo"
         code_repo.mkdir()
-        examples = examples_with_sluglines(md_content, code_repo)
+        md_file = base / "example.md"
+        md_file.write_text(md_content, encoding="utf-8")
+        examples = examples_with_sluglines(md_file, code_repo)
         assert {e.slug_filename for e in examples} == {"correct.java", "also_correct.py"}
 
 
@@ -252,9 +267,12 @@ print("Good")
 ```
 """
     with tempfile.TemporaryDirectory() as tmp_dir:
-        code_repo = Path(tmp_dir) / "repo"
+        base = Path(tmp_dir)
+        code_repo = base / "repo"
         code_repo.mkdir()
-        examples = examples_with_sluglines(md_content, code_repo)
+        md_file = base / "example.md"
+        md_file.write_text(md_content, encoding="utf-8")
+        examples = examples_with_sluglines(md_file, code_repo)
         assert len(examples) == 1
         assert examples[0].slug_filename == "valid.py"
 
@@ -271,9 +289,12 @@ print("hi")
 ```
 """
     with tempfile.TemporaryDirectory() as tmp_dir:
-        code_repo = Path(tmp_dir) / "repo"
+        base = Path(tmp_dir)
+        code_repo = base / "repo"
         code_repo.mkdir()
-        examples = examples_with_sluglines(md_content, code_repo, fence_tags={"python"})
+        md_file = base / "example.md"
+        md_file.write_text(md_content, encoding="utf-8")
+        examples = examples_with_sluglines(md_file, code_repo, fence_tags={"python"})
         assert len(examples) == 1
         assert examples[0].slug_filename == "script.py"
 
