@@ -21,6 +21,7 @@ app = App(
 def extract(markdown_file: Path, target_dir: Path):
     """Extract examples from a single markdown file to a repo directory."""
     print(f" {markdown_file.name} ".center(80, "-"))
+    print(f"  extracting to {target_dir}  ".center(80, "-"))
     examples = examples_with_sluglines(markdown_file, target_dir)
     write_examples(examples)
 

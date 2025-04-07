@@ -26,9 +26,12 @@ class Example:
 
     def __post_init__(self):
         if '/' in self.slug_filename:
-            self.code_dir /= self.slug_filename.split('/')[0]
-            self.slug_filename = self.slug_filename.split('/')[-1]
-        self.destination_path = self.code_dir / self.slug_filename
+            # self.code_dir /= self.slug_filename.split('/')[0]
+            # self.slug_filename = self.slug_filename.split('/')[-1]
+            print(">>>", self.code_dir, self.slug_filename, ">>>")
+            self.destination_path = self.code_dir / self.slug_filename
+        else:
+            self.destination_path = self.code_dir / self.slug_filename
 
     def show(self) -> None:
         from dataclasses import fields
@@ -53,13 +56,13 @@ class Example:
             body.append("\n")
 
         if syntax:
-            syntax_panel = Panel(syntax, title="example_body", border_style="dim")
+            syntax_panel = Panel(syntax, title=str(self.destination_path), border_style="dim")
             from rich.console import Group
             content = Group(body, syntax_panel)
         else:
             content = body
 
-        panel = Panel(content, title=f"[bold magenta]{self.destination_path}[/]", border_style="blue")
+        panel = Panel(content, title=f"[bold magenta]{self.destination_path.resolve()}[/]", border_style="blue")
         console.print(panel)
 
     def __str__(self) -> str:
@@ -70,6 +73,12 @@ class Example:
         )
 
     def write(self, verbose: bool = True):
+        parent = self.destination_path.parent
+        parent.mkdir(parents=True, exist_ok=True)
+        init_file = parent / "__init__.py"
+        if not init_file.exists():
+            init_file.write_text("# __init__.py\n", encoding="utf-8")
+            print(f"{init_file}")
         self.destination_path.write_text(self.example_body, encoding="utf-8")
         if verbose:
             self.show()
@@ -95,9 +104,9 @@ def examples_with_sluglines(
 
     return [
         Example(
-            slug_filename=match.group(1).split("/")[-1],
+            slug_filename=match.group(1),  # .split("/")[-1],
             example_body="\n".join(block.content.splitlines()).rstrip() + "\n",
-            code_dir=determine_code_dir(match.group(1)),
+            code_dir=code_repo_root,
             fence_tag=block.fence_tag,
             md_source_path=source_path,
         )
@@ -129,11 +138,11 @@ def examples_without_fence_tags(markdown_content: str) -> List[str]:
 
 def write_examples(examples: List[Example]) -> None:
     for example in examples:
-        example.code_dir.mkdir(parents=True, exist_ok=True)
-        init_file = example.code_dir / "__init__.py"
-        if not init_file.exists():
-            init_file.write_text("# __init__.py\n", encoding="utf-8")
-            print(f"{init_file}")
+        # example.code_dir.mkdir(parents=True, exist_ok=True)
+        # init_file = example.code_dir / "__init__.py"
+        # if not init_file.exists():
+        #     init_file.write_text("# __init__.py\n", encoding="utf-8")
+        #     print(f"{init_file}")
         example.write(verbose=True)
 
 
