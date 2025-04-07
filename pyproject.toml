@@ -29,7 +29,7 @@ chapnum = "pybooktools.renumber_markdown_chapters.renumber_chapters:app"
 # Run validation checks on Markdown chapters
 mdvalid = "pybooktools.pymarkdown_validator.validate:app"
 # Extract examples from Markdown to repo
-mdextract = "pybooktools.extract_examples.extractor:app"
+mdextract = "pybooktools.md_extract_examples.extractor:app"
 # Inject examples from repo to Markdown
 mdinject = "pybooktools.inject_examples.injector:app"
 # Remove chapter directories from example repository

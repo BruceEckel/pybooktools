@@ -42,15 +42,15 @@ class SlugInserter:
     @staticmethod
     def _insert_slug_lines(content: str) -> str:
         """
-        Insert slug lines before Python code blocks in the markdown content if they
+        Insert slug lines before Python code blocks in the markdown example_body if they
         don't already have one. Each code block is detected by the pattern
         \"```python\" and ended by \"```\".
 
         Slug lines follow the pattern: \"# example_N.py\".
 
         Steps:
-        1. Find each Python code block using a regex capturing (```python)(content)(```).
-        2. Split the content into lines.
+        1. Find each Python code block using a regex capturing (```python)(example_body)(```).
+        2. Split the example_body into lines.
         3. Remove leading blank lines.
         4. If the first non-blank line is NOT already a slug, insert it.
         5. Reassemble and replace in the original text.
@@ -69,7 +69,7 @@ class SlugInserter:
             while lines and not lines[0].strip():
                 lines.pop(0)
 
-            # If there's no content at all after removing leading blanks,
+            # If there's no example_body at all after removing leading blanks,
             # or we can't get a first line to check:
             if not lines:
                 # There's nothing to annotate
@@ -90,7 +90,7 @@ class SlugInserter:
 
             lines.insert(0, f"# example_{replacer.count}.py")  # type: ignore
 
-            # Rebuild the code block content
+            # Rebuild the code block example_body
             new_block_content = "\n".join(lines)
 
             # Return the entire code block with the inserted slug
@@ -100,7 +100,7 @@ class SlugInserter:
 
     def process_files(self) -> None:
         """
-        Find Markdown files, read their content, insert slug lines, then rewrite the files.
+        Find Markdown files, read their example_body, insert slug lines, then rewrite the files.
         """
         md_files = self._find_markdown_files()
         for md_file in md_files:

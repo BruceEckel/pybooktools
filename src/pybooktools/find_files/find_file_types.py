@@ -1,3 +1,4 @@
+# find_file_types.py
 from pybooktools.find_files.file_finder import curry_file_finder
 
 # Exclude these directories from python_files().

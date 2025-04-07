@@ -1,9 +1,10 @@
+# examples.py
 import re
 import tempfile
 from dataclasses import dataclass
 from functools import partial
 from pathlib import Path
-from typing import List, Pattern, Set, Callable
+from typing import List, Pattern, Set, Callable, Optional
 
 from pybooktools.md_examples.fenced_blocks import fenced_blocks
 
@@ -12,26 +13,35 @@ default_slug_line_pattern: Pattern[str] = re.compile(r"^\s*(?:#|//)\s*(\S+\.[a-z
 
 @dataclass
 class Example:
-    filename: str
-    content: str
+    slug_filename: str
+    example_body: str
     code_dir: Path
-    fence_tag: str
+    fence_tag: str  # Name after three backticks, if it exists
+    md_source_path: Optional[Path] = None
+    destination_path: Path = None
+
+    def __post_init__(self):
+        self.destination_path = self.code_dir / self.slug_filename if self.code_dir else None
 
     def __str__(self) -> str:
-        full_path = " " + str(self.code_dir / self.filename) + " "
-        return f"""--- {full_path.center(70, "-")} ---
-{self.content.strip()}"""
+        return (f" {self.destination_path.name} ".center(70, "-") + "\n" +
+                self.example_body.strip())
+
+    def write(self, verbose: bool = False):
+        self.destination_path.write_text(self.example_body, encoding="utf-8")
+        if verbose:
+            print(f"{self.destination_path}")
 
 
 def examples_with_sluglines(
-    markdown_content: str,
+    markdown_source: Path | str,
     code_repo: Path,
     slug_pattern: Pattern[str] = default_slug_line_pattern,
     fence_tags: Set[str] | None = None
 ) -> List[Example]:
     examples: List[Example] = []
 
-    for block in fenced_blocks(markdown_content):
+    for block in fenced_blocks(markdown_source):
         if fence_tags is not None and block.fence_tag not in fence_tags:
             continue
 
@@ -41,18 +51,26 @@ def examples_with_sluglines(
 
         match = slug_pattern.match(lines[0])
         if match:
-            filename = match.group(1)
-            parts = filename.split('/')
+            slug_filename = match.group(1)
+            parts = slug_filename.split('/')
             code_dir = code_repo
-            if '/' in filename:
+            if '/' in slug_filename:
                 for part in parts[:-1]:
                     code_dir = code_dir / part
                 code_dir.mkdir(parents=True, exist_ok=True)
-            else:
-                code_dir = code_dir / "markdown"
 
             content = "\n".join(lines).rstrip() + "\n"
-            examples.append(Example(filename=parts[-1], content=content, code_dir=code_dir, fence_tag=block.fence_tag))
+            if isinstance(markdown_source, Path):
+                md_source_path = markdown_source.resolve()
+            else:
+                md_source_path = None
+            examples.append(Example(
+                slug_filename=parts[-1],
+                example_body=content,
+                code_dir=code_dir,
+                fence_tag=block.fence_tag,
+                md_source_path=md_source_path,
+            ))
 
     return examples
 
@@ -79,8 +97,8 @@ def write_examples(examples: List[Example]) -> None:
         if not dunder_init.exists():
             dunder_init.write_text("# __init__.py\n", encoding="utf-8")
             print(f"{dunder_init}")
-        file_path = example.code_dir / example.filename
-        file_path.write_text(example.content, encoding="utf-8")
+        file_path = example.code_dir / example.slug_filename
+        file_path.write_text(example.example_body, encoding="utf-8")
         print(f"{file_path}")
 
 
@@ -113,7 +131,7 @@ This is not code.
         examples = examples_with_sluglines(md_content, code_repo)
 
         assert len(examples) == 3
-        assert {e.filename for e in examples} == {"hello.py", "main.java", "ignore.txt"}
+        assert {e.slug_filename for e in examples} == {"hello.py", "main.java", "ignore.txt"}
         assert {e.fence_tag for e in examples} == {"python", "java", "text"}
 
 
@@ -135,7 +153,7 @@ echo "B"
         examples = examples_with_sluglines(md_content, code_repo, fence_tags={"python"})
 
         assert len(examples) == 1
-        assert examples[0].filename == "a.py"
+        assert examples[0].slug_filename == "a.py"
         assert examples[0].fence_tag == "python"
 
 
@@ -199,7 +217,7 @@ print("Two")
 
         examples = python_examples(md_content, code_repo)
         assert len(examples) == 2
-        assert {e.filename for e in examples} == {"script1.py", "script2.py"}
+        assert {e.slug_filename for e in examples} == {"script1.py", "script2.py"}
         assert all(e.fence_tag == "python" for e in examples)
 
 

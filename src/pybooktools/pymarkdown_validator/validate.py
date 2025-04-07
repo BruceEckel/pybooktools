@@ -1,6 +1,7 @@
 # validate.py
 """Perform multiple validation tests on Markdown files."""
 import re
+from itertools import chain
 from typing import Callable, List, NamedTuple
 
 from cyclopts import App
@@ -82,10 +83,7 @@ app = App(
 def check_markdown_file(markdown_file: ResolvedExistingFile) -> list[Issue]:
     """Validate a single Markdown file."""
     content = markdown_file.read_text(encoding="utf-8")
-    issues: list[Issue] = []
-    for check in validation_checks:
-        issues.extend(check(content))
-    return issues
+    return list(chain.from_iterable(check(content) for check in validation_checks))
 
 
 def display_issues(issues: list[Issue], markdown_file: ResolvedExistingFile):

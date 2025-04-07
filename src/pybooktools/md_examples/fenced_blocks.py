@@ -1,25 +1,32 @@
 # fenced_blocks.py
+from pathlib import Path
 from typing import Generator, NamedTuple
 
 
 class FencedBlock(NamedTuple):
-    content: str
-    fence_tag: str
-    raw: str
+    content: str  # Content within fences
+    fence_tag: str  # Name after three backticks, if it exists
+    raw: str  # Entire block including fences
 
 
-def fenced_blocks(markdown_content: str) -> Generator[FencedBlock]:
-    """Produces blocks from markdown content that are enclosed in ``` fences.
+def fenced_blocks(markdown: Path | str) -> Generator[FencedBlock]:
+    """Produces blocks from markdown example_body that are enclosed in ``` fences.
 
-    Each block is yielded as a FencedBlock, containing the content inside the fence,
+    Accepts either a Path to a markdown file or the markdown example_body as a string.
+    Each block is yielded as a FencedBlock, containing the example_body inside the fence,
     the fence tag (e.g., 'python' for ```python), and the raw fenced block text.
     """
+    if isinstance(markdown, Path):
+        lines = markdown.read_text(encoding="utf-8").splitlines()
+    else:
+        lines = markdown.splitlines()
+
     in_fence = False
     fence_tag = ""
     block_lines: list[str] = []
     raw_lines: list[str] = []
 
-    for line in markdown_content.splitlines():
+    for line in lines:
         stripped = line.lstrip()
         if stripped.startswith("```"):
             raw_lines.append(line)
