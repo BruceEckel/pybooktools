@@ -10,7 +10,7 @@ import pytest
 
 from pybooktools.md_examples.fenced_blocks import fenced_blocks
 
-default_slug_line_pattern: Pattern[str] = re.compile(
+default_slug_line_pattern: Pattern[str] = re.compile(  # TODO: unify
     r"^\s*(?:#|//)\s*(\S+\.[a-zA-Z0-9_]+)"
 )
 
@@ -25,7 +25,42 @@ class Example:
     destination_path: Path = field(init=False)  # Full path where example is written
 
     def __post_init__(self):
+        if '/' in self.slug_filename:
+            self.code_dir /= self.slug_filename.split('/')[0]
+            self.slug_filename = self.slug_filename.split('/')[-1]
         self.destination_path = self.code_dir / self.slug_filename
+
+    def show(self) -> None:
+        from dataclasses import fields
+        from rich.console import Console
+        from rich.panel import Panel
+        from rich.text import Text
+        from rich.syntax import Syntax
+
+        console = Console()
+        body = Text()
+        syntax: Syntax | None = None
+
+        for f in fields(self):  # type: ignore
+            if f.name == "example_body":
+                syntax = Syntax(self.example_body.strip(), "python", theme="monokai", line_numbers=False)
+                continue
+            name = Text(f.name, style="bold cyan")
+            value = Text(repr(getattr(self, f.name)), style="green")
+            body.append_text(name)
+            body.append(": ")
+            body.append_text(value)
+            body.append("\n")
+
+        if syntax:
+            syntax_panel = Panel(syntax, title="example_body", border_style="dim")
+            from rich.console import Group
+            content = Group(body, syntax_panel)
+        else:
+            content = body
+
+        panel = Panel(content, title=f"[bold magenta]{self.destination_path}[/]", border_style="blue")
+        console.print(panel)
 
     def __str__(self) -> str:
         return (
@@ -34,22 +69,23 @@ class Example:
             + self.example_body.strip()
         )
 
-    def write(self, verbose: bool = False):
+    def write(self, verbose: bool = True):
         self.destination_path.write_text(self.example_body, encoding="utf-8")
         if verbose:
-            print(f"{self.destination_path}")
+            self.show()
 
 
 def examples_with_sluglines(
     markdown_source: Path,
-    code_repo: Path,
+    code_repo_root: Path,
     slug_pattern: Pattern[str] = default_slug_line_pattern,
     fence_tags: Set[str] | None = None,
 ) -> List[Example]:
     def determine_code_dir(slug: str) -> Path:
+        target_dir = code_repo_root / markdown_source.stem.replace(" ", "_").lower()
         path_parts = slug.split("/")
         path = (
-            code_repo.joinpath(*path_parts[:-1]) if len(path_parts) > 1 else code_repo
+            target_dir.joinpath(*path_parts[:-1]) if len(path_parts) > 1 else target_dir
         )
         path.mkdir(parents=True, exist_ok=True)
         return path
@@ -81,8 +117,7 @@ def examples_without_sluglines(markdown_content: str) -> List[str]:
     return [
         block.raw
         for block in fenced_blocks(markdown_content)
-        if (lines := block.content.splitlines())
-        and not default_slug_line_pattern.match(lines[0])
+        if (lines := block.content.splitlines()) and not default_slug_line_pattern.match(lines[0])
     ]
 
 
