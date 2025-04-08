@@ -23,7 +23,7 @@ def python_example_validator(pyfile: Path, main_allowed=False) -> None:
     example = pyfile.read_text(encoding="utf-8")
     example_lines = example.splitlines()
     validate(len(example) > 0, "is empty")
-    validate(len(example_lines) > 2, "is too short")
+    validate(len(example_lines) > 1, "is too short")
     validate(is_slug(example_lines[0]), "has no slug line")
     validate("__main__" not in example and not main_allowed, "contains __main__")
 
