@@ -8,7 +8,7 @@ from typing import List, Pattern, Set, Callable, Optional
 
 import pytest
 
-from pybooktools.md_examples.fenced_blocks import fenced_blocks_with_tags, FenceTypes, fenced_blocks
+from .fenced_blocks import fenced_blocks_with_tags, FenceTypes, fenced_blocks
 
 default_slug_line_pattern: Pattern[str] = re.compile(  # TODO: unify
     r"^\s*(?:#|//)\s*(\S+\.[a-zA-Z0-9_]+)"
@@ -88,21 +88,12 @@ def examples_with_sluglines(
     slug_pattern: Pattern[str] = default_slug_line_pattern,
     fence_tags: Optional[Set[FenceTypes]] = None,
 ) -> List[Example]:
-    def determine_code_dir(slug: str) -> Path:
-        target_dir = code_repo_root / markdown_source.stem.replace(" ", "_").lower()
-        path_parts = slug.split("/")
-        path = (
-            target_dir.joinpath(*path_parts[:-1]) if len(path_parts) > 1 else target_dir
-        )
-        path.mkdir(parents=True, exist_ok=True)
-        return path
-
     source_path = markdown_source.resolve()
     markdown_content = markdown_source.read_text(encoding="utf-8")
 
     return [
         Example(
-            slug_filename=match.group(1),  # .split("/")[-1],
+            slug_filename=match.group(1),
             example_body="\n".join(block.content.splitlines()).rstrip() + "\n",
             parent_code_dir=code_repo_root,
             fence_tag=block.fence_tag,
@@ -122,25 +113,20 @@ python_examples: Callable[[str, Path], List[Example]] = partial(
 
 def examples_without_sluglines(markdown_content: str, fence_tags: Optional[Set[FenceTypes]] = None, ) -> List[str]:
     return [
-        block.raw
-        for block in fenced_blocks_with_tags(markdown_content, fence_tags)
-        if (lines := block.content.splitlines()) and not default_slug_line_pattern.match(lines[0])
+        example.raw
+        for example in fenced_blocks_with_tags(markdown_content, fence_tags)
+        if (lines := example.content.splitlines()) and not default_slug_line_pattern.match(lines[0])
     ]
 
 
-def examples_without_fence_tags(markdown_content: str) -> List[str]:
+def examples_without_a_fence_tag(markdown_content: str) -> List[str]:
     return [
-        block.raw for block in fenced_blocks(markdown_content) if not block.fence_tag
+        example.raw for example in fenced_blocks(markdown_content) if not example.fence_tag
     ]
 
 
 def write_examples(examples: List[Example]) -> None:
     for example in examples:
-        # example.parent_code_dir.mkdir(parents=True, exist_ok=True)
-        # init_file = example.parent_code_dir / "__init__.py"
-        # if not init_file.exists():
-        #     init_file.write_text("# __init__.py\n", encoding="utf-8")
-        #     print(f"{init_file}")
         example.write(verbose=True)
 
 
@@ -315,7 +301,7 @@ print("Raw")
 print("Tagged")
 ```
 """
-    blocks = examples_without_fence_tags(md)
+    blocks = examples_without_a_fence_tag(md)
     assert len(blocks) == 1
     assert "# raw.py" in blocks[0]
     assert blocks[0].strip().startswith("```")
