@@ -1,6 +1,8 @@
 # fenced_blocks.py
 from pathlib import Path
-from typing import Generator, NamedTuple
+from typing import Generator, NamedTuple, Optional, Literal
+
+FenceTypes = Literal["python", "pyi", "cpp", "java", "bash", "js"]
 
 
 class FencedBlock(NamedTuple):
@@ -44,6 +46,20 @@ def fenced_blocks(markdown: Path | str) -> Generator[FencedBlock]:
         elif in_fence:
             block_lines.append(line)
             raw_lines.append(line)
+
+
+def fenced_blocks_with_tags(
+    markdown: Path | str,
+    tags: Optional[set[FenceTypes]] = None
+) -> Generator[FencedBlock]:
+    """Yields only fenced blocks that have a fence tag.
+
+    If `tag` is provided, only blocks with that exact tag are returned.
+    """
+    yield from (block for block in fenced_blocks(markdown)
+                if block.fence_tag
+                and (tags is None or block.fence_tag in tags)
+                )
 
 
 def test_single_block():

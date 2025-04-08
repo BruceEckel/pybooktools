@@ -8,7 +8,7 @@ from typing import List, Pattern, Set, Callable, Optional
 
 import pytest
 
-from pybooktools.md_examples.fenced_blocks import fenced_blocks
+from pybooktools.md_examples.fenced_blocks import fenced_blocks_with_tags, FenceTypes, fenced_blocks
 
 default_slug_line_pattern: Pattern[str] = re.compile(  # TODO: unify
     r"^\s*(?:#|//)\s*(\S+\.[a-zA-Z0-9_]+)"
@@ -19,19 +19,17 @@ default_slug_line_pattern: Pattern[str] = re.compile(  # TODO: unify
 class Example:
     slug_filename: str
     example_body: str
-    code_dir: Path  # Parent directory where example is written
+    parent_code_dir: Path  # Parent directory where example will be written
     fence_tag: str  # Name after three backticks, if it exists
     md_source_path: Optional[Path] = None  # Markdown file where example came from
     destination_path: Path = field(init=False)  # Full path where example is written
 
     def __post_init__(self):
         if '/' in self.slug_filename:
-            # self.code_dir /= self.slug_filename.split('/')[0]
-            # self.slug_filename = self.slug_filename.split('/')[-1]
-            print(">>>", self.code_dir, self.slug_filename, ">>>")
-            self.destination_path = self.code_dir / self.slug_filename
+            self.destination_path = self.parent_code_dir / self.slug_filename
         else:
-            self.destination_path = self.code_dir / self.slug_filename
+            chapter_path = self.md_source_path.stem.replace(" ", "_").lower() if self.md_source_path else ""
+            self.destination_path = self.parent_code_dir / chapter_path / self.slug_filename
 
     def show(self) -> None:
         from dataclasses import fields
@@ -88,7 +86,7 @@ def examples_with_sluglines(
     markdown_source: Path,
     code_repo_root: Path,
     slug_pattern: Pattern[str] = default_slug_line_pattern,
-    fence_tags: Set[str] | None = None,
+    fence_tags: Optional[Set[FenceTypes]] = None,
 ) -> List[Example]:
     def determine_code_dir(slug: str) -> Path:
         target_dir = code_repo_root / markdown_source.stem.replace(" ", "_").lower()
@@ -106,11 +104,11 @@ def examples_with_sluglines(
         Example(
             slug_filename=match.group(1),  # .split("/")[-1],
             example_body="\n".join(block.content.splitlines()).rstrip() + "\n",
-            code_dir=code_repo_root,
+            parent_code_dir=code_repo_root,
             fence_tag=block.fence_tag,
             md_source_path=source_path,
         )
-        for block in fenced_blocks(markdown_content)
+        for block in fenced_blocks_with_tags(markdown_content, fence_tags)
         if (fence_tags is None or block.fence_tag in fence_tags)
         if (lines := block.content.splitlines())
         if (match := slug_pattern.match(lines[0]))
@@ -122,10 +120,10 @@ python_examples: Callable[[str, Path], List[Example]] = partial(
 )
 
 
-def examples_without_sluglines(markdown_content: str) -> List[str]:
+def examples_without_sluglines(markdown_content: str, fence_tags: Optional[Set[FenceTypes]] = None, ) -> List[str]:
     return [
         block.raw
-        for block in fenced_blocks(markdown_content)
+        for block in fenced_blocks_with_tags(markdown_content, fence_tags)
         if (lines := block.content.splitlines()) and not default_slug_line_pattern.match(lines[0])
     ]
 
@@ -138,8 +136,8 @@ def examples_without_fence_tags(markdown_content: str) -> List[str]:
 
 def write_examples(examples: List[Example]) -> None:
     for example in examples:
-        # example.code_dir.mkdir(parents=True, exist_ok=True)
-        # init_file = example.code_dir / "__init__.py"
+        # example.parent_code_dir.mkdir(parents=True, exist_ok=True)
+        # init_file = example.parent_code_dir / "__init__.py"
         # if not init_file.exists():
         #     init_file.write_text("# __init__.py\n", encoding="utf-8")
         #     print(f"{init_file}")
@@ -234,7 +232,7 @@ print("Nested")
     with tempfile.TemporaryDirectory() as tmp:
         examples = _write_and_parse(md, Path(tmp))
         assert len(examples) == 1
-        assert examples[0].slug_filename == "test.py"
+        assert examples[0].slug_filename == "examples/nested/test.py"
         assert "nested" in str(examples[0].destination_path)
 
 

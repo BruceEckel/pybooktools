@@ -5,6 +5,8 @@ Command-line tools I use for writing Python books.
 - [Documentation](https://bruceeckel.github.io/pybooktools/)
 
 - To deploy updated documentation: `uvx mkdocs gh-deploy`
+- Tool: [`pipdeptree`](https://github.com/tox-dev/pipdeptree/blob/main/README.md#pipdeptree)
+- Tool: [`deptry`](https://deptry.com/), run in root directory of the project.
 
 TODO:
 
