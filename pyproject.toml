@@ -54,3 +54,8 @@ packages = ["src/pybooktools"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src/pybooktools"]
+
+[tool.docformatter]
+recursive = true
+wrap-summaries = 82
+blank = true
