@@ -17,7 +17,7 @@ def nc(notification: str) -> str:  # Notification color
     return f"[dark_orange]{notification}[/dark_orange]"
 
 
-def update_markdown_with_repo_examples(markdown_file: Path, repo: Path) -> str:
+def update_markdown_with_repo_examples(markdown_file: Path, example_repo: Path) -> str:
     """
     Reads a Markdown file containing Python examples within fenced code blocks,
     where each block starts with a "slug line" (a comment containing the filename).
@@ -33,7 +33,7 @@ def update_markdown_with_repo_examples(markdown_file: Path, repo: Path) -> str:
 
     Args:
         markdown_file: The Markdown file to process.
-        repo: The directory containing Python examples. Each example must have a filename
+        example_repo: The directory containing Python examples. Each example must have a filename
               corresponding to its slug line in the Markdown file.
 
     Returns:
@@ -57,16 +57,16 @@ def update_markdown_with_repo_examples(markdown_file: Path, repo: Path) -> str:
     )
 
     def replacer(match: re.Match) -> str:
-        file_name: str = match.group(3)
-        if "/" in file_name:
-            console.print(nc("Skipping book utility ") + pc(file_name))
+        example_name: str = match.group(3)
+        if "/" in example_name:
+            console.print(nc("Skipping book utility ") + pc(example_name))
             return match.group(0)
-        file_path: Path = repo / file_name
+        example_path: Path = example_repo / example_name
         try:
             # Read the content of the corresponding file.
-            file_content: str = file_path.read_text(encoding="utf-8").rstrip()
+            file_content: str = example_path.read_text(encoding="utf-8").rstrip()
         except Exception as e:
-            raise FileNotFoundError(f"Could not read file {file_path}: {e}")
+            raise FileNotFoundError(f"Could not read file {example_path}: {e}")
         # Return a new fenced code block with the file's content.
         return f"```python\n{file_content}\n```"
 
@@ -84,24 +84,24 @@ app = App(
 
 
 @app.command(name="-i")
-def update_markdown_files(markdown_files: ResolvedExistingDirectory, root_repo: ResolvedExistingDirectory) -> None:
-    """ Inject examples into markdown files from repo"""
+def update_markdown_files(markdown_files: ResolvedExistingDirectory, example_repo: ResolvedExistingDirectory) -> None:
+    """ Inject examples from example_repo into markdown files"""
     """
     For each Markdown file in the directory `markdown_files`, produces the corresponding
-    subdirectory under `root_repo` by lowercasing the file name (without the trailing '.md').
+    subdirectory under `example_repo` by lowercasing the file name (without the trailing '.md').
     It then calls `update_markdown_with_repo_examples` with that Markdown file and subdirectory,
-    updating the Markdown file with the contents of the corresponding Python examples from the repo.
+    updating the Markdown file with the contents of the corresponding Python examples from the example_repo.
 
     Args:
         markdown_files: Directory containing Markdown files with Python examples in code fences.
-        root_repo: Directory containing subdirectories with Python example files corresponding to each Markdown file.
+        example_repo: Directory containing subdirectories with Python example files corresponding to each Markdown file.
     """
     # Iterate over all Markdown files in the provided directory.
     for md_file in markdown_files.iterdir():
         if md_file.is_file() and md_file.suffix.lower() == ".md":
             # Compute subdirectory name: lowercase the markdown file name (without '.md').
             subdir_name: str = md_file.stem.lower()
-            repo_subdir: Path = root_repo / subdir_name
+            repo_subdir: Path = example_repo / subdir_name
             if not repo_subdir.exists():
                 console.print(
                     nc("Skipping missing subdirectory ") +
@@ -109,7 +109,7 @@ def update_markdown_files(markdown_files: ResolvedExistingDirectory, root_repo: 
                 )
                 continue
 
-            # console.print(f"Processing {md_file.name} with repo subdir {repo_subdir.name}")
+            # console.print(f"Processing {md_file.name} with example_repo subdir {repo_subdir.name}")
             try:
                 updated_content: str = update_markdown_with_repo_examples(md_file, repo_subdir)
             except FileNotFoundError as err:

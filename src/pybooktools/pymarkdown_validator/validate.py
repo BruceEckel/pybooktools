@@ -97,6 +97,8 @@ def display_issues(issues: list[Issue], markdown_file: ResolvedExistingFile):
 @app.command(name="-f")
 def validate_markdown_file(markdown_file: ResolvedExistingFile):
     """Validate a single Markdown file."""
+    console = Console()
+    console.print(f"Validating {markdown_file.name}...")
     issues = check_markdown_file(markdown_file)
     display_issues(issues, markdown_file)
 

@@ -136,7 +136,7 @@ def write_examples(examples: List[Example]) -> None:
 def _write_and_parse(
     md: str, tmp_dir: Path, tag_filter: Optional[Set[str]] = None
 ) -> List[Example]:
-    code_repo = tmp_dir / "repo"
+    code_repo = tmp_dir / "example_repo"
     code_repo.mkdir()
     md_file = tmp_dir / "example.md"
     md_file.write_text(md, encoding="utf-8")

@@ -28,10 +28,10 @@ mdslug = "pybooktools.sluglines.md_auto_slug:main"
 chapnum = "pybooktools.renumber_markdown_chapters.renumber_chapters:app"
 # Run validation checks on Markdown chapters
 mdvalid = "pybooktools.pymarkdown_validator.validate:app"
-# Extract examples from Markdown to repo
-mdextract = "pybooktools.md_extract_examples.extractor:app"
-# Inject examples from repo to Markdown
-mdinject = "pybooktools.inject_examples.injector:app"
+# Extract examples from Markdown to example_repo
+mdextract = "pybooktools.md_examples.extractor:app"
+# Inject examples from example_repo to Markdown
+mdinject = "pybooktools.md_examples.injector:app"
 # Remove chapter directories from example repository
 repoclean = "pybooktools.repo_cleaner.clean_example_repo:app"
 # Flatten a directory tree to give to an AI
@@ -54,4 +54,3 @@ packages = ["src/pybooktools"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src/pybooktools"]
-

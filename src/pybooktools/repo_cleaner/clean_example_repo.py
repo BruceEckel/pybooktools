@@ -45,20 +45,20 @@ def remove_dirs(dirs: list[Path]) -> None:
 
 @app.command(name="-d")
 def display(path: ResolvedExistingDirectory = Path(".")) -> None:
-    """Display the existing repo chapters."""
+    """Display the existing example_repo chapters."""
     for d in chapter_dirs(path):
         print(d.name)
 
 
 @app.command(name="-c")
 def remove_chapters(path: ResolvedExistingDirectory = Path(".")) -> None:
-    """Remove numbered repo chapters."""
+    """Remove numbered example_repo chapters."""
     remove_dirs(chapter_dirs(path))
 
 
 @app.command(name="-a")
 def remove_all(path: ResolvedExistingDirectory = Path(".")) -> None:
-    """Remove repo chapters AND additional specified directories."""
+    """Remove example_repo chapters AND additional specified directories."""
     remove_dirs([
         *chapter_dirs(path),
         *(d for name in additional_dirs if (d := path / name).exists())
