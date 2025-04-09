@@ -37,8 +37,12 @@ class Example:
         from rich.panel import Panel
         from rich.text import Text
         from rich.syntax import Syntax
-
-        console = Console()
+        import sys
+        console = Console(
+            file=sys.__stdout__,  # force real terminal stdout
+            force_terminal=True,
+            color_system="truecolor",
+        )
         body = Text()
         syntax: Syntax | None = None
 
@@ -70,13 +74,14 @@ class Example:
             + self.example_body.strip()
         )
 
-    def write(self, verbose: bool = True):
+    def write(self, verbose: bool = False):
         parent = self.destination_path.parent
         parent.mkdir(parents=True, exist_ok=True)
         init_file = parent / "__init__.py"
         if not init_file.exists():
             init_file.write_text("# __init__.py\n", encoding="utf-8")
             print(f"{init_file}")
+        print(f"{self.destination_path}")
         self.destination_path.write_text(self.example_body, encoding="utf-8")
         if verbose:
             self.show()
@@ -125,9 +130,9 @@ def examples_without_a_fence_tag(markdown_content: str) -> List[str]:
     ]
 
 
-def write_examples(examples: List[Example]) -> None:
+def write_examples(examples: List[Example], verbose=False) -> None:
     for example in examples:
-        example.write(verbose=True)
+        example.write(verbose)
 
 
 # --------------------------- TESTS ---------------------------
