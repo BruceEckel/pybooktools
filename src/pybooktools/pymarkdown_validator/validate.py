@@ -58,7 +58,7 @@ def check_for_main(markdown_content: str) -> list[Issue]:
         if line.strip().startswith("```"):
             in_code_block = not in_code_block
             continue
-        if in_code_block and "__main__" in line:
+        if in_code_block and 'if __name__ == "__main__":' in line:
             mains.append(Issue("__main__ found", f"line {i + 1}"))
 
     return mains

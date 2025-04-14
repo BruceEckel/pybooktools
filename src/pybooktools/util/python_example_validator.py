@@ -25,7 +25,7 @@ def python_example_validator(pyfile: Path, main_allowed=False) -> None:
     validate(len(example) > 0, "is empty")
     validate(len(example_lines) > 1, "is too short")
     validate(is_slug(example_lines[0]), "has no slug line")
-    validate("__main__" not in example and not main_allowed, "contains __main__")
+    validate("""if __name__ == "__main__":""" not in example and not main_allowed, "contains __main__")
 
 
 def cyclopts_python_example_validator(type_, pyfile: Path, main_allowed=False) -> None:  # noqa

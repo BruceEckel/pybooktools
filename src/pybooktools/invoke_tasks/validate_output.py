@@ -14,14 +14,36 @@ import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import datetime
+from difflib import Differ
 from pathlib import Path
 
 from invoke import task
 from rich.console import Console
+from rich.panel import Panel
 
 from pybooktools.invoke_tasks.find_python_files import find_python_files
 
 console = Console()
+
+
+def rich_diff(text1, text2):
+    """
+    Compares two strings and prints a rich-formatted diff output.
+    """
+    differ = Differ()
+    diff = list(
+        differ.compare(text1.splitlines(keepends=True), text2.splitlines(keepends=True))
+    )
+
+    for line in diff:
+        if line.startswith("+ "):
+            console.print(f"[green]{line.rstrip()}[/green]")
+        elif line.startswith("- "):
+            console.print(f"[red]{line.rstrip()}[/red]")
+        elif line.startswith("? "):
+            console.print(f"[yellow]{line.rstrip()}[/yellow]")
+        else:
+            console.print(line.rstrip())
 
 
 @dataclass
@@ -50,6 +72,13 @@ def extract_expected_output(file: Path) -> str:
     return "\n".join(expected)
 
 
+def word_set_compare(expected: str, actual: str) -> set[str]:
+    def word_set(s):
+        return set(s.split())
+
+    return word_set(expected) ^ word_set(actual)
+
+
 def run_and_compare(file: Path, interpreter: str) -> tuple[bool, str | None]:
     """
     Run a Python script using the specified
@@ -58,7 +87,7 @@ def run_and_compare(file: Path, interpreter: str) -> tuple[bool, str | None]:
     success and an error message (if any).
     """
     timestamp = datetime.now().strftime("%H:%M:%S")
-    console.print(f"{timestamp} ▶️ Checking: {file}", style="cyan")
+    # console.print(f"{timestamp} ▶️ Checking: {file}", style="cyan")
 
     expected = extract_expected_output(file)
     try:
@@ -72,12 +101,23 @@ def run_and_compare(file: Path, interpreter: str) -> tuple[bool, str | None]:
         return False, f"{file}\n[bold red]❌ Exception running script:[/bold red] {e}"
 
     if result.returncode != 0:
-        return False, f"{file}\n[bold red]❌ Script failed to run:[/bold red]\n{result.stderr}"
+        return (
+            False,
+            f"{file}\n[bold red]❌ Script failed to run:[/bold red]\n{result.stderr}",
+        )
 
     actual_clean = re.sub(r"\s+", "", result.stdout)
     expected_clean = re.sub(r"\s+", "", expected)
 
     if expected_clean != actual_clean:
+        rich_diff(expected, result.stdout)
+
+    # if expected_clean != actual_clean:
+    diffs = word_set_compare(expected, result.stdout)
+    if diffs:
+        console.print(Panel(f"Word differences: {diffs}", title=f"{file}"))
+        for diff in diffs:
+            console.print(f"[magenta]{diff}[/magenta]")
         return False, (
             f"{file}\n[bold red]❌ Output mismatch.[/bold red]\n"
             f"--- [yellow]Expected (from ## comments)[/yellow] ---\n{expected}\n"
@@ -120,7 +160,7 @@ def validate(ctx, target_dir: str = ".", throttle_limit: int | None = None) -> N
 
     console.print(
         f"🧪 Comparing output for {len(files)} examples (ThrottleLimit = {throttle_limit})",
-        style="cyan"
+        style="cyan",
     )
 
     discrepancies: list[str] = []

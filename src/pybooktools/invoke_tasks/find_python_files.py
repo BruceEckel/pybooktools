@@ -3,7 +3,7 @@
 from pathlib import Path
 
 # Directories to exclude from the search.
-EXCLUDED_DIRS = {"venv", ".venv", "__pycache__", ".git", "python", "invoke_tasks"}
+EXCLUDED_DIRS = {"venv", ".venv", "__pycache__", ".git", "python", "invoke_tasks", "xperiments"}
 EXCLUDED_FILES = {"__init__.py", "tasks.py", "bootstrap.py"}
 
 

@@ -10,6 +10,7 @@ Command-line tools I use for writing Python books.
 
 TODO:
 
+- Centralize "example locator" utility so that all subprojects use it, and incorporate example validation.
 - Overview in docs, or details or both.
 - Possible addition to slugline format:
     - In actual code, includes a book & chapter indicator:
