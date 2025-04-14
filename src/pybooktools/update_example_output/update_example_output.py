@@ -11,7 +11,7 @@ from cyclopts.types import ExistingDirectory
 from rich.console import Console
 from rich.panel import Panel
 
-from pybooktools.find_files.find_file_types import python_files
+from pybooktools.find_files.find_file_types import find_python_files
 from pybooktools.update_example_output.example_updater import ExampleUpdater
 from pybooktools.util.python_example_validator import PyExample
 
@@ -109,7 +109,7 @@ def update_all_examples_in_dir(
     """All: Update all Python examples in specified directory [.]"""
     opts = opts or OptFlags()
     # paths = [p for p in target_dir.glob("*.py") if p.name != "__init__.py"]
-    paths = list(python_files("d", target_dir))
+    paths = list(find_python_files("d", target_dir))
     if opts.verbose:
         report("all_files_in_dir", paths, opts=opts)
     process_example_list(paths, opts.verbose, not opts.no_wrap)
@@ -120,7 +120,7 @@ def update_all_examples_in_dir(
 def recursive(target_dir: ExistingDirectory = Path("."), opts: Optional[OptFlags] = None) -> None:
     """Recursive: Update all Python examples in specified directory [.] AND subdirectories"""
     opts = opts or OptFlags()
-    for p in python_files("r", target_dir):
+    for p in find_python_files("r", target_dir):
         if opts.verbose:
             report("recursive", [p], opts=opts)
         process_example(p, opts.verbose, not opts.no_wrap)
