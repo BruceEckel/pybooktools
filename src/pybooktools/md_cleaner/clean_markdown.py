@@ -30,23 +30,17 @@ def replace_all_dashes(text: str) -> str:
 
 
 def extract_and_remove_links(text: str) -> tuple[str, list[str]]:
-    link_pattern = re.compile(r'\[([^]]+)]\((https?:[^)]+)\)')
+    link_pattern = re.compile(r'\[([^]]+)]\((https?:[^)#\s]+)(?:#:~:[^)]+)?\)')
     links: OrderedDict[tuple[str, str], None] = OrderedDict()
-
-    def normalize_url(url: str) -> str:
-        return url.split("#:~:")[0].strip()
 
     def replace_link(match: re.Match) -> str:
         name, url = match.groups()
-        clean_url = normalize_url(url)
-        key = (name.strip(), clean_url)
+        key = (name.strip(), url.strip())
         if key not in links:
-            links[key] = None  # Preserve order, no duplicates
-        return ''  # Remove the link entirely from the main text
+            links[key] = None
+        return ''
 
     cleaned_text = link_pattern.sub(replace_link, text)
-    # Remove empty parentheses that may have been left behind
-    cleaned_text = re.sub(r'\(\s*\)', '', cleaned_text)
     sources = [f"{i + 1}. [{name}]({url})" for i, (name, url) in enumerate(links.keys())]
     return cleaned_text, sources
 
