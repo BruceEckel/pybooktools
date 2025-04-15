@@ -1,3 +1,4 @@
+# clean_markdown.py
 import re
 from collections import OrderedDict
 
@@ -29,17 +30,20 @@ def replace_all_dashes(text: str) -> str:
 
 
 def extract_and_remove_links(text: str) -> tuple[str, list[str]]:
-    link_pattern = re.compile(r'\[([^\]]+)]\((https?://[^)]+)\)')
-    links: OrderedDict[str, int] = OrderedDict()
+    link_pattern = re.compile(r'\[([^\]]+)]\((http[s]?:[^)]+)\)')
+    links: OrderedDict[tuple[str, str], None] = OrderedDict()
+
+    def normalize_url(url: str) -> str:
+        return url.split("#:~:")[0]
 
     def replace_link(match: re.Match) -> str:
-        text, url = match.groups()
-        if url not in links:
-            links[url] = len(links) + 1
-        return text
+        name, url = match.groups()
+        clean_url = normalize_url(url)
+        links[(name, clean_url)] = None  # Preserve order, no duplicates
+        return name
 
     cleaned_text = link_pattern.sub(replace_link, text)
-    sources = [f"{index}. {url}" for url, index in links.items()]
+    sources = [f"{i + 1}. [{name}]({url})" for i, (name, url) in enumerate(links.keys())]
     return cleaned_text, sources
 
 
@@ -74,14 +78,14 @@ def clean_markdown(markdown: str) -> str:
     Clean a Markdown string by:
     1. Replacing curly quotes and apostrophes with straight versions.
     2. Replacing all dash-like characters with '--'.
-    3. Removing inline URLs and collecting them into a numbered '## Sources' section.
+    3. Removing inline URLs and collecting them into a numbered '## References' section.
     4. Structurally wrapping sentences (but not inside code blocks).
 
     Args:
         markdown: A string containing Markdown-formatted text.
 
     Returns:
-        A cleaned Markdown string with formatted sentences and a sources section.
+        A cleaned Markdown string with formatted sentences and a references section.
     """
     markdown = normalize_quotes(markdown)
     markdown = replace_all_dashes(markdown)
