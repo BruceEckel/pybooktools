@@ -45,6 +45,8 @@ def extract_and_remove_links(text: str) -> tuple[str, list[str]]:
         return ''  # Remove the link entirely from the main text
 
     cleaned_text = link_pattern.sub(replace_link, text)
+    # Remove empty parentheses that may have been left behind
+    cleaned_text = re.sub(r'\(\s*\)', '', cleaned_text)
     sources = [f"{i + 1}. [{name}]({url})" for i, (name, url) in enumerate(links.keys())]
     return cleaned_text, sources
 
