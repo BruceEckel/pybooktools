@@ -10,6 +10,7 @@ def normalize_quotes(text: str) -> str:
         .replace("”", '"')
         .replace("‘", "'")
         .replace("’", "'")
+        .replace(" ", " ")  # Also normalize non-breaking spaces
     )
 
 
