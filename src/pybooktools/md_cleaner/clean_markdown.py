@@ -40,7 +40,35 @@ def extract_and_remove_links(text: str) -> tuple[str, list[str]]:
             links[key] = None
         return ''
 
+    # Preserve code and inline code blocks before substitution
+    code_block_pattern = re.compile(r'```.*?```', re.DOTALL)
+    inline_code_pattern = re.compile(r'`[^`]*`')
+
+    code_blocks: list[str] = []
+    inline_blocks: list[str] = []
+
+    def hide_code_block(match: re.Match) -> str:
+        code_blocks.append(match.group(0))
+        return f"__CODE_BLOCK_{len(code_blocks) - 1}__"
+
+    def hide_inline_code(match: re.Match) -> str:
+        inline_blocks.append(match.group(0))
+        return f"__INLINE_CODE_{len(inline_blocks) - 1}__"
+
+    text = code_block_pattern.sub(hide_code_block, text)
+    text = inline_code_pattern.sub(hide_inline_code, text)
+
     cleaned_text = link_pattern.sub(replace_link, text)
+
+    # Remove any residual empty parentheses only outside protected blocks
+    cleaned_text = re.sub(r'(?<!\w)\(\s*\)', '', cleaned_text)
+
+    # Restore inline and code blocks
+    for i, block in enumerate(inline_blocks):
+        cleaned_text = cleaned_text.replace(f"__INLINE_CODE_{i}__", block)
+    for i, block in enumerate(code_blocks):
+        cleaned_text = cleaned_text.replace(f"__CODE_BLOCK_{i}__", block)
+
     sources = [f"{i + 1}. [{name}]({url})" for i, (name, url) in enumerate(links.keys())]
     return cleaned_text, sources
 
