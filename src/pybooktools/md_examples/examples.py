@@ -1,5 +1,4 @@
 # examples.py
-import re
 import tempfile
 from dataclasses import dataclass, field
 from functools import partial
@@ -8,11 +7,8 @@ from typing import List, Pattern, Set, Callable, Optional
 
 import pytest
 
+from pybooktools.util.config import default_slug_line_pattern
 from .fenced_blocks import fenced_blocks_with_tags, FenceTypes, fenced_blocks
-
-default_slug_line_pattern: Pattern[str] = re.compile(  # TODO: unify
-    r"^\s*(?:#|//)\s*(\S+\.[a-zA-Z0-9_]+)"
-)
 
 
 @dataclass

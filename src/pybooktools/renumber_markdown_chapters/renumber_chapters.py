@@ -7,9 +7,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, ClassVar
 
-from cyclopts import App
-from cyclopts.types import ResolvedExistingDirectory
-
 from pybooktools.util.config import chapter_pattern
 from pybooktools.util.path_utils import sanitize_title
 
@@ -25,13 +22,13 @@ class MarkdownChapterID:
 
     def __post_init__(self) -> None:
         assert self.path.is_file(), f"{self.path} is not a file."
+        assert self.path.name[0] in "CZ", f"{self.path.name} must start with C or Z."
         if not (match := re.match(chapter_pattern, self.path.name)):
             raise ValueError(f"{self.path.name} doesn't match pattern.")
-        number_str = match.group(1)
-        self.appendix = number_str.startswith('C9')
+        self.appendix = self.path.name.startswith('Z')
         # Strip non-digit chars from number_str and convert it to an int:
-        self._number = int(re.sub(r"\D", "", number_str))
-        # self.id.root_name is single-# headline in markdown file
+        self._number = match.group(1)  # int(re.sub(r"\D", "", number_str))
+        # root_name is single-# headline at top of markdown
         with self.path.open(encoding="utf-8") as file:
             headline = file.readline()
         if headline.startswith("# "):
@@ -41,13 +38,13 @@ class MarkdownChapterID:
 
     def file_name(self) -> str:
         if self.appendix:
-            return f"C{self._number:0{self.appendixnum_width}d}_{self.root_name}.md"
+            return f"Z{self._number:0{self.appendixnum_width}d}_{self.root_name}.md"
         else:
             return f"C{self._number:0{self.chapternum_width}d}_{self.root_name}.md"
 
     def yaml_entry(self) -> str:
-        prefix = f"C{self._number}"
-        title = f"{prefix}: {self.root_name.replace('_', ' ')}"
+        tag = "A" if self.appendix else ""
+        title = f"{tag}{self._number}: {self.root_name.replace('_', ' ').replace("Appendix ", "")}"
         return f"  - '{title}': {self.file_name()}"
 
     @property
@@ -117,50 +114,15 @@ class Book:
         mdkocs_yml_path.write_text(updated_mkdocs_yml, encoding="utf-8")
 
 
-# Command-line interface using Cyclopts:
-
-# console = Console()
-app = App(
-    version_flags=[],
-    # console=console,
-    # help_format="plaintext",
-    help=__doc__,
-    # default_parameter=Parameter(negative=()),
-)
-
-
-@app.command(name="-r")
-def renumber(path: ResolvedExistingDirectory = Path("..")):
-    """Renumber the chapters, update mkdocs.yml"""
-    book = Book(path)
+def test_book() -> None:
+    directory = Path(r"C:\git\ThinkingInTypes.github.io\Chapters").resolve()
+    book = Book(directory)
     book.renumber()
-    book.update_file_names()
-    book.update_nav()
-    print(book)
-
-
-@app.command(name="-d")
-def display(path: ResolvedExistingDirectory = Path("..")):
-    """Display the existing chapters without renumbering"""
-    print(Book(path))
-
-
-@app.command(name="-t")
-def trace_info(path: ResolvedExistingDirectory = Path("..")):
-    """Display trace info, no changes"""
-    print(" Trace info ".center(60, "-"))
-    print(f"{path = }")
-    book = Book(path)
-    print(f"{book.directory = }")
-    print(book)
-    print(" Renumbered ".center(60, "-"))
-    book.renumber()
-    print(book)
-    print(" updated_mkdocs_yml ".center(60, "-"))
     mdkocs_yml_path, updated_mkdocs_yml = book.updated_mkdocs_yml()
-    print(f"{mdkocs_yml_path = }")
+    print(mdkocs_yml_path)
     print(updated_mkdocs_yml)
+    print(book)
 
 
 if __name__ == "__main__":
-    app()
+    test_book()

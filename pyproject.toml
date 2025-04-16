@@ -26,7 +26,7 @@ slug = "pybooktools.sluglines.slug_line:app"
 # Adds sluglines to Python examples in Markdown files
 mdslug = "pybooktools.sluglines.md_auto_slug:main"
 # Renumber Markdown chapters & align chapter names
-chapnum = "pybooktools.renumber_markdown_chapters.renumber_chapters:app"
+chapnum = "pybooktools.renumber_markdown_chapters.renumber_chapters_cli:app"
 # Run validation checks on Markdown chapters
 mdvalid = "pybooktools.pymarkdown_validator.validate:app"
 # Extract examples from Markdown to example_repo

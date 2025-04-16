@@ -6,10 +6,11 @@ Call before extracting code from markdown files.
 import re
 import shutil
 from pathlib import Path
-from typing import Final
 
 from cyclopts import App
 from cyclopts.types import ResolvedExistingDirectory
+
+from pybooktools.util.config import repo_chapter_pattern
 
 # Extra directories to be removed by `remove_all`:
 additional_dirs = [
@@ -18,8 +19,6 @@ additional_dirs = [
     "butil",
     "util"
 ]
-
-repo_chapter_pattern: Final[str] = r"^c\d+_[a-z_]+$"  # TODO: Unify in config.py
 
 app = App(
     version_flags=[],
