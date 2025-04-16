@@ -7,8 +7,8 @@ from typing import List, Pattern, Set, Callable, Optional
 
 import pytest
 
+from pybooktools.md_examples.fenced_blocks import FenceTypes, fenced_blocks_with_tags, fenced_blocks
 from pybooktools.util.config import default_slug_line_pattern
-from .fenced_blocks import fenced_blocks_with_tags, FenceTypes, fenced_blocks
 
 
 @dataclass
@@ -309,5 +309,16 @@ print("Tagged")
     assert blocks[0].strip().endswith("```")
 
 
+def test_python_examples_on_book():
+    md_root = Path(r"C:\git\ThinkingInTypes.github.io\Chapters")
+    repo_root = Path(r"C:\git\ThinkingInTypes_Examples")
+    for chapter in md_root.iterdir():
+        if chapter.name.endswith(".md"):
+            print(chapter.name)
+            for example in python_examples(chapter, repo_root):
+                print(example.destination_path)
+
+
 if __name__ == "__main__":
     pytest.main([__file__])
+    test_python_examples_on_book()
