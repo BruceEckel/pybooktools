@@ -28,7 +28,7 @@ class MarkdownChapterID:
         if not (match := re.match(chapter_pattern, self.path.name)):
             raise ValueError(f"{self.path.name} doesn't match pattern.")
         number_str = match.group(1)
-        self.appendix = number_str.startswith('A')
+        self.appendix = number_str.startswith('C9')
         # Strip non-digit chars from number_str and convert it to an int:
         self._number = int(re.sub(r"\D", "", number_str))
         # self.id.root_name is single-# headline in markdown file
@@ -41,12 +41,12 @@ class MarkdownChapterID:
 
     def file_name(self) -> str:
         if self.appendix:
-            return f"A{self._number:0{self.appendixnum_width}d}_{self.root_name}.md"
+            return f"C{self._number:0{self.appendixnum_width}d}_{self.root_name}.md"
         else:
-            return f"{self._number:0{self.chapternum_width}d}_{self.root_name}.md"
+            return f"C{self._number:0{self.chapternum_width}d}_{self.root_name}.md"
 
     def yaml_entry(self) -> str:
-        prefix = f"A{self._number}" if self.appendix else str(self._number)
+        prefix = f"C{self._number}"
         title = f"{prefix}: {self.root_name.replace('_', ' ')}"
         return f"  - '{title}': {self.file_name()}"
 

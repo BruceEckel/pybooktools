@@ -19,7 +19,7 @@ additional_dirs = [
     "util"
 ]
 
-repo_chapter_pattern: Final[str] = r"^[a]?\d+_[a-z_]+$"
+repo_chapter_pattern: Final[str] = r"^c\d+_[a-z_]+$"  # TODO: Unify in config.py
 
 app = App(
     version_flags=[],
