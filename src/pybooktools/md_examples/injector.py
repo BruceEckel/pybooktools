@@ -47,6 +47,6 @@ def update_markdown_files(markdown_files: ResolvedExistingDirectory, example_rep
                 continue
 
             # Overwrite the markdown file with the updated content.
-            # if updated_content != md_file.read_text(encoding="utf-8"):
-            #     md_file.write_text(updated_content, encoding="utf-8")
-            #     console.print(f"[green]Updated[/green] {pc(md_file.name)} with {pc(repo_subdir.name)}")
+            if updated_content != md_file.read_text(encoding="utf-8"):
+                md_file.write_text(updated_content, encoding="utf-8")
+                console.print(f"[green]Updated[/green] {pc(md_file.name)} with {pc(repo_subdir.name)}")
