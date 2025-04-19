@@ -36,7 +36,7 @@ def main(
     if trace_flag:
         display_function_name()
 
-    if files:  # Multiple files on command line
+    if files:  # Multiple files on the command line
         code_files: list[Path] = files
     elif recursive:
         code_files: list[Path] = list(Path.cwd().rglob("*.py"))

@@ -32,8 +32,8 @@ class SlugInserter:
 
     def _find_markdown_files(self) -> list[Path]:
         """
-        Collect all .md files in the given directory. If single_file is specified,
-        just return that file in a list.
+        Collect all .md files in the given directory.
+        If single_file is specified, return that file in a list.
         """
         if self.single_file is not None:
             return [self.single_file]
