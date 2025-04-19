@@ -47,6 +47,24 @@ def check_for_missing_slug_lines(markdown_content: str) -> list[Issue]:
     return missing_line_issues
 
 
+def check_for_colon_in_slug_tag(markdown_content: str) -> list[Issue]:
+    """There shouldn't be a colon in the slug tag."""
+    issues: list[Issue] = []
+    lines = markdown_content.splitlines()
+    for i, line in enumerate(lines):
+        if line.strip().startswith("```python"):
+            slug_line = lines[i + 1]
+            if slug_line.strip().startswith("#:"):
+                issues.append(
+                    Issue(
+                        "Colon in Slug Tag",
+                        slug_line
+                    )
+                )
+
+    return issues
+
+
 # TODO: use md_examples util here:
 def check_for_main(markdown_content: str) -> list[Issue]:
     """Checks for '__main__' inside fenced code blocks in a Markdown file."""
@@ -68,6 +86,7 @@ def check_for_main(markdown_content: str) -> list[Issue]:
 validation_checks: List[Callable[[str], list[Issue]]] = [
     check_for_missing_slug_lines,
     check_for_duplicate_slug_lines,
+    check_for_colon_in_slug_tag,
     check_for_main,
     # Add more test functions here as needed
 ]
