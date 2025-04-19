@@ -2,7 +2,7 @@
 """Perform multiple validation tests on Markdown files."""
 import re
 from itertools import chain
-from typing import Callable, List, NamedTuple
+from typing import Callable, List, NamedTuple, Literal
 
 from cyclopts import App
 from cyclopts.types import ResolvedExistingFile, ResolvedExistingDirectory
@@ -11,6 +11,7 @@ from rich.panel import Panel
 
 from pybooktools.md_examples import examples_without_sluglines
 
+console = Console()
 # TODO: Unify this in one place
 slug_line_pattern = re.compile(r"^\s*(?:#|//)\s*(\S+\.(?:py|pyi|cpp|java))")
 
@@ -55,12 +56,7 @@ def check_for_colon_in_slug_tag(markdown_content: str) -> list[Issue]:
         if line.strip().startswith("```python"):
             slug_line = lines[i + 1]
             if slug_line.strip().startswith("#:"):
-                issues.append(
-                    Issue(
-                        "Colon in Slug Tag",
-                        slug_line
-                    )
-                )
+                issues.append(Issue("Colon in Slug Tag", slug_line))
 
     return issues
 
@@ -110,20 +106,22 @@ def display_issues(issues: list[Issue], markdown_file: ResolvedExistingFile):
     if issues:
         sub_panels = [Panel(issue.text, title=issue.problem, border_style="red") for i, issue in enumerate(issues)]
         main_panel = Panel(Group(*sub_panels), title=str(markdown_file.name), border_style="yellow")
-        Console().print(main_panel)
+        console.print(main_panel)
 
 
 @app.command(name="-f")
-def validate_markdown_file(markdown_file: ResolvedExistingFile):
+def validate_markdown_file(markdown_file: ResolvedExistingFile, verbose: Literal["verbose", "quiet"] = "quiet"):
     """Validate a single Markdown file."""
-    console = Console()
-    console.print(f"Validating {markdown_file.name}...")
+    if verbose == "verbose":
+        console.print(f"Validating {markdown_file.name}...")
     issues = check_markdown_file(markdown_file)
     display_issues(issues, markdown_file)
 
 
 @app.command(name="-d")
-def validate_markdown_directory(markdown_dir: ResolvedExistingDirectory):
+def validate_markdown_directory(markdown_dir: ResolvedExistingDirectory,
+                                verbose: Literal["verbose", "quiet"] = "quiet"):
     """Validate all Markdown files in a directory."""
     for markdown_file in list(markdown_dir.glob("*.md")):
-        validate_markdown_file(markdown_file)
+        validate_markdown_file(markdown_file, verbose)
+    console.print("[green]Markdown validation complete.[/green]")
