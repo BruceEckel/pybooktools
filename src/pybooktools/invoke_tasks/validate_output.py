@@ -164,7 +164,7 @@ def validate(ctx, target_dir: str = ".", throttle_limit: int | None = None) -> N
                 discrepancies.append(result.msg)
 
     if discrepancies:
-        console.print("\n❗ Discrepancies found in output:", style="bold red")
+        console.print(f"\n❗{len(discrepancies)} Discrepancies found in output:", style="bold red")
         for msg in discrepancies:
             console.print(f"\n{msg}")
         sys.exit(1)
