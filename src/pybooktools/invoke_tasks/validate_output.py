@@ -60,7 +60,7 @@ def rich_diff(text1: str, text2: str, filename: str) -> Panel:
             rich_lines.append(line + "\n", style="yellow")
         else:
             rich_lines.append(line + "\n")
-    return Panel(rich_lines, title=f"Diff for {filename}", border_style="white")
+    return Panel(rich_lines, title=f"Diff: {filename}", border_style="white")
 
 
 class Result(NamedTuple):
@@ -111,7 +111,7 @@ def run_and_compare(file: Path, interpreter: str) -> Result:
             f"[red]Missing:[/red] {sorted(expected - actual)}\n"
             f"[blue]Unexpected:[/blue] {sorted(actual - expected)}"
         )
-        console.print(Panel(msg, title=f"Comparison for {file.name}", border_style="red"))
+        console.print(Panel(msg, title=f"Comparison: {file.name}", border_style="red"))
         return fail()
 
     return succeed()
