@@ -8,9 +8,9 @@ import re
 import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass
 from difflib import Differ
 from pathlib import Path
+from typing import NamedTuple
 
 from invoke import task
 from rich.console import Console
@@ -44,7 +44,7 @@ def actual_output_set(result: str) -> set[str]:
     return set(re.findall(r"\b\w+\b", result))
 
 
-def rich_diff(text1: str, text2: str) -> Panel:
+def rich_diff(text1: str, text2: str, filename: str) -> Panel:
     """
     Return a rich-formatted panel showing the diff between two texts.
     """
@@ -60,21 +60,12 @@ def rich_diff(text1: str, text2: str) -> Panel:
             rich_lines.append(line + "\n", style="yellow")
         else:
             rich_lines.append(line + "\n")
-    return Panel(rich_lines, title="Diff", border_style="white")
+    return Panel(rich_lines, title=f"Diff for {filename}", border_style="white")
 
 
-@dataclass(frozen=True)
-class Result:
+class Result(NamedTuple):
     msg: str = ""
     failed: bool = False
-
-
-def succeed() -> Result:
-    return Result()
-
-
-def fail(msg: str = "") -> Result:
-    return Result(msg=msg, failed=True)
 
 
 def run_and_compare(file: Path, interpreter: str) -> Result:
@@ -83,6 +74,13 @@ def run_and_compare(file: Path, interpreter: str) -> Result:
     interpreter, compare its output to the
     expected output, and return a result object.
     """
+
+    def succeed() -> Result:
+        return Result()
+
+    def fail(msg: str = "") -> Result:
+        return Result(msg=msg, failed=True)
+
     try:
         result = subprocess.run(
             [interpreter, str(file)],
@@ -92,7 +90,7 @@ def run_and_compare(file: Path, interpreter: str) -> Result:
         )
     except Exception as e:
         return fail(
-            f"{file}\n[bold red]\u274c Exception trying to run script:[/bold red] {e}"
+            f"{file}\n[bold red]\u274c Exception trying to run {file.name}:[/bold red] {e}"
         )
 
     if result.returncode != 0:
@@ -100,10 +98,11 @@ def run_and_compare(file: Path, interpreter: str) -> Result:
             f"{file}\n[bold red]\u274c {result.returncode = }: [/bold red]\n{result.stderr}"
         )
 
-    expected = extract_expected_output(file)
-    actual = actual_output_set(result.stdout)
+    expected: set[str] = extract_expected_output(file)
+    actual: set[str] = actual_output_set(result.stdout)
     if actual != expected:
-        diff_panel = rich_diff("\n".join(sorted(expected)), "\n".join(sorted(actual)))
+        diff_panel = rich_diff("\n".join(sorted(expected)), "\n".join(sorted(actual)), file.name)
+        console.print(diff_panel)
         msg = (
             f"{file}\n[bold red]\u274c Output mismatch.[/bold red]\n"
             f"[yellow]Expected (from ## comments):[/yellow] {sorted(expected)}\n"
@@ -112,8 +111,7 @@ def run_and_compare(file: Path, interpreter: str) -> Result:
             f"[red]Missing:[/red] {sorted(expected - actual)}\n"
             f"[blue]Unexpected:[/blue] {sorted(actual - expected)}"
         )
-        console.print(Panel(msg, title="Comparison", border_style="red"))
-        console.print(diff_panel)
+        console.print(Panel(msg, title=f"Comparison for {file.name}", border_style="red"))
         return fail()
 
     return succeed()
@@ -164,9 +162,10 @@ def validate(ctx, target_dir: str = ".", throttle_limit: int | None = None) -> N
                 discrepancies.append(result.msg)
 
     if discrepancies:
-        console.print(f"\n❗{len(discrepancies)} Discrepancies found in output:", style="bold red")
+        console.rule(f"\n❗{len(discrepancies)} Output discrepancies", style="bold red")
         for msg in discrepancies:
-            console.print(f"\n{msg}")
+            if msg:
+                console.print(f"\n{msg}")
         sys.exit(1)
 
     console.print("\n✅ All outputs matched expectations.", style="bold green")
