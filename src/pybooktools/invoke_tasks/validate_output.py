@@ -112,7 +112,7 @@ def run_and_compare(file: Path, interpreter: str) -> Result:
             f"[blue]Unexpected:[/blue] {sorted(actual - expected)}"
         )
         console.print(Panel(msg, title=f"Comparison: {file.name}", border_style="red"))
-        return fail()
+        return fail(f"[bold red]{file}[/bold red]")
 
     return succeed()
 
@@ -165,7 +165,7 @@ def validate(ctx, target_dir: str = ".", throttle_limit: int | None = None) -> N
         console.rule(f"\n❗{len(discrepancies)} Output discrepancies", style="bold red")
         for msg in discrepancies:
             if msg:
-                console.print(f"\n{msg}")
+                console.print(f"{msg}")
         sys.exit(1)
 
     console.print("\n✅ All outputs matched expectations.", style="bold green")
