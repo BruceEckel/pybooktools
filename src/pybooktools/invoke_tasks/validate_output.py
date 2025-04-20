@@ -1,25 +1,19 @@
-#!/usr/bin/env python3
+# validate_output.py
 """
 Validate Python example scripts by comparing their
 output to expected ## comments.
-
-NOTE: Does not appear to be working correctly.
-
 """
-
 import os
 import re
 import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass
-from datetime import datetime
 from difflib import Differ
 from pathlib import Path
+from typing import NamedTuple
 
 from invoke import task
 from rich.console import Console
-from rich.panel import Panel
 
 from pybooktools.invoke_tasks.find_python_files import find_python_files
 
@@ -46,30 +40,19 @@ def rich_diff(text1, text2):
             console.print(line.rstrip())
 
 
-@dataclass
-class ScriptResult:
-    """
-    Result of running a Python script.
-    """
-
-    success: bool
-    path: Path | None = None
-    error: str | None = None
-    skipped: bool = False
-
-
-def extract_expected_output(file: Path) -> str:
+def extract_expected_output(file: Path) -> set[str]:
     """
     Extract expected output from a Python file by
-    reading lines that start with '## '.
+    reading lines that start with '## ' and return a set
+    of all unique words found in those lines.
     """
     lines = file.read_text(encoding="utf-8").splitlines()
-    expected = []
+    words: set[str] = set()
     for line in lines:
-        match = re.match(r"^## (.*)$", line)
+        match = re.match(r"^\s*## (.*)$", line)
         if match:
-            expected.append(match.group(1))
-    return "\n".join(expected)
+            words.update(re.findall(r"\b\w+\b", match.group(1)))
+    return words
 
 
 def word_set_compare(expected: str, actual: str) -> set[str]:
@@ -79,17 +62,23 @@ def word_set_compare(expected: str, actual: str) -> set[str]:
     return word_set(expected) ^ word_set(actual)
 
 
-def run_and_compare(file: Path, interpreter: str) -> tuple[bool, str | None]:
+class Result(NamedTuple):
+    msg: str | None = None
+    diffs: set[str] | None = None
+    failed: bool = False
+
+
+class Fail(Result):
+    failed = True
+
+
+def run_and_compare(file: Path, interpreter: str) -> Result:
     """
     Run a Python script using the specified
     interpreter, compare its output to the
     expected output, and return a tuple indicating
     success and an error message (if any).
     """
-    timestamp = datetime.now().strftime("%H:%M:%S")
-    # console.print(f"{timestamp} ▶️ Checking: {file}", style="cyan")
-
-    expected = extract_expected_output(file)
     try:
         result = subprocess.run(
             [interpreter, str(file)],
@@ -98,35 +87,27 @@ def run_and_compare(file: Path, interpreter: str) -> tuple[bool, str | None]:
             check=False,
         )
     except Exception as e:
-        return False, f"{file}\n[bold red]❌ Exception running script:[/bold red] {e}"
+        return Fail(
+            f"{file}\n[bold red]\u274c Exception trying to run script:[/bold red] {e}"
+        )
 
     if result.returncode != 0:
-        return (
-            False,
-            f"{file}\n[bold red]❌ Script failed to run:[/bold red]\n{result.stderr}",
+        return Fail(
+            f"{file}\n[bold red]\u274c {result.returncode = }: [/bold red]\n{result.stderr}"
         )
 
-    actual_clean = re.sub(r"\s+", "", result.stdout)
-    expected_clean = re.sub(r"\s+", "", expected)
-
-    if expected_clean != actual_clean:
-        rich_diff(expected, result.stdout)
-
-    # if expected_clean != actual_clean:
-    diffs = word_set_compare(expected, result.stdout)
-    if diffs:
-        console.print(Panel(f"Word differences: {diffs}", title=f"{file}"))
-        for diff in diffs:
-            console.print(f"[magenta]{diff}[/magenta]")
-        return False, (
-            f"{file}\n[bold red]❌ Output mismatch.[/bold red]\n"
+    expected = extract_expected_output(file)
+    actual = extract_expected_output(file)
+    if actual != expected:
+        return Fail(
+            f"{file}\n[bold red]\u274c Output mismatch.[/bold red]\n"
             f"--- [yellow]Expected (from ## comments)[/yellow] ---\n{expected}\n"
             f"--- [green]Actual (stdout)[/green] ---\n{result.stdout}\n"
-            f"--- [blue]Expected (cleaned)[/blue] ---\n{expected_clean}\n"
-            f"--- [magenta]Actual (cleaned)[/magenta] ---\n{actual_clean}"
+            f"--- [blue]Expected[/blue] ---\n{expected}\n"
+            f"--- [magenta]Actual[/magenta] ---\n{actual}"
         )
 
-    return True, None
+    return Result(diffs=expected - actual)
 
 
 @task(
@@ -169,9 +150,9 @@ def validate(ctx, target_dir: str = ".", throttle_limit: int | None = None) -> N
             executor.submit(run_and_compare, file, interpreter): file for file in files
         }
         for future in as_completed(futures):
-            success, error = future.result()
-            if not success and error:
-                discrepancies.append(error)
+            result = future.result()
+            if result.failed and result.msg:
+                discrepancies.append(result.msg)
 
     if discrepancies:
         console.print("\n❗ Discrepancies found in output:", style="bold red")
