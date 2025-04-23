@@ -132,11 +132,11 @@ def generate_html(js_blocks: str) -> str:
     let fontSize = 2;
     const el = document.getElementById("code");
 
-    async function render() {{
+    async function render(forceRuff = false) {{
       const {{ lang }} = blocks[i];
       let code = blocks[i].code;
 
-      if (lang === "python") {{
+      if (lang === "python" && forceRuff) {{
         const width = estimateCharWidth();
         const res = await fetch(`/format?index=${{i}}&width=${{width}}`);
         if (res.ok) code = await res.text();
@@ -163,10 +163,11 @@ def generate_html(js_blocks: str) -> str:
     }}
 
     document.addEventListener('keydown', e => {{
-      if (e.key === 'ArrowRight') {{ i = Math.min(i + 1, blocks.length - 1); render(); }}
-      else if (e.key === 'ArrowLeft') {{ i = Math.max(i - 1, 0); render(); }}
-      else if (e.key === '+') {{ fontSize = Math.min(fontSize + 0.2, 6); render(); }}
-      else if (e.key === '-') {{ fontSize = Math.max(fontSize - 0.2, 0.5); render(); }}
+      if (e.key === 'ArrowRight') {{ i = Math.min(i + 1, blocks.length - 1); render(true); }}
+      else if (e.key === 'ArrowLeft') {{ i = Math.max(i - 1, 0); render(true); }}
+      else if (e.key === '+') {{ fontSize = Math.min(fontSize + 0.2, 6); render(true); }}
+      else if (e.key === '-') {{ fontSize = Math.max(fontSize - 0.2, 0.5); render(true); }}
+      else if (e.key.toLowerCase() === 'r') {{ render(true); }}
       else if (e.key.toLowerCase() === 'b') {{
         document.body.classList.toggle('light');
         document.getElementById('hljs-theme').href =
@@ -176,7 +177,7 @@ def generate_html(js_blocks: str) -> str:
       }}
     }});
 
-    render();
+    render(true);
   </script>
 </body>
 </html>
