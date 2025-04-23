@@ -35,58 +35,75 @@ def extract_code_blocks(md_text: str) -> list[tuple[str, str]]:
 
 
 def generate_html(code_blocks: list[tuple[str, str]]) -> str:
-    """Returns a self-contained HTML page with code blocks embedded as JS array."""
-    js_array = [
-        {"lang": lang or "plaintext", "code": code}
-        for lang, code in code_blocks
-    ]
-    # Convert to JS source safely
     import json
 
-    js_blocks = json.dumps(js_array)
+    js_blocks = json.dumps([
+        {"lang": lang or "plaintext", "code": code}
+        for lang, code in code_blocks
+    ])
 
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Markdown Code Viewer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet" />
+  <title>Code Viewer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
   <link id="hljs-theme" rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css" />
   <style>
     html, body {{
-      margin: 0; padding: 0;
-      background: #fff; color: #000;
+      margin: 0;
+      height: 100%;
+      background: #111;
+      color: #eee;
       font-family: 'Fira Code', monospace;
-      height: 100%; overflow: hidden;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 2rem;
+      overflow: auto;
+      transition: background 0.3s, color 0.3s;
+      scrollbar-width: none;           /* Firefox */
+      -ms-overflow-style: none;        /* IE 10+ */
     }}
-    body.dark {{
-      background: #111; color: #eee;
+    body::-webkit-scrollbar {{
+      display: none;                   /* Chrome, Safari, Edge */
+    }}
+    body.light {{
+      background: #fdfdfd;
+      color: #000;
     }}
     pre {{
-      font-size: 1.2rem;
-      max-width: 90vw; max-height: 90vh;
-      overflow-wrap: break-word;
+      font-size: 2rem;
+      line-height: 1.5;
       white-space: pre-wrap;
+      overflow-wrap: break-word;
+      margin: 0;
     }}
-    pre.hljs {{ background: transparent !important; }}
+    pre.hljs {{
+      background: transparent !important;
+    }}
   </style>
 </head>
 <body>
   <pre><code id="code" class="hljs"></code></pre>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
   <script>
     const blocks = {js_blocks};
     let i = 0;
+    let fontSize = 3;
 
     const el = document.getElementById("code");
+
     function render() {{
       const {{ lang, code }} = blocks[i];
       el.textContent = code;
       el.className = '';
       el.classList.add(lang);
+      el.style.fontSize = fontSize + 'rem';
       hljs.highlightElement(el);
+      requestAnimationFrame(() => document.body.scrollTop = 0);
     }}
 
     document.addEventListener('keydown', e => {{
@@ -96,12 +113,18 @@ def generate_html(code_blocks: list[tuple[str, str]]) -> str:
       }} else if (e.key === 'ArrowLeft') {{
         i = Math.max(i - 1, 0);
         render();
+      }} else if (e.key === '=') {{
+        fontSize = Math.min(fontSize + 0.2, 6);
+        render();
+      }} else if (e.key === '-') {{
+        fontSize = Math.max(fontSize - 0.2, 0.5);
+        render();
       }} else if (e.key.toLowerCase() === 'b') {{
-        document.body.classList.toggle('dark');
+        document.body.classList.toggle('light');
         const theme = document.getElementById('hljs-theme');
-        theme.href = document.body.classList.contains('dark')
-          ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css'
-          : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css';
+        theme.href = document.body.classList.contains('light')
+          ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css'
+          : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css';
       }}
     }});
 
@@ -139,11 +162,16 @@ def run_viewer(md_path: Path) -> None:
         InMemoryHandler(html, *args, **kwargs)
 
     with socketserver.TCPServer(("localhost", PORT), handler) as httpd:
-        threading.Thread(target=httpd.serve_forever, daemon=True).start()
+        thread = threading.Thread(target=httpd.serve_forever)
+        thread.daemon = True
+        thread.start()
+
         webbrowser.open(f"http://localhost:{PORT}")
+        print("Press Ctrl+C to exit.")
         try:
-            input("Press Enter to quit...\n")
-        finally:
+            thread.join()  # Keep main thread alive until interrupted
+        except KeyboardInterrupt:
+            print("\nShutting down...")
             httpd.shutdown()
 
 
