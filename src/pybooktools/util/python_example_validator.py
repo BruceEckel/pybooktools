@@ -61,7 +61,7 @@ if __name__ == "__main__":
     for demo in create_demo_files(demo_dir, examples):
         print(f"arg: {demo}")
         try:
-            # Note brackets around argument:
+            # Note brackets around the argument:
             app([str(demo)], exit_on_error=False)
         except Exception:  # noqa pylint: disable=broad-except
             pass
