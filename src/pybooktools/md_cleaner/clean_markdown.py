@@ -133,7 +133,7 @@ def remove_emphasis(text: str) -> str:
     return ''.join(result_parts)
 
 
-def clean_markdown(markdown: str) -> str:
+def clean_ai_generated_markdown(markdown: str) -> str:
     """
     Clean a Markdown string by:
     1. Replacing curly quotes and apostrophes with straight versions.
