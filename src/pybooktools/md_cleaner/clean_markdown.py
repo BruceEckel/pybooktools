@@ -100,6 +100,39 @@ def wrap_sentences(text: str) -> str:
     return wrapped_text
 
 
+def remove_emphasis(text: str) -> str:
+    """
+    Removes Markdown bold (** **) and italics (_ _ or * *) from the input string,
+    preserving content inside fenced code blocks (```), and inline code fragments (`code`).
+    Handles multiline emphasis spans.
+    """
+    # Pattern to split out fenced code blocks and inline code
+    code_pattern = re.compile(r'(```[\s\S]*?```|`[^`]*`)')
+
+    parts = code_pattern.split(text)
+    result_parts: list[str] = []
+
+    # Regex to remove strong (bold) and italic markers
+    strong_re = re.compile(r'(?:\*\*|__)(.+?)(?:\*\*|__)', re.S)
+    italic_re = re.compile(r'(?:\*|_)(.+?)(?:\*|_)', re.S)
+
+    for part in parts:
+        # If this part is a code block or inline code, leave it unchanged
+        if code_pattern.fullmatch(part):
+            result_parts.append(part)
+        else:
+            # Remove emphasis markers in non-code text
+            new_part = part
+            prev_part = None
+            while prev_part != new_part:
+                prev_part = new_part
+                new_part = strong_re.sub(r'\1', new_part)
+                new_part = italic_re.sub(r'\1', new_part)
+            result_parts.append(new_part)
+
+    return ''.join(result_parts)
+
+
 def clean_markdown(markdown: str) -> str:
     """
     Clean a Markdown string by:
@@ -118,6 +151,7 @@ def clean_markdown(markdown: str) -> str:
     markdown = replace_all_dashes(markdown)
     markdown, sources = extract_and_remove_links(markdown)
     markdown = wrap_sentences(markdown)
+    markdown = remove_emphasis(markdown)
 
     if sources:
         markdown = markdown.rstrip() + "\n\n## References\n" + "\n".join(sources) + "\n"
