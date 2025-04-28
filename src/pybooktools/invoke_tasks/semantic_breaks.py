@@ -1,4 +1,4 @@
-#: semantic_breaks.py
+# semantic_breaks.py
 import re
 from pathlib import Path
 

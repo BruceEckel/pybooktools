@@ -1,28 +1,14 @@
 # run_script.py
 import os
 import subprocess
-import sys
 from pathlib import Path
 from typing import NamedTuple
 
-from pybooktools.util.console import console
-from pybooktools.util.display import warn
 from rich.syntax import Syntax
 
-
-def get_virtual_env_python() -> str:
-    """
-    Return the Python interpreter path from the virtual environment if available
-    """
-    venv_path = os.getenv("VIRTUAL_ENV")
-    if venv_path:
-        python_path = (
-            Path(venv_path)
-            / ("Scripts" if os.name == "nt" else "bin")
-            / "python"
-        )
-        return str(python_path)
-    return sys.executable
+from pybooktools.run_scripts.get_virtual_environment import get_virtual_env_python
+from pybooktools.util.console import console
+from pybooktools.util.display import warn
 
 
 class ScriptResult(NamedTuple):

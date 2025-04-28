@@ -1,3 +1,4 @@
+# rename_appendices.py
 from pathlib import Path
 
 root = Path(r"C:\git\ThinkingInTypes.github.io\Chapters")

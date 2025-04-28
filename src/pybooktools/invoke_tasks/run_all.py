@@ -1,11 +1,10 @@
-#!/usr/bin/env python3
+# run_all.py
 """
 Run Python scripts in a directory tree (or a
 specific subdirectory) in parallel.
 
 Prints colored output with timestamps and stops
 all jobs on first failure.
-
 """
 
 import subprocess
