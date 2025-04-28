@@ -199,6 +199,9 @@ def generate_html(js_slides: str) -> str:
     .slide.active {{
       display: block;
     }}
+    .slide.code-slide {{
+      padding: 0;
+    }}
 
     .header-slide {{
       font-size: 2rem;
@@ -212,11 +215,28 @@ def generate_html(js_slides: str) -> str:
       white-space: pre-wrap;
       overflow-wrap: break-word;
       margin: 0;
-      padding-left: 2rem;
+      padding: 2rem;
       text-align: left;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+    }}
+    .code-slide pre {{
+      margin: 0;
+      padding: 0;
     }}
     pre.hljs {{
-      background: transparent !important;
+      background: #282c34 !important;
+      border-radius: 0;
+    }}
+    body.light pre.hljs {{
+      background: #f6f8fa !important;
+    }}
+    .code-slide {{
+      background: #282c34 !important;
+    }}
+    body.light .code-slide {{
+      background: #f6f8fa !important;
     }}
 
     .controls {{
@@ -266,6 +286,7 @@ def generate_html(js_slides: str) -> str:
         slideDiv.className += " header-slide";
         slideDiv.innerHTML = slide.content;
       }} else if (slide.type === "code") {{
+        slideDiv.className += " code-slide";
         const pre = document.createElement("pre");
         const code = document.createElement("code");
         code.className = `hljs ${{slide.language}}`;
