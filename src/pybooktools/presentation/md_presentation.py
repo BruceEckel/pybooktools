@@ -175,14 +175,12 @@ def generate_html(js_slides: str) -> str:
   <style>
     html, body {{
       margin: 0;
+      padding: 0;
       height: 100%;
+      width: 100%;
       background: #111;
       color: #eee;
       font-family: 'Roboto', sans-serif;
-      display: flex;
-      align-items: flex-start;
-      justify-content: flex-start;
-      padding: 2rem;
       overflow: auto;
       transition: background 0.3s, color 0.3s;
       scrollbar-width: none;
@@ -194,6 +192,9 @@ def generate_html(js_slides: str) -> str:
     .slide {{
       display: none;
       width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      padding: 2rem;
     }}
     .slide.active {{
       display: block;
@@ -232,6 +233,11 @@ def generate_html(js_slides: str) -> str:
     .controls.light {{
       background: rgba(200, 200, 200, 0.5);
       color: black;
+    }}
+
+    #slides-container {{
+      width: 100%;
+      height: 100%;
     }}
   </style>
 </head>
