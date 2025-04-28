@@ -15,7 +15,7 @@ from invoke import task
 from rich.console import Console
 
 from pybooktools.invoke_tasks.find_python_files import find_python_files
-from pybooktools.run_scripts.run_script import run_scripts_parallel
+from pybooktools.run_scripts.run_scripts_parallel import run_scripts_parallel
 
 console = Console()
 

@@ -7,7 +7,7 @@ from typing import Optional
 
 from icecream import ic
 
-from pybooktools.run_scripts.run_script import run_script
+from pybooktools.run_scripts.run_one_script import run_script
 from pybooktools.update_example_output.insert_tls_tags import insert_top_level_separators
 from pybooktools.update_example_output.tls_results_to_dict import tls_tags_to_dict
 from pybooktools.util.path_utils import cleaned_dir
