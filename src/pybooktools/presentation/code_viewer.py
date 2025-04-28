@@ -1,5 +1,5 @@
 """
-code_viewer.py
+presentation.py
 
 Launches an in-memory fullscreen HTML viewer for fenced code blocks
 from a Markdown file. Uses arrow keys to navigate examples,
@@ -8,7 +8,7 @@ B to toggle background color, and syntax highlighting via highlight.js.
 No files are written to disk; everything is served from memory.
 
 Usage:
-    python code_viewer.py path/to/examples.md
+    python presentation.py path/to/examples.md
 """
 
 import argparse

@@ -36,6 +36,8 @@ mdextract = "pybooktools.md_examples.extractor:app"
 mdinject = "pybooktools.md_examples.injector:app"
 # Remove chapter directories from example repository
 repoclean = "pybooktools.repo_cleaner.clean_example_repo:app"
+# Create an interactive browser presentation from a Markdown file
+mdpresent = "pybooktools.presentation.md_presentation:main"
 # Flatten a directory tree to give to an AI
 aiflatten = "ai_flatten.flatten_dir_for_ai:main"
 # Take results from an AI and turn back into a directory tree
