@@ -1,0 +1,10 @@
+I'd like a Python script that takes a markdown file and produces a
+[Marp](https://marp.app/) presentation by processing it as follows:
+
+1. Each Markdown header/subhead (lines starting with #, ##, ###, etc.) becomes
+   A bullet point in the resulting slides
+2. Each fenced code example in the Markdown becomes a slide, with appropriate syntax highlighting
+3. The program creates output in the subdirectory `.marp` and then runs Marp
+   on that result, to start the slide show.
+4. Use the "Uncover" Marp theme
+
