@@ -171,3 +171,5 @@ cython_debug/
 .validate_*
 /xperiments/xperiments/.check_simple
 /src/pybooktools/util/validate_demos
+/src/pybooktools/reveal_slideshow/.presentation
+/src/pybooktools/slide_show/node_modules
