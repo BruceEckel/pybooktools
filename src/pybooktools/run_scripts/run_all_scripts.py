@@ -1,4 +1,4 @@
-# run_scripts_parallel.py
+# run_all_scripts.py
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Generator
@@ -11,9 +11,44 @@ from pybooktools.util.console import console
 from pybooktools.util.display import warn
 
 
+def run_scripts(
+    scripts: Generator[Path, None, None] | list[Path],
+) -> list[ScriptResult]:
+    """
+    Runs a list or generator of script Paths sequentially.
+    Stops on the first failure and returns that ScriptResult.
+    Otherwise returns a list of all successful ScriptResults.
+    """
+    results: list[ScriptResult] = []
+
+    for path in scripts:
+        try:
+            result = run_script(path)
+        except Exception as exc:
+            warn(f"Exception running script {path}: {exc}")
+            syntax = Syntax(
+                path.read_text(encoding="utf-8"),
+                "python",
+                theme="monokai",
+                line_numbers=True,
+            )
+            console.print(syntax)
+            warn(f"{exc}")
+            return [ScriptResult(-1, str(exc))]
+
+        match result.return_code:
+            case 0:
+                results.append(result)
+            case _:
+                results.append(result)
+                return results
+
+    return results
+
+
 def run_scripts_parallel(
-        scripts: Generator[Path, None, None] | list[Path],
-        max_workers: int | None = None,
+    scripts: Generator[Path, None, None] | list[Path],
+    max_workers: int | None = None,
 ) -> list[ScriptResult]:
     """
     Takes a generator of script Paths, runs them in parallel (up to `max_workers` at once),
@@ -47,10 +82,10 @@ def run_scripts_parallel(
                         f.cancel()
                 return [ScriptResult(-1, str(exc))]
 
-            match result:
-                case ScriptResult(return_code=0, result_value=_):
+            match result.return_code:
+                case 0:
                     results.append(result)
-                case ScriptResult(return_code=code, result_value=_):
+                case _:
                     for f in future_to_path:
                         if not f.done():
                             f.cancel()

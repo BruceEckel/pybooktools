@@ -17,7 +17,6 @@ def run_script(script_path: Path) -> ScriptResult:
     Ensures the script's parent directory is on PYTHONPATH so it can import from its parent.
     """
     python_exec = get_virtual_env_python()
-    # console.log(f"[dim]Using Python interpreter:[/] {python_exec}")
 
     env = os.environ.copy()
     parent_dir = script_path.parent.parent.resolve()
@@ -31,7 +30,8 @@ def run_script(script_path: Path) -> ScriptResult:
     )
 
     if result.returncode != 0:
-        warn(f"Error running script {script_path}")
+        err_msg = f"Error running script {script_path}, {result.stderr}"
+        warn(err_msg)
         syntax = Syntax(
             script_path.read_text(encoding="utf-8"),
             "python",
@@ -39,7 +39,6 @@ def run_script(script_path: Path) -> ScriptResult:
             line_numbers=True,
         )
         console.print(syntax)
-        warn(f"{result.stderr}")
-        return ScriptResult(result.returncode, result.stderr)
+        return ScriptResult(result.returncode, err_msg)
 
-    return ScriptResult(result.returncode, result.stdout)
+    return ScriptResult(0, result.stdout)

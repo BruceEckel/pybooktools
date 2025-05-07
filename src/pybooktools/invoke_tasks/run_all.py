@@ -15,7 +15,7 @@ from invoke import task
 from rich.console import Console
 
 from pybooktools.invoke_tasks.find_python_files import find_python_files
-from pybooktools.run_scripts.run_scripts_parallel import run_scripts_parallel
+from pybooktools.run_scripts.run_all_scripts import run_scripts_parallel
 
 console = Console()
 
@@ -50,32 +50,7 @@ def examples(ctx, target_dir: str = ".", throttle_limit: Optional[int] = None) -
         console.print("❗ No Python files found.", style="bold red")
         sys.exit(1)
 
-    # if throttle_limit is None:
-    #     try:
-    #         import os
-    #         throttle_limit = os.cpu_count() or 1
-    #     except (AttributeError, ValueError):
-    #         throttle_limit = 1
-    #
-    # console.print(
-    #     f"🚀 Running {len(python_files)} scripts in parallel (ThrottleLimit = {throttle_limit})",
-    #     style="green"
-    # )
-
     results = run_scripts_parallel(python_files)
-
-    # with ThreadPoolExecutor(max_workers=throttle_limit) as executor:
-    #     future_to_file = {
-    #         executor.submit(run_script, file, failure_event): file
-    #         for file in python_files
-    #     }
-    #     for future in as_completed(future_to_file):
-    #         result = future.result()
-    #         results.append(result)
-    #         if not result.success and not result.skipped:
-    #             console.print(f"\nFailed: {result.path}\n{result.error}", style="bold red")
-    #             failure_event.set()
-    #             break
 
     if any(res.return_code != 0 for res in results):
         console.print("\n❌ One or more scripts failed.", style="bold red")
