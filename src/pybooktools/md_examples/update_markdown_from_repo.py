@@ -23,8 +23,8 @@ def update_markdown_with_repo_examples(markdown_file: Path, example_repo: Path) 
     from the given repository directory.
 
     A slug line is defined as the first line in the fenced code block that is a comment,
-    for example: "# example_1.py" or "// example_1.py". The Python file in the repo directory
-    with that filename is read and its content is inserted in a new fenced block (with the
+    for example, "# example_1.py" or "// example_1.py". The Python file in the repo directory
+    with that filename is read, and its content is inserted in a new fenced block (with the
     "python" language tag).
 
     Code blocks with slug lines containing a '/' character are ignored; these are book utilities.
@@ -38,7 +38,7 @@ def update_markdown_with_repo_examples(markdown_file: Path, example_repo: Path) 
         A new version of the Markdown file as a string, with the fenced examples replaced
         by the contents of the corresponding Python files.
     """
-    # Read the original markdown content.
+    # Read the original Markdown content.
     markdown_text = markdown_file.read_text(encoding="utf-8")
 
     # Pattern to match a fenced python code block starting with a slug line.
@@ -47,10 +47,10 @@ def update_markdown_with_repo_examples(markdown_file: Path, example_repo: Path) 
     # Group 3: the filename from the slug line (e.g. "example_1.py")
     # Group 4: the rest of the code block (which will be replaced)
     fenced_python_block = re.compile(
-        r"(```python\s*\n)"  # opening fence with language tag.
+        r"(```python\s*\n)"  # Opening fence with language tag.
         r"(\s*(?:#|//)\s*(\S+\.py)\s*\n)"  # slug line: commented filename.
         r"(.*?)"  # the rest of the code block.
-        r"\n```",  # closing fence.
+        r"\n```",  # Closing fence.
         re.DOTALL
     )
 

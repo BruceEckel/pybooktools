@@ -4,7 +4,9 @@ from pathlib import Path
 from cyclopts import App
 from cyclopts.types import ResolvedExistingDirectory
 
-from pybooktools.md_examples.update_markdown_from_repo import pc, nc, update_markdown_with_repo_examples, console
+from pybooktools.md_examples.update_markdown_from_repo import (
+    pc, nc, update_markdown_with_repo_examples, console
+)
 
 app = App(
     version_flags=[],
