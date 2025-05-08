@@ -34,7 +34,9 @@ mdvalid = "pybooktools.pymarkdown_validator.validate:app"
 mdextract = "pybooktools.md_examples.extractor:app"
 # Inject examples from example_repo to Markdown
 mdinject = "pybooktools.md_examples.injector:app"
-# Remove chapter directories from example repository
+# Insert a single example from example_repo into corresponding Markdown chapter
+mdinsert = "pybooktools.md_examples.insert_one_example_into_chapter:app"
+# Remove chapter directories from the example repository
 repoclean = "pybooktools.repo_cleaner.clean_example_repo:app"
 # Create an interactive browser presentation from a Markdown file
 mdpresent = "pybooktools.presentation.md_presentation:main"

@@ -18,7 +18,7 @@ app = App(
 
 @app.command(name="-i")
 def update_markdown_files(markdown_files: ResolvedExistingDirectory, example_repo: ResolvedExistingDirectory) -> None:
-    """ Inject examples from example_repo into markdown files"""
+    """ Inject examples from example_repo into Markdown files"""
     """
     For each Markdown file in the directory `markdown_files`, produces the corresponding
     subdirectory under `example_repo` by lowercasing the file name (without the trailing '.md').
@@ -48,7 +48,7 @@ def update_markdown_files(markdown_files: ResolvedExistingDirectory, example_rep
                 console.print(f"[red]Error processing[/red] {md_file.name}: {err}")
                 continue
 
-            # Overwrite the markdown file with the updated content.
+            # Overwrite the Markdown file with the updated content.
             if updated_content != md_file.read_text(encoding="utf-8"):
                 md_file.write_text(updated_content, encoding="utf-8")
                 console.print(f"[green]Updated[/green] {pc(md_file.name)} with {pc(repo_subdir.name)}")
