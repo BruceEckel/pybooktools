@@ -2,9 +2,17 @@ import difflib
 import re
 from pathlib import Path
 
-from cyclopts import App
+from cyclopts import App, Parameter
 from cyclopts.types import ResolvedExistingPath
 from rich.console import Console
+from rich.panel import Panel
+from rich.traceback import install
+
+from pybooktools.util import config
+
+# Install a rich handler that shows syntax-highlighted code snippets,
+# local variables, and “pretty” formatting.
+install(show_locals=True, width=120)
 
 console = Console()
 
@@ -12,7 +20,7 @@ app = App(
     version_flags=[],
     help_flags="-h",
     help=__doc__,
-    # default_parameter=Parameter(negative=()),
+    default_parameter=Parameter(negative=()),
 )
 
 
@@ -26,8 +34,8 @@ def nc(notification: str) -> str:
     return f"[dark_orange]{notification}[/dark_orange]"
 
 
-@app.command(name="-i")
-def insert_example(example_path: ResolvedExistingPath, replace: bool = False) -> None:
+@app.default
+def insert_example(example_path: ResolvedExistingPath, replace: bool = False, verbose: bool = True) -> None:
     """
     Using example_path, figures out:
     1. What Markdown chapter this example came from (by matching the lowercase
@@ -42,7 +50,7 @@ def insert_example(example_path: ResolvedExistingPath, replace: bool = False) ->
 
     # 1️⃣ Locate the chapter file by matching its stem.lower() to chapter_key
     markdown_file: Path | None = None
-    for md in Path.cwd().rglob("*.md"):
+    for md in config.book_chapters.rglob("*.md"):
         if md.stem.lower() == chapter_key:
             markdown_file = md
             break
@@ -50,7 +58,7 @@ def insert_example(example_path: ResolvedExistingPath, replace: bool = False) ->
     if markdown_file is None:
         raise FileNotFoundError(f"Could not find chapter file for '{chapter_key}'")
 
-    console.print(nc("Found chapter ") + pc(str(markdown_file)))
+    console.print(pc(str(markdown_file)))
     markdown_text = markdown_file.read_text(encoding="utf-8")
 
     # 2️⃣ Find the existing fenced python block with the slug line
@@ -64,11 +72,32 @@ def insert_example(example_path: ResolvedExistingPath, replace: bool = False) ->
     if not match:
         raise ValueError(f"Could not locate code block for {example_name} in {markdown_file}")
 
-    old_content = match.group("content").rstrip()
+    # 3️⃣ Extract the old content including the slug line
+    full_block = match.group(0)
+    block_lines = full_block.splitlines()
+    # drop the opening and closing fences, keeping slug + code lines
+    old_content = "\n".join(block_lines[1:-1]).rstrip()
     new_content = example_path.read_text(encoding="utf-8").rstrip()
 
-    # 3️⃣ Compare and handle accordingly
+    # Compare and handle accordingly
     if old_content != new_content:
+        if verbose:
+            # Display panels for before/after
+            panel = Panel(
+                old_content,
+                title=f"Markdown: {example_name}",
+                title_align="left",
+                style="dark_orange",
+            )
+            console.print(panel)
+            panel = Panel(
+                new_content,
+                title=f"Example: {example_name}",
+                title_align="left",
+                style="dark_orange",
+            )
+            console.print(panel)
+
         # Show unified diff
         diff = difflib.unified_diff(
             old_content.splitlines(),
@@ -82,9 +111,11 @@ def insert_example(example_path: ResolvedExistingPath, replace: bool = False) ->
 
         # 4️⃣ Replace if requested
         if replace:
-            new_block = f"```python\n{new_content}\n```"
+            # Reconstruct a new block with slug line + updated content
+            slug_line = block_lines[1]
+            new_block = f"```python\n{slug_line}\n{new_content}\n```"
             updated = block_re.sub(new_block, markdown_text, count=1)
             markdown_file.write_text(updated, encoding="utf-8")
             console.print(nc("Replaced example ") + pc(example_name))
     else:
-        console.print(nc("No changes for ") + pc(example_name))
+        console.print(nc("No update: ") + pc(example_name))
