@@ -1,7 +1,10 @@
 # config.py
 import re
+from pathlib import Path
 from re import Pattern
 from typing import Final
+
+book_chapters = Path(r"C:\git\ThinkingInTypes.github.io\Chapters")
 
 chapter_pattern: Final[str] = r"^[CZ](\d+)_.+\.md$"
 
