@@ -48,11 +48,11 @@ class ExampleUpdater:
             print(f"update_output Updating {self.example_name}")
         with_tls_tags = insert_top_level_separators(self.cleaned_code)
         tls_tagged = self.__write_with_ext(with_tls_tags, "1_tls_tags")
-        returncode, result_value = run_script(tls_tagged)
-        if returncode != 0:
+        return_code, result_value = run_script(tls_tagged)
+        if return_code != 0:
             if not self.verbose:
                 self.remove_validate_dir()
-            return f"Failed: {self.example_path.parent}/{self.example_name}    {returncode = }"
+            return f"Failed: {self.example_path.parent}/{self.example_name}    {return_code = }"
         self.__write_with_ext(result_value, "2_output", "txt")
         tls_tag_dict = tls_tags_to_dict(result_value, wrap=wrap)
         self.__write_with_ext(
