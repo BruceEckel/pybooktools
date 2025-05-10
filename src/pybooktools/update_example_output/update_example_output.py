@@ -78,8 +78,6 @@ def process_example(example_path: Path, verbose=False, wrap: bool = True) -> str
     """Process a single example"""
     if verbose:
         print(f"process({example_path}, verbose={verbose}, wrap={wrap}) ...")
-    # if "# R:" in example_path.read_text():
-    #     return f"Skipping {example_path.name} because it has '# R:' comments"
     return ExampleUpdater(example_path, verbose=verbose).update_output(wrap=wrap)
 
 
@@ -103,8 +101,8 @@ def update_examples(files: list[PyExample], *, opts: Optional[OptFlags] = None) 
 
 @app.command(name="-a", sort_key=2)
 def update_all_examples_in_dir(
-    target_dir: ExistingDirectory = Path("."),
-    opts: Optional[OptFlags] = None
+        target_dir: ExistingDirectory = Path("."),
+        opts: Optional[OptFlags] = None
 ) -> None:
     """All: Update all Python examples in specified directory [.]"""
     opts = opts or OptFlags()
