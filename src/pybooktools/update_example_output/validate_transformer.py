@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from pybooktools.util import config
+
 
 @dataclass
 class UseCase:
@@ -124,9 +126,9 @@ DIVIDER = "****"
 
 def report(test: bool, case_id: int) -> str:
     if test:
-        return "\n" + f" Case {case_id} passed ".center(47, "=")
+        return "\n" + f" Case {case_id} passed ".center(config.LINE_LENGTH, "=")
     else:
-        return f" Case {case_id} failed ".center(47, "=")
+        return f" Case {case_id} failed ".center(config.LINE_LENGTH, "=")
 
 
 passed = lambda case_id: report(True, case_id)

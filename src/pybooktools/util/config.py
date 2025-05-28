@@ -4,6 +4,9 @@ from pathlib import Path
 from re import Pattern
 from typing import Final
 
+LINE_LENGTH: Final[int] = 65
+# 65 is for slide width
+
 book_chapters = Path(r"C:\git\ThinkingInTypes.github.io\Chapters")
 
 chapter_pattern: Final[str] = r"^[CZ](\d+)_.+\.md$"

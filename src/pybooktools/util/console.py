@@ -1,4 +1,6 @@
 # console.py
 from rich.console import Console
 
-console = Console(width=65)
+from pybooktools.util import config
+
+console = Console(width=config.LINE_LENGTH)

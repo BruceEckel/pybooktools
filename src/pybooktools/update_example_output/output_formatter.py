@@ -2,11 +2,13 @@
 import textwrap
 from typing import Any
 
+from pybooktools.util import config
+
 
 def output_format(arg: Any, wrap: bool = True) -> list[str]:
     arg = str(arg)
     if wrap:
-        lines: list[str] = textwrap.wrap(arg, width=47)
+        lines: list[str] = textwrap.wrap(arg, width=config.LINE_LENGTH)
     else:
         lines = [arg]
     # Prepend '## ' to each line
