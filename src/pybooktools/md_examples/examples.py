@@ -104,6 +104,7 @@ def examples_with_sluglines(
         if (fence_tags is None or block.fence_tag in fence_tags)
         if (lines := block.content.splitlines())
         if (match := slug_pattern.match(lines[0]))
+        if ("_.py" is not match.group(1))  # Do not extract unfinished examples
     ]
 
 
