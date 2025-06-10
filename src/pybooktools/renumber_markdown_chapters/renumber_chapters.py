@@ -15,6 +15,7 @@ from pybooktools.util.path_utils import sanitize_title
 class MarkdownChapterID:
     path: Path
     _number: int = field(init=False)
+    chapter_title: str = field(init=False)
     root_name: str = field(init=False)  # Does not include _number or '.md'
     appendix: bool = False
     chapternum_width: ClassVar[int] = 2
@@ -32,7 +33,8 @@ class MarkdownChapterID:
         with self.path.open(encoding="utf-8") as file:
             headline = file.readline()
         if headline.startswith("# "):
-            self.root_name = sanitize_title(headline[2:].strip())
+            self.chapter_title = headline[2:].strip()
+            self.root_name = sanitize_title(self.chapter_title)
         else:
             raise ValueError(f"{self.path.name} must start with a single-# headline.")
 
@@ -44,7 +46,8 @@ class MarkdownChapterID:
 
     def yaml_entry(self) -> str:
         tag = "A" if self.appendix else ""
-        title = f"{tag}{self._number}: {self.root_name.replace('_', ' ').replace("Appendix ", "")}"
+        # title = f"{tag}{self._number}: {self.root_name.replace('_', ' ').replace("Appendix ", "")}"
+        title = f"{tag}{self._number}. {self.chapter_title.replace("Appendix: ", "")}"
         return f"  - '{title}': {self.file_name()}"
 
     @property
